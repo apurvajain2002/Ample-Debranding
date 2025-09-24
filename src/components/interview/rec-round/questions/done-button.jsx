@@ -1,0 +1,73 @@
+import { useState } from "react";
+import Tooltip from "../../../miscellaneous/tooltip";
+
+const DoneButton = ({ type, stopAudioRecording, stopVideoRecording }) => {
+  const [recording, setRecording] = useState(true);
+
+  if (type === "audio") {
+    return (
+      <div className="robochart user-chatt">
+        <div className="chatt-round roboround"></div>
+        <div className="rochat-wrap">
+          <div className="chatt-text">
+            <div
+              className={"recImgDiv"}
+              style={{ width: "60px", position: "unset", padding: "0" }}
+            >
+              <ul className="rec-image">
+                <li>
+                  <div className="rec-round pulse"></div>
+                </li>
+                <li>REC</li>
+              </ul>
+              <br />
+            </div>
+          </div>
+          <div className="btn-wr user-btnside">
+            <a
+              className="waves-effect waves-light btn-large left btn-mcw-robo right"
+              href="#"
+              onClick={() => {
+                stopAudioRecording();
+                setRecording(false);
+              }}
+              style={
+                recording
+                  ? { backgroundColor: "red", color: "white" }
+                  : { backgroundColor: "#00bf7e", color: "white" }
+              }
+            >
+              Stop Recording
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Video JSX
+  return (
+    <div className="btn-wr" style={{ textAlign: 'center', marginTop: '20px' }}>
+      <a
+        href="#"
+        className="waves-effect waves-light btn btn-clear btn-submit btn-small"
+        onClick={stopVideoRecording}
+        style={{ marginRight: '10px' }}
+      >
+        DONE
+      </a>
+
+      <i
+        className="show-details infermation-ico-black"
+        style={{ padding: "0" }}
+      >
+        i
+        <Tooltip divTagCssClasses={"infbox-click-done information-box-done"}>
+          <p>Press Done, once you have finished recording your answer</p>
+        </Tooltip>
+      </i>
+    </div>
+  );
+};
+
+export default DoneButton;

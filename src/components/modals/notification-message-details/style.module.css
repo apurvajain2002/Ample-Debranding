@@ -1,0 +1,8 @@
+.notification-msg-details-modal{
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+.notification-msg-content-details{
+    padding-right: 5px !important;
+}
