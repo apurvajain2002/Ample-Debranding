@@ -8,5 +8,5 @@ export const OAUTH = {
   CLIENT_ID: "ev-client-1",
   CLIENT_SECRET: "egov",
   GRANT_TYPE: "authorization_code",
-  REDIRECT_URI: process.env.REACT_APP_APP_API_REDIRECT_URL,
+    REDIRECT_URI: `${window.location.protocol}//${window.location.host}/oauth2/callback`,
 };
