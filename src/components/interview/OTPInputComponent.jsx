@@ -37,7 +37,7 @@ const OTPInputComponent = ({
                   }
                 }}
                 type="number"
-                placeholder={"Enter OTP"}
+                placeholder={"Enter verification code"}
                 // maxLength={6}
                 style={{ background: "#fff", border: "none" }}
                 autoComplete={"off"}
@@ -54,12 +54,12 @@ const OTPInputComponent = ({
             </div>
             <NormalButton
               buttonTagCssClasses={"btn-large otp-btn"}
-              buttonText={"Resend OTP"}
+              buttonText={"Resend verification code"}
               onClick={handleResendOtp}
             />
             <NormalButton
               buttonTagCssClasses={"btn-large otp-btn"}
-              buttonText={"Verify OTP"}
+              buttonText={"Verify verification code"}
               disabled={otp.length < 6}
               onClick={handleVerifyOTP}
             />

@@ -387,21 +387,47 @@ const InviteCandidates = () => {
 
   useEffect(() => {
     if (location?.state) {
-      const { candidateInvitation } = location.state;
-      const { emailAddress, username, mobileNumber, whatsappNumber } = candidateInvitation || {};
-
-      const emailId = `${emailAddress ? `${emailAddress}, ` : username ? `${username}, ` : ""}`
-      const phoneNumber = `${mobileNumber ? `${mobileNumber}` : whatsappNumber ? `${whatsappNumber}` : ""}`
-      const candidateDetails = emailId.concat(phoneNumber);
-      setCandidatesToInvite(candidateDetails);
-      if (candidateInvitation?.interviewRound) {
-        dispatch(setRoundName(candidateInvitation?.interviewRound));
+      const { candidateInvitation, candidateInvitations } = location.state;
+      
+      // Handle multiple candidates
+      if (candidateInvitations && Array.isArray(candidateInvitations)) {
+        const candidateDetails = candidateInvitations.map(candidate => {
+          const { emailAddress, username, mobileNumber, whatsappNumber } = candidate || {};
+          const emailId = `${emailAddress ? `${emailAddress}, ` : username ? `${username}, ` : ""}`;
+          const phoneNumber = `${mobileNumber ? `${mobileNumber}` : whatsappNumber ? `${whatsappNumber}` : ""}`;
+          return emailId.concat(phoneNumber);
+        }).join('\n'); // Join multiple candidates with newlines
+        
+        setCandidatesToInvite(candidateDetails);
+        
+        // Handle other properties from the first candidate (if needed)
+        if (candidateInvitations[0]?.interviewRound) {
+          dispatch(setRoundName(candidateInvitations[0]?.interviewRound));
+        }
+        if (candidateInvitations[0]?.vacancyLocations) {
+          setSelectedLocation(candidateInvitations[0]?.vacancyLocations);
+        }
+        if (candidateInvitations[0]?.agencyName) {
+          setSelectedPlacementAgency(candidateInvitations[0]?.agencyName);
+        }
       }
-      if (candidateInvitation?.vacancyLocations) {
-        setSelectedLocation(candidateInvitation?.vacancyLocations);
-      }
-      if (candidateInvitation?.agencyName) {
-        setSelectedPlacementAgency(candidateInvitation?.agencyName);
+      // Handle single candidate (backward compatibility)
+      else if (candidateInvitation) {
+        const { emailAddress, username, mobileNumber, whatsappNumber } = candidateInvitation || {};
+        const emailId = `${emailAddress ? `${emailAddress}, ` : username ? `${username}, ` : ""}`;
+        const phoneNumber = `${mobileNumber ? `${mobileNumber}` : whatsappNumber ? `${whatsappNumber}` : ""}`;
+        const candidateDetails = emailId.concat(phoneNumber);
+        setCandidatesToInvite(candidateDetails);
+        
+        if (candidateInvitation?.interviewRound) {
+          dispatch(setRoundName(candidateInvitation?.interviewRound));
+        }
+        if (candidateInvitation?.vacancyLocations) {
+          setSelectedLocation(candidateInvitation?.vacancyLocations);
+        }
+        if (candidateInvitation?.agencyName) {
+          setSelectedPlacementAgency(candidateInvitation?.agencyName);
+        }
       }
     }
   }, [location])
@@ -1014,8 +1040,9 @@ const InviteCandidates = () => {
                     <a
                       href="javascript:void(0)"
                       className={`waves-effect waves-light btn btn-clear btn-submit ${isSubmitDisabled && 'btn-disabled'}`}
+                      style={isInviteCandidateButtonDisable ? { backgroundColor: '#666666' } : {}}
                       onClick={() => {
-                        if (isSubmitDisabled) return;
+                        if (isSubmitDisabled || isInviteCandidateButtonDisable) return;
                         handleInterviewLinkInviteDetails()
                       }}
                     >

@@ -52,9 +52,11 @@ const SwitchInputFieldContainer = ({
           checked={checked}
           onChange={onChange}
         />
-        <span style={{ marginLeft: "-10px" }}>
-          {spanText}{" "}
-          <i className="show-details infermation-ico-black ">
+        <div className="switch-text-container">
+          <span className="switch-text">
+            {spanText}
+          </span>
+          <i className="show-details infermation-ico-black switch-icon">
             i
             <Tooltip divTagCssClasses={"infbox-click"}>
               <p>
@@ -62,7 +64,7 @@ const SwitchInputFieldContainer = ({
               </p>
             </Tooltip>
           </i>
-        </span>{" "}
+        </div>
       </li>
     </ul>
   );
@@ -73,7 +75,8 @@ const PublishQuestions = () => {
     cameraOn: false,
     randomizeCompetencyQuestions: false,
     randomizeCompetencySections: false,
-    isRoundPublished: false
+    isRoundPublished: false,
+    randomiseMcqOptions:false
   });
   const [chooseNextStep, setChooseNextStep] = useState("");
   const [showPublishingModal, setShowPublishingModal] = useState(false);
@@ -91,7 +94,8 @@ const PublishQuestions = () => {
   const isPublished = roundName === 'L1 Hiring Manager Round' 
   ? l1Round?.isRoundPublished 
   : recruiterRound?.isRoundPublished;
-
+  console.log("isPublished",isPublished);
+  
   const handleOnChangeSwitchOptions = (e) => {
     const { name, checked } = e.target;
     setPublishInfo((prevState) => ({
@@ -155,7 +159,8 @@ const PublishQuestions = () => {
           'jobId': currentJobId,
           'cameraOn': publishInfo.cameraOn,
           'randomiseCompetancySections': publishInfo.randomizeCompetencySections,
-          'randomiseCompetancyQuestions': publishInfo.randomizeCompetencyQuestions
+          'randomiseCompetancyQuestions': publishInfo.randomizeCompetencyQuestions,
+          'randomiseMcqOptions': publishInfo.randomiseMcqOptions
         }
       );
       
@@ -171,6 +176,7 @@ const PublishQuestions = () => {
           }));
           SuccessToast("Interview published successfully");
         }
+        ErrorToast(data.message);
       }, 5000);
 
     } catch (error) {
@@ -194,7 +200,7 @@ const PublishQuestions = () => {
       }
       </h6>
       <div className="radios col s12" >
-        <div className="col l3 m10 s12 large-screen-center-small-screen-start">
+        <div className="col l3 m6 s12 large-screen-center-small-screen-start">
           <SwitchInputFieldContainer
             switchInputFieldIdAndName="cameraOn"
             checked={publishInfo.cameraOn}
@@ -203,7 +209,7 @@ const PublishQuestions = () => {
             tooltipText="When turned ON, the candidate's camera will remain on while they answer all skill-based questions"
           />
         </div>
-        <div className="col l4 m12 s12 large-screen-center-small-screen-start">
+        <div className="col l4 m6 s12 large-screen-center-small-screen-start">
           <SwitchInputFieldContainer
             switchInputFieldIdAndName="randomizeCompetencyQuestions"
             checked={publishInfo.randomizeCompetencyQuestions}
@@ -212,7 +218,7 @@ const PublishQuestions = () => {
             tooltipText="When turned ON, questions within each competency section will be shuffled and delivered in a random order to different candidates"
           />
         </div>
-        <div className="col l4 m12 s12 large-screen-center-small-screen-start">
+        <div className="col l4 m6 s12 large-screen-center-small-screen-start">
           <SwitchInputFieldContainer
             switchInputFieldIdAndName="randomizeCompetencySections"
             checked={publishInfo.randomizeCompetencySections}
@@ -221,13 +227,13 @@ const PublishQuestions = () => {
             tooltipText="When turned ON, the order of competency sections will vary for each candidate"
           />
         </div>
-        <div className="col l4 m12 s12 large-screen-center-small-screen-start">
+        <div className="col l4 m6 s12 large-screen-center-small-screen-start">
           <SwitchInputFieldContainer
-            switchInputFieldIdAndName="randomizeMCQOptions"
-            checked={publishInfo.randomizeCompetencySections}
+            switchInputFieldIdAndName="randomiseMcqOptions"
+            checked={publishInfo.randomiseMcqOptions}
             onChange={(e) => handleOnChangeSwitchOptions(e)}
             spanText="Randomize MCQ Options"
-            tooltipText="When turned ON, the order of competency sections will vary for each candidate"
+            tooltipText="When turned ON, the order of MCQ options will vary for each candidate"
           />
         </div>
       </div>

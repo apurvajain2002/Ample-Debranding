@@ -6,7 +6,6 @@ import { useGlobalContext } from "../../../context";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSelectedCandidateInfo } from "../../../redux/actions/interview-responses-l1-dashboard-actions";
-
 const userData = {
   name: "Preeti Sharma",
   email: "preetisarma@gmail.com",
@@ -44,11 +43,12 @@ const UserProfile = () => {
 
   const { rootColor } = useGlobalContext();
   const dispatch = useDispatch();
+  const userid = useSelector((state)=>state.signinSliceReducer.userId);
 
   const { userDetailsInfo } = useSelector((state) => state.interviewResponsesL1DashboardSliceReducer);
 
   useEffect(() => {
-    dispatch(fetchSelectedCandidateInfo({ id: '2499' }));
+    dispatch(fetchSelectedCandidateInfo({ id: userid }));
   }, []);
 
   console.log('userDetailsInfo ', userDetailsInfo)

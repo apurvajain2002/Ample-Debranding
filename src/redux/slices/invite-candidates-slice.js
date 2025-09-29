@@ -305,6 +305,7 @@ export const {
   setCustomLinkGenerated,
   setInterviewLinkInviteDetailsApiCalled,
   setInviteCandidateButtonDisable,
+  isInviteCandidateButtonDisable
 } = inviteCandidatesSlice.actions;
 
 const inviteCandidatesSliceReducer = inviteCandidatesSlice.reducer;

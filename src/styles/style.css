@@ -7147,7 +7147,7 @@ table .moreoutder-wrap {
   float: left;
   text-align: center;
   border-right: 1px solid #d3d3d3;
-  padding-right: 30px;
+  padding-right: 10px;
 }
 
 .candnamewr h3 {
@@ -12535,5 +12535,42 @@ input[type="range"] {
   }
   to {
       width: 100%;
+  }
+}
+
+/* Switch Text Container Responsive Styles */
+.switch-text-container {
+  display: flex;
+  align-items: center;
+  margin-left: -10px;
+}
+
+.switch-text {
+  margin-right: 5px;
+}
+
+.switch-icon {
+  display: inline-block;
+}
+
+/* Medium screens and below - move icon to new line */
+@media only screen and (max-width: 992px) {
+  .switch-text-container {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 0;
+    margin-top: 5px;
+  }
+  
+  .switch-text {
+    margin-right: 0;
+    margin-bottom: 3px;
+  }
+  
+  .switch-icon {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    line-height: 1;
   }
 }

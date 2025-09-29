@@ -9,7 +9,7 @@ import handleDate from "../../../utils/handleDate.js";
 import { dateFormatter } from "../../../utils/dateFormatter.js";
 import { saveUserProfile } from "../../../redux/actions/interview-responses-l1-dashboard-actions";
 import { useDispatch,useSelector } from "react-redux";
-
+  
 const EditProfile2 = () => {
   const inputFieldCssClasses = "input-field col xl4 l4 m6 s12";
   const {
@@ -34,7 +34,7 @@ const EditProfile2 = () => {
   const [workStartDate, setWorkStartDate] = useState("");
   const [workEndDate, setWorkEndDate] = useState("");
   const dispatch = useDispatch();
-  const { userDetailsInfo } = useSelector((state) => state.interviewResponsesL1DashboardSliceReducer);
+  const { userDetailsInfo, selectedCandidateInfo } = useSelector((state) => state.interviewResponsesL1DashboardSliceReducer);
   // Helper function to convert date format from DD/MM/YYYY to YYYY-MM-DD
   const convertDateFormat = (dateString) => {
     if (!dateString) return "";
@@ -103,15 +103,99 @@ const EditProfile2 = () => {
     };
     handleDate("dateOfBirth", callback);
   };
-  const {id, username , totalExperience, higherEducation} = userDetailsInfo;
+  const sourceData = selectedCandidateInfo || userDetailsInfo;
+  const id = sourceData?.id === '-' ? undefined : sourceData?.id;
+  const username = sourceData?.username === '-' ? undefined : sourceData?.username;
+  const totalExperience = sourceData?.totalExperience === '-' ? '' : sourceData?.totalExperience;
+  const higherEducation = sourceData?.higherEducation === '-' ? '' : sourceData?.higherEducation;
+  
+  // Debug logging for selectedCandidateInfo and userDetailsInfo
+  console.log('selectedCandidateInfo:', selectedCandidateInfo);
+  console.log('userDetailsInfo:', userDetailsInfo);
+  console.log('Extracted values - id:', id, 'username:', username, 'totalExperience:', totalExperience, 'higherEducation:', higherEducation);
   const handleSave = async () => {
     try {
+     
       const formData = new FormData();
-      formData.append('userProfileDTO', JSON.stringify({...userProfile, id, username , totalExperience, higherEducation}));
-      formData.append('resumeFile',userCV );
+      
+      // Ensure we have valid id and username from selectedCandidateInfo
+      const userId = id || selectedCandidateInfo?.id || userDetailsInfo?.id;
+      const userUsername = username || selectedCandidateInfo?.username || userDetailsInfo?.username;
+      console.log('userId', userId);
+      console.log('userUsername', userUsername);
+      console.log('userProfile', userProfile);
+      
+      if (!userId || !userUsername) {
+        console.error('Missing required fields: id or username');
+        return;
+      }
+      
+      // Process workExperience to ensure userId is set
+      const processedWorkExperience = (userProfile.workExperience || []).map((item) => ({
+        ...item,
+        userId: userId,
+      }));
+      
+      // Process userAcademics to ensure userId is set
+      const processedUserAcademics = (userProfile.userAcademics || []).map((item) => ({
+        ...item,
+        userId: userId,
+      }));
+      
+      // Process userSocialProfileDTO to ensure proper structure and userId is set
+      const processedUserSocialProfileDTO = {
+        userSocialId: userProfile.userSocialProfileDTO?.userSocialId || 1,
+        userId: userId,
+        linkedInProfile: userProfile.userSocialProfileDTO?.linkedInProfile || "",
+        facebookProfile: userProfile.userSocialProfileDTO?.facebookProfile || "",
+        stackOverflowProfile: userProfile.userSocialProfileDTO?.stackOverflowProfile || "",
+        twitterProfile: userProfile.userSocialProfileDTO?.twitterProfile || "",
+        githubUsername: userProfile.userSocialProfileDTO?.githubUsername || "",
+        personalWebsite: userProfile.userSocialProfileDTO?.personalWebsite || "",
+        blogUrl: userProfile.userSocialProfileDTO?.blogUrl || "",
+        resumeUrl: userProfile.userSocialProfileDTO?.resumeUrl || null,
+        photoUrl: userProfile.userSocialProfileDTO?.photoUrl || null,
+      };
+      
+      // Construct the complete payload with all required fields
+      const userProfilePayload = {
+        id: userId,
+        firstName: userProfile.firstName || "",
+        lastName: userProfile.lastName || "",
+        username: userUsername,
+        mobileNumber1: userProfile.mobileNumber1 || "",
+        mobileNumber2: userProfile.mobileNumber2 || "",
+        primaryEmailId: userProfile.primaryEmailId || "",
+        secondaryEmailId: userProfile.secondaryEmailId || "",
+        whatsappNumber: userProfile.whatsappNumber || "",
+        currentLocation: userProfile.currentLocation || "",
+        currentCTC: userProfile.currentCTC || "",
+        fixedCTC: userProfile.fixedCTC || "",
+        variableCTC: userProfile.variableCTC || "",
+        noticePeriod: userProfile.noticePeriod || "",
+        totalExperience: totalExperience || "",
+        higherEducation: higherEducation || "",
+        dateOfBirth: userProfile.dateOfBirth || "",
+        negotiableNoticePeriod: userProfile.negotiableNoticePeriod || "",
+        workExperience: processedWorkExperience,
+        userAcademics: processedUserAcademics,
+        userSocialProfileDTO: processedUserSocialProfileDTO
+      };
+      
+      // Log the payload for debugging
+      console.log('User Profile Payload:', userProfilePayload);
+      console.log('Processed Work Experience:', processedWorkExperience);
+      console.log('Processed User Academics:', processedUserAcademics);
+      
+      formData.append('userProfileDTO', JSON.stringify(userProfilePayload));
+      formData.append('resumeFile', userCV);
       formData.append('photoFile', userPhoto);
+      console.log("");
+      
       await dispatch(saveUserProfile(formData)).unwrap();
-    } catch (err) {}
+    } catch (err) {
+      console.error('Error saving user profile:', err);
+    }
   };
 
   const handleWorkExperienceChange = (index, fieldName) => (e) => {
@@ -125,15 +209,16 @@ const EditProfile2 = () => {
   };
 
   const handleAddWorkExperience = () => {
+    const userId = id || selectedCandidateInfo?.id || userDetailsInfo?.id;
     const emptyWorkExperience = {
-      workExperienceId: 2,
-      userId: userDetailsInfo.id,
+      workExperienceId: (userProfile.workExperience?.length || 0) + 1,
+      userId: userId,
       organizationName: "",
       designation: "",
       startDate: "",
       endDate: "",
       workLocation: "",
-      description:"",
+      description: "",
       currentOrganization: false,
     };
     const current = Array.isArray(userProfile.workExperience)
@@ -190,9 +275,10 @@ const EditProfile2 = () => {
   };
 
   const handleAddAcademic = () => {
+    const userId = id || selectedCandidateInfo?.id || userDetailsInfo?.id;
     const emptyAcademic = {
-      userAcademicId: 10,
-      userId: userDetailsInfo.id,
+      userAcademicId: (userProfile.userAcademics?.length || 0) + 1,
+      userId: userId,
       universityName: "",
       degreeName: "",
       startDate: "",
@@ -227,6 +313,43 @@ const EditProfile2 = () => {
     };
   }, []);
 
+  // Initialize userProfile with selectedCandidateInfo or userDetailsInfo values
+  useEffect(() => {
+    const sourceData = selectedCandidateInfo || userDetailsInfo;
+    if (sourceData && Object.keys(sourceData).length > 0) {
+      // Helper function to filter out '-' values and convert to empty string
+      const getValue = (value) => {
+        if (value === '-' || value === null || value === undefined) return "";
+        return value;
+      };
+
+      console.log('Processing sourceData:', sourceData);
+      console.log('currentCTC before processing:', sourceData.currentCTC);
+      console.log('noticePeriod before processing:', sourceData.noticePeriod);
+
+      setUserProfile(prev => ({
+        ...prev,
+        currentCTC: getValue(sourceData.currentCTC),
+        fixedCTC: getValue(sourceData.fixedCTC),
+        variableCTC: getValue(sourceData.variableCTC),
+        noticePeriod: getValue(sourceData.noticePeriod),
+        negotiableNoticePeriod: getValue(sourceData.negotiableNoticePeriod),
+        dateOfBirth: getValue(sourceData.dateOfBirth),
+        firstName: getValue(sourceData.firstName),
+        lastName: getValue(sourceData.lastName),
+        mobileNumber1: getValue(sourceData.mobileNumber1),
+        mobileNumber2: getValue(sourceData.mobileNumber2),
+        primaryEmailId: getValue(sourceData.primaryEmailId),
+        secondaryEmailId: getValue(sourceData.secondaryEmailId),
+        whatsappNumber: getValue(sourceData.whatsappNumber),
+        currentLocation: getValue(sourceData.currentLocation),
+        workExperience: sourceData.workExperience || [],
+        userAcademics: sourceData.userAcademics || [],
+        userSocialProfileDTO: sourceData.userSocialProfileDTO || {},
+      }));
+    }
+  }, [selectedCandidateInfo, userDetailsInfo]);
+
   const handleUserProfileFormChange = (e) => {
     const { name, value } = e.target;
     setUserProfile({ ...userProfile, [name]: value });
@@ -239,7 +362,7 @@ const EditProfile2 = () => {
         inputTagCssClasses: "validate",
         inputTagIdAndName: "currentCTC",
         placeholder: "Current CTC",
-        value: userDetailsInfo.currentCTC,
+        value: userProfile.currentCTC || "",
         onChange: (e) => handleUserProfileFormChange(e),
         required: true,
         labelText: "Current CTC",
@@ -249,7 +372,7 @@ const EditProfile2 = () => {
         inputTagCssClasses: "validate",
         inputTagIdAndName: "fixedCTC",
         placeholder: "Fixed CTC",
-        value: userDetailsInfo.fixedCTC,
+        value: userProfile.fixedCTC || "",
         onChange: (e) => handleUserProfileFormChange(e),
         required: true,
         labelText: "Fixed CTC",
@@ -259,7 +382,7 @@ const EditProfile2 = () => {
         inputTagCssClasses: "validate",
         inputTagIdAndName: "variableCTC",
         placeholder: "Variable CTC",
-        value: userDetailsInfo.variableCTC,
+        value: userProfile.variableCTC || "",
         onChange: (e) => handleUserProfileFormChange(e),
         required: true,
         labelText: "Variable CTC",
@@ -269,7 +392,7 @@ const EditProfile2 = () => {
         inputTagCssClasses: "validate",
         inputTagIdAndName: "noticePeriod",
         placeholder: "Notice Period",
-        value: userDetailsInfo.noticePeriod,
+        value: userProfile.noticePeriod || "",
         onChange: (e) => handleUserProfileFormChange(e),
         required: true,
         labelText: "Notice Period",
@@ -279,7 +402,7 @@ const EditProfile2 = () => {
         inputTagCssClasses: "validate",
         inputTagIdAndName: "negotiableNoticePeriod",
         placeholder: "Negotiable Notice Period",
-        value: userDetailsInfo.negotiableNoticePeriod,
+        value: userProfile.negotiableNoticePeriod || "",
         onChange: (e) => handleUserProfileFormChange(e),
         required: true,
         labelText: "Negotiable Notice Period",
@@ -297,29 +420,47 @@ const EditProfile2 = () => {
       userPhoto,
       "userCV",
       userCV,
+      'selectedCandidateInfo',
+      selectedCandidateInfo,
       'userDetailsInfo',
       userDetailsInfo
     );
-   const workExperience =  userProfile.workExperience.map((item)=>{
-        item.userId = id;
-        return item;
-    })
-   const userAcademics =  userProfile.userAcademics.map((item)=>{
-        item.userId = id;
-        return item;
-    })
+    
+    // Ensure workExperience has userId field
+    const workExperience = (userProfile.workExperience || []).map((item) => ({
+      ...item,
+      userId: id,
+    }));
+    
+    // Ensure userAcademics has userId field
+    const userAcademics = (userProfile.userAcademics || []).map((item) => ({
+      ...item,
+      userId: id,
+    }));
+
+    // Ensure userSocialProfileDTO has proper structure
+    const userSocialProfileDTO = {
+      userSocialId: userProfile.userSocialProfileDTO?.userSocialId || 1,
+      userId: id,
+      linkedInProfile: userProfile.userSocialProfileDTO?.linkedInProfile || "",
+      facebookProfile: userProfile.userSocialProfileDTO?.facebookProfile || "",
+      stackOverflowProfile: userProfile.userSocialProfileDTO?.stackOverflowProfile || "",
+      twitterProfile: userProfile.userSocialProfileDTO?.twitterProfile || "",
+      githubUsername: userProfile.userSocialProfileDTO?.githubUsername || "",
+      personalWebsite: userProfile.userSocialProfileDTO?.personalWebsite || "",
+      blogUrl: userProfile.userSocialProfileDTO?.blogUrl || "",
+      resumeUrl: userProfile.userSocialProfileDTO?.resumeUrl || null,
+      photoUrl: userProfile.userSocialProfileDTO?.photoUrl || null,
+    };
 
     setUserProfile(prev => ({
       ...prev,
       workExperience,
       userAcademics,
-      userSocialProfileDTO: {
-        ...prev.userSocialProfileDTO,
-        userId: id,
-      },
+      userSocialProfileDTO,
     }));
     
-  }, []);
+  }, [id]);
 
   return (
     <div className="container full-height valign-wrapper row-relative">

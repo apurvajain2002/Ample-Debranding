@@ -252,7 +252,7 @@ const L1RoundInterviewSection = ({
           moveToNextQuestion(nextQuestionIfYes, currentScriptType);
           dispatch(setUserId(data.user.id));
         } else {
-          SuccessToast(data.message || "OTP sent successfully!");
+          SuccessToast(data.message || "verification code sent successfully!");
           setOtpValue(String(data.otp));
           setIsOtpSent(true);
           if (proceed) {
@@ -265,7 +265,7 @@ const L1RoundInterviewSection = ({
         }
       }
     } catch (error) {
-      ErrorToast(error.message || "Error sending the OTP!");
+      ErrorToast(error.message || "Error sending the verification code!");
     } finally {
       // setLoading(false);
     }
@@ -306,7 +306,7 @@ const L1RoundInterviewSection = ({
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
     if (otp !== otpValue) {
-      return ErrorToast("Invalid OTP");
+      return ErrorToast("Invalid verification code");
     } else {
       startInterviewMonitoring();
       moveToNextQuestion(currentQuestion.nextQuestionIfYes, currentScriptType);

@@ -316,7 +316,7 @@ const RecruiterRoundInterviewSection = ({
           startInterviewMonitoring(); // Start monitoring after verification
           moveToNextQuestion(nextQuestionIfYes, currentScriptType);
         } else {
-          SuccessToast(data.message || "OTP sent successfully!");
+          SuccessToast(data.message || "verification code sent successfully!");
           setOtpValue(String(data.otp));
           if (data?.user) {
             setFullName(data?.user?.firstName?.concat(' ', data?.user?.lastName));
@@ -332,7 +332,7 @@ const RecruiterRoundInterviewSection = ({
         }
       }
     } catch (error) {
-      ErrorToast(error.message || "Error sending the OTP!");
+      ErrorToast(error.message || "Error sending the verification code!");
     }
     handleSubmitMobile();
   };
@@ -345,7 +345,7 @@ const RecruiterRoundInterviewSection = ({
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
     if (otp !== otpValue) {
-      return ErrorToast("Invalid OTP");
+      return ErrorToast("Invalid verification code");
     } else {
       startInterviewMonitoring(); // Start monitoring after OTP verification
       moveToNextQuestion(currentQuestion.nextQuestionIfYes, currentScriptType);
