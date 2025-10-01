@@ -137,6 +137,11 @@ const CreatejobPosition = ({ currentJobDetails }) => {
   const [count, setCount] = useState(0);
   const [loadingReadFile, setLoadingReadFile] = useState(false);
   const [error, setError] = useState(INITIAL_ERROR_STATE);
+  
+  // Pagination state for domain skills
+  const [domainSkillsPage, setDomainSkillsPage] = useState(1);
+  const DOMAIN_SKILLS_PER_PAGE = 99;
+  
 
   const handleClick = (ref) => {
     ref.current.click();
@@ -193,9 +198,29 @@ const CreatejobPosition = ({ currentJobDetails }) => {
       domainSkills: updatedDomainSkills && updatedDomainSkills.length > 0 ? updatedDomainSkills : null,
     });
   };
-  const availableOptionsDomainSkills = (domainSkillsData || []).filter(
+
+  // Handle "View More" for domain skills pagination
+  const handleViewMoreDomainSkills = () => {
+    setDomainSkillsPage(prevPage => prevPage + 1);
+  };
+  // Get all available domain skills (excluding already selected ones)
+  const allAvailableDomainSkills = (domainSkillsData || []).filter(
     (skill) => !jobPosition.domainSkills?.includes(skill.name)
   );
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(allAvailableDomainSkills.length / DOMAIN_SKILLS_PER_PAGE);
+  const startIndex = (domainSkillsPage - 1) * DOMAIN_SKILLS_PER_PAGE;
+  const endIndex = startIndex + DOMAIN_SKILLS_PER_PAGE;
+  
+  // Get paginated options
+  const availableOptionsDomainSkills = allAvailableDomainSkills.slice(startIndex, endIndex);
+  
+  // Check if there are more pages to show
+  const hasMorePages = domainSkillsPage < totalPages;
+  
+  // console.log("jobPosition---------->",jobPosition.domainSkills,availableOptionsDomainSkills);
+
 
   // TODO: Test the new Typeahead comp for Soft Skills
   const handleOnChangeSoftSkills = (selected) => {
@@ -1005,6 +1030,8 @@ const CreatejobPosition = ({ currentJobDetails }) => {
                   multiple={true}
                   required={false}
                   missing={error.domainSkills}
+                  viewMore={hasMorePages}
+                  handleViewMore={handleViewMoreDomainSkills}
                 />
                 <NewTypeaheadInputField
                   divTagCssClasses="input-field col xl3 l3 m4 s12"

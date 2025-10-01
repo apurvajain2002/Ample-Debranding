@@ -24,7 +24,7 @@ import { baseUrl } from "../../../config/config";
 
 const numberOfDigits = 6;
 const initialTime = 1 * 60;
-const AUTH_API_URL = process.env.REACT_APP_APP_AUTH_URL;
+
 const LoginWithOTP = ({
   resendOtp = false,
   setResendSent = () => { },
@@ -107,7 +107,7 @@ const LoginWithOTP = ({
         response.status === 200 ||
         response.statusText === "OK"
       ) {
-        SuccessToast(data.message || "OTP sent successfully!");
+        SuccessToast(data.message || "verification code sent successfully!");
          navigate("/signin/enter-otp", { state: { ActualOTP: data.otp } });
       }
     } catch (error) {
@@ -127,7 +127,7 @@ const LoginWithOTP = ({
     const nationalNumber = getPhoneNumber(mobileNumber);
 
     if (actualOTP !== stringOtp) {
-      ErrorToast("Invalid OTP!");
+      ErrorToast("Invalid verification code!");
       return;
     }
     if (isModal) {
@@ -143,7 +143,7 @@ const LoginWithOTP = ({
       formData.append("username", nationalNumber);
       formData.append("password", stringOtp);
       const response = await axios.post(
-        `https://${hostname}${AUTH_API_URL}/oauth2/token`,
+        `https://${hostname}-auth.evueme.dev/oauth2/token`,
         // { phoneCode: countryCode, mobileNo: nationalNumber, otp: stringOtp }
         formData
       );
@@ -184,7 +184,7 @@ const LoginWithOTP = ({
         }
       }
     } catch (error) {
-      ErrorToast(error.message || "Invalid OTP!");
+      ErrorToast(error.message || "Invalid verification code!");
     } finally {
       setLoading(false);
     }
@@ -221,7 +221,7 @@ const LoginWithOTP = ({
       >
         <div className="login-wrap-box">
           <h3>Verify your mobile number</h3>
-          <p>We have just sent a 6 digit OTP code to your phone number</p>
+          <p>We have just sent a 6 digit verification code to your phone number</p>
           <div
             className="loginform otp-form"
             onSubmit={handleSubmitOtp}
@@ -250,13 +250,13 @@ const LoginWithOTP = ({
                 i
                 <Tooltip divTagCssClasses={"infbox-click"}>
                   <p>
-                  When the OTP timer reaches 0, click on 'Resend OTP' to receive a new OTP and verify your number.
+                  When the verification code timer reaches 0, click on 'Resend verification code' to receive a new verification code and verify your number.
                   </p>
                 </Tooltip>
               </i>
               </div>
               {/* <p style={{marginRight: '5px'}}> */}
-              Didn't receive OTP?
+              Didn't receive verification code?
               {/* </p> */}
               <font style={{marginLeft: '10px'}}>
                 {otpSent && (
@@ -278,7 +278,7 @@ const LoginWithOTP = ({
     style={{ color: 'red', cursor: 'pointer' }} 
     onClick={handleEnterOTP}
   >
-    Resend OTP
+    Resend verification code
   </span>
 ) : null}
               </font>

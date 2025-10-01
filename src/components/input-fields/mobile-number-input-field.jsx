@@ -74,8 +74,8 @@ export const MobileNumberInputField = ({
       if (data.success || data.status || data.response?.status === "success") {
         // Success message based on whether it's SMS or WhatsApp
         const successMessage = isWhatsapp
-          ? `OTP sent Successfully through WhatsApp on WhatsApp No. ${mobileNumber}!`
-          : `OTP sent successfully through SMS on Mobile No. ${mobileNumber}!`;
+          ? `verification code sent Successfully through WhatsApp on WhatsApp No. ${mobileNumber}!`
+          : `verification code sent successfully through SMS on Mobile No. ${mobileNumber}!`;
 
         SuccessToast(successMessage);
 
@@ -84,7 +84,7 @@ export const MobileNumberInputField = ({
           : setOtp(String(data.otp));
       }
     } catch (error) {
-      ErrorToast(error.message || "Error sending the OTP!");
+      ErrorToast(error.message || "Error sending the verification code!");
     } finally {
       // setLoading(false);
     }
@@ -108,7 +108,7 @@ export const MobileNumberInputField = ({
     if (verified) {
       setIsVerified(verified);
     } else {
-      WarningToast("Invalid OTP");
+      WarningToast("Invalid verification code");
     }
   };
 
@@ -186,7 +186,7 @@ export const MobileNumberInputField = ({
                 ref={modalRef}
               >
                 <span className="text">
-                  Send OTP
+                  Send verification code
                   {/* {showResendOTP ? "Send OTP" : "Verify through OTP"} */}
                 </span>
               </EvuemeModalTrigger>

@@ -48,13 +48,14 @@ const SigninWithEmailPasswordOTP = ({ mobileNumber, setMobileNumber }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { hostname } = useGlobalContext();
-const AUTH_API_URL = process.env.REACT_APP_APP_AUTH_URL;
+
   console.log('hostname sign in with email password otp page ::: ', hostname);
 
   //Handle Login with email password
   const handleLogin = async (e) => {
     e.preventDefault();
-
+    console.log("xxxxxx---------->");
+    
     try {
       setLoading(true);
       setError(INITIAL_ERROR_STATE);
@@ -74,7 +75,7 @@ const AUTH_API_URL = process.env.REACT_APP_APP_AUTH_URL;
         formData.append("username", email);
         formData.append("password", password);
         const response = await axios.post(
-          `https://${hostname}${AUTH_API_URL}/oauth2/token`,
+          `https://${hostname}-auth.evueme.dev/oauth2/token`,
           formData,
           {
             headers: {
@@ -144,11 +145,11 @@ const AUTH_API_URL = process.env.REACT_APP_APP_AUTH_URL;
         response.status === 200 ||
         response.statusText === "OK"
       ) {
-        SuccessToast(data.message || "OTP sent successfully!");
+        SuccessToast(data.message || "verification code sent successfully!");
         navigate("enter-otp", { state: { ActualOTP: data.otp } });
       }
     } catch (error) {
-      ErrorToast(error.message || "Error sending the OTP!");
+      ErrorToast(error.message || "Error sending the verification code!");
     } finally {
       setLoading(false);
     }
@@ -262,7 +263,7 @@ const AUTH_API_URL = process.env.REACT_APP_APP_AUTH_URL;
             />
             <div className="loginwith">
               <div className="border-separetor"></div>
-              <span>Or login with mobile number and OTP</span>
+              <span>Or login with mobile number and verification code</span>
             </div>
             <MobileNumberInputField
               value={mobileNumber}

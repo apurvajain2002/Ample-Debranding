@@ -249,7 +249,9 @@ const interviewResponsesL1DashboardSlice = createSlice({
           designation: currentEmp?.designation ?? '-',
           currentCTC: userProfileDTO?.currentCTC ?? '-',
           noticePeriod: userProfileDTO?.noticePeriod ?? '-',
-          currentLocation: userProfileDTO?.currentLocation ?? '-'
+          currentLocation: userProfileDTO?.currentLocation ?? '-',
+          username: userProfileDTO?.username ?? '-',
+          id: userProfileDTO?.id ?? '-',
         };
       })
       .addCase(fetchSelectedCandidateInfo.rejected, (state, action) => {
@@ -327,7 +329,8 @@ export const {
   setCandidateResponseMap,
   setFilteredResponseMap,
   searchedCandidateList,
-  setReportLink
+  setReportLink,
+  userDetailsInfo
 } = interviewResponsesL1DashboardSlice.actions;
 
 const interviewResponsesL1DashboardSliceReducer = interviewResponsesL1DashboardSlice.reducer;
