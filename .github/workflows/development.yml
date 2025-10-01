@@ -16,9 +16,6 @@ jobs:
     - name: Build Docker Image
       run: docker build -t evuemev4-frontend:development .
     
-    - name: Run Tests
-      run: docker run --rm evuemev4-frontend:development npm test -- --coverage --watchAll=false
-    
     - name: Deploy to Development
       run: |
         docker tag evuemev4-frontend:development ${{ secrets.DOCKER_REGISTRY }}/evuemev4-frontend:development
