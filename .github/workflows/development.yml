@@ -2,9 +2,9 @@ name: Development Deploy
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ Development ]
   pull_request:
-    branches: [ develop ]
+    branches: [ Development ]
 
 jobs:
   build-and-deploy:
