@@ -1,0 +1,26 @@
+name: Development Deploy
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Docker Image
+      run: docker build -t evuemev4-frontend:development .
+    
+    - name: Run Tests
+      run: docker run --rm evuemev4-frontend:development npm test -- --coverage --watchAll=false
+    
+    - name: Deploy to Development
+      run: |
+        docker tag evuemev4-frontend:development ${{ secrets.DOCKER_REGISTRY }}/evuemev4-frontend:development
+        echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        docker push ${{ secrets.DOCKER_REGISTRY }}/evuemev4-frontend:development
