@@ -6,6 +6,7 @@ import {
   fetchVideoScores,
   updateCandidateStatus,
   fetchDomainScores,
+  moveToNextRound,
 } from "../actions/interview-responses-recruiter-dashboard-actions";
 import { useDispatch } from "react-redux";
 import SuccessToast from "../../components/toasts/success-toast";
@@ -31,6 +32,9 @@ const initialState = {
   filteredResponses: [],
   responseMap: {},
   selectedCandidateEmailWpInfo:'',
+  moveToNextRoundResponse: null,
+  moveToNextRoundStatus: "idle",
+  moveToNextRoundError: null,
   status: "idle",
   error: null, 
 };
@@ -45,6 +49,11 @@ const interviewResponsesRecruiterDashboardSlice = createSlice({
     },
     setSelectedCandidateEmailWpInfo:(state,action)=>{
       state.selectedCandidateEmailWpInfo = action?.payload; 
+    },
+    clearMoveToNextRoundResponse: (state) => {
+      state.moveToNextRoundResponse = null;
+      state.moveToNextRoundStatus = "idle";
+      state.moveToNextRoundError = null;
     },
     setSelectedJobId: (state, action) => {
       state.selectedJobId = action?.payload;
@@ -317,6 +326,22 @@ const interviewResponsesRecruiterDashboardSlice = createSlice({
       .addCase(updateCandidateStatus.rejected, (state, action) => {
         // state.status = 'failed';
         // state.error = action.payload;
+      })
+      .addCase(moveToNextRound.pending, (state) => {
+        state.moveToNextRoundStatus = 'loading';
+        state.moveToNextRoundError = null;
+      })
+      .addCase(moveToNextRound.fulfilled, (state, action) => {
+        state.moveToNextRoundStatus = 'succeeded';
+        state.moveToNextRoundResponse = action.payload;
+        console.log('Move to next round response in slice:', action.payload);
+        console.log('Action type:', action.type);
+        console.log('Action meta:', action.meta);
+      })
+      .addCase(moveToNextRound.rejected, (state, action) => {
+        state.moveToNextRoundStatus = 'failed';
+        state.moveToNextRoundError = action.payload;
+        console.log('Move to next round error:', action.payload);
       });
   },
 });
@@ -333,7 +358,8 @@ export const {
   setSelectedQuestionsMap,
   setInitialState,
   setIsStatusUpdateSuccessful,
-  setSelectedCandidateEmailWpInfo
+  setSelectedCandidateEmailWpInfo,
+  clearMoveToNextRoundResponse
 } = interviewResponsesRecruiterDashboardSlice.actions;
 
 const interviewResponsesRecruiterDashboardSliceReducer =

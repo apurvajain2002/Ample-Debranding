@@ -29,13 +29,13 @@ const NewQuestion = ({ jobName, roundName, entityId, jobId, hiringType }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { recruiterRound, l1Round } = useSelector(
+  const { allNotPublishedJobs,recruiterRound, l1Round } = useSelector(
     (state) => state.defineInterviewSliceReducer
   );
   const isPublished = roundName === 'L1 Hiring Manager Round' 
   ? l1Round?.isRoundPublished 
   : recruiterRound?.isRoundPublished;
-
+ 
 
   const {
     newQuestion,
@@ -90,11 +90,64 @@ const NewQuestion = ({ jobName, roundName, entityId, jobId, hiringType }) => {
   };
 
   const handleOnChangeNewQuestion = (e) => {
+    
     if (!jobName || !roundName) {
       return showWarningToast();
     }
+    
+    // Check if userType is available before proceeding
+    if (!userType) {
+      console.warn('userType is not available, cannot proceed with question change');
+      return;
+    }
+    
     const { name, value, checked } = e.target;
+    
+    // Only call getAllOpeningScriptQuestions for specific question types
+    const openingClosingScriptTypes = [
+      "openingScript",
+      "closingScript", 
+      "practiceQuestion",
+    ];
 
+
+    
+    if (openingClosingScriptTypes.includes(e.target.value)) {
+      // Check if currentEntity and currentJob are available
+      console.log("xxxx",openingClosingScriptTypes.includes(e.target.value),currentJob,roundName,currentJob.hiringType
+      ,userType,jobId);
+
+      // Additional validation before dispatching
+      if (!currentJob || !currentJob.orgId) {
+        console.warn('currentJob or currentJob.orgId is not available');
+        return;
+      }
+      
+      if (!userType) {
+        console.warn('userType is not available');
+        return;
+      }
+
+      // Use e.target.value as scriptType since questionType might not be updated yet
+      const actionPayload = {
+        scriptType: e.target.value,
+        jobId: jobId,
+        interviewRound: roundName,
+        entityId: currentJob.orgId,
+        hiringType: currentJob.hiringType,
+        userType: userType,
+        userId: userId,
+      };
+      
+      console.log('Dispatching getAllOpeningScriptQuestions with payload:', actionPayload);
+      
+      dispatch(
+        getAllOpeningScriptQuestions(
+          actionPayload,
+          { rejectWithValue: ErrorToast }
+        )
+      );
+    }
     if (
       name === "originalQuestion" &&
       (questionType === "openingScript" ||
@@ -184,6 +237,12 @@ const NewQuestion = ({ jobName, roundName, entityId, jobId, hiringType }) => {
       return;
     }
     
+    // Check if userType is available
+    if (!userType) {
+      console.warn('userType is not available, cannot fetch opening/closing scripts');
+      return;
+    }
+    
     dispatch(
       getAllOpeningScriptQuestions(
         {
@@ -209,12 +268,13 @@ const NewQuestion = ({ jobName, roundName, entityId, jobId, hiringType }) => {
     if (jobId && roundName) {
       if (openingClosingScriptTypes.includes(questionType)) {
         // Only call getAllOpeningClosingScripts if we have the required data
-        if (currentEntity && currentEntity.id && currentJob && currentJob.hiringType) {
+        if (currentEntity && currentEntity.id && currentJob && currentJob.hiringType && userType) {
           getAllOpeningClosingScripts(questionType);
         } else {
           console.warn('Missing required data for opening/closing scripts:', {
             currentEntity: !!currentEntity,
             currentJob: !!currentJob,
+            userType: !!userType,
             questionType
           });
         }

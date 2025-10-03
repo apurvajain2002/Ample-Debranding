@@ -135,12 +135,14 @@ const InvitedCandidateTableRow = ({
   const handleNextRoundInvite = () => {
     dispatch(setIsGetJobsApiCalled(false));
     dispatch(setIsNotPublishedJobsApiCalled(false));
+    console.log('candidateInvitation :: ', candidateInvitation);
     navigate("/admin/invite-candidates?type=invited-candidates", {
       state: { candidateInvitation: candidateInvitation }
     });
   };
 
   const {
+    id,
     whatsappStatus: initialWhatsappStatus = "",
     emailStatus: initialEmailStatus = "",
     emailAddress = "",
@@ -172,6 +174,11 @@ const InvitedCandidateTableRow = ({
   const [isSelected, setIsSelected] = useState(
     selectedCandidates.includes(inviteId)
   );
+
+  // Sync local state with global selectedCandidates
+  useEffect(() => {
+    setIsSelected(selectedCandidates.includes(id));
+  }, [selectedCandidates, id]);
 
   const [startDate, setStartDate] = useState({});
   const [endDate, setEndDate] = useState({});
@@ -264,27 +271,31 @@ const InvitedCandidateTableRow = ({
 
   // checkbox handler
   const checkboxHandler = () => {
+    const currentlySelected = selectedCandidates.includes(id);
+    console.log("checkbox clicking - current state:", currentlySelected);
+    
     setSelectedCandidates((prevSelects) => {
-      if (!isSelected) {
-        return [...prevSelects, inviteId];
+      if (!currentlySelected) {
+        console.log("checkbox clicked - adding to selection");
+        return [...prevSelects, id];
       } else {
-        return prevSelects.filter((rowInd) => rowInd !== inviteId);
+        console.log("checkbox clicked - removing from selection");
+        return prevSelects.filter((rowInd) => rowInd !== id);
       }
     });
-    setIsSelected((prev) => !prev);
   };
 
   // cancelling the invite
   const cancelInviteHandler = () => {
     const status = true;
     setHasCancelledInvite(status);
-    dispatch(cancelInviteStatus({ inviteIds: [inviteId], status }));
+    dispatch(cancelInviteStatus({ ids: [id], status }));
   };
 
   const undoCancelInviteHandler = () => {
     const status = false;
     setHasCancelledInvite(status);
-    dispatch(cancelInviteStatus({ inviteIds: [inviteId], status }));
+    dispatch(cancelInviteStatus({ ids: [id], status }));
   };
 
   // phone handler
