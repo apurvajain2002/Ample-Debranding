@@ -35,12 +35,12 @@ const getAllInvitedCandidates = createAsyncThunk(
 // cancel invite
 const cancelInviteStatus = createAsyncThunk(
   "cancelInviteStatus",
-  async ({ inviteIds = [], status }, { rejectWithValue }) => {
+  async ({ ids = [], status }, { rejectWithValue }) => {
     try {
       const { data } = await axiosInstance.post(
         `${baseUrl}/job-posting/interview-link/update-invite-cancel-status`,
         {
-          inviteIds: inviteIds,
+          ids: ids,
           status: status,
         }
       );

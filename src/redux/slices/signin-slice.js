@@ -87,7 +87,7 @@ const signinSlice = createSlice({
       if (storedTncStatus !== null) state.tncStatus = storedTncStatus === "true";
       if (storedUserType) state.userType = storedUserType;
       if (storedCurrentUser) state.currentUser = storedCurrentUser;
-    }
+    },
   },
 });
 

@@ -26,7 +26,7 @@ import rootSliceReducer from "../slices/root-slice";
 import { apiSlice } from "./api";
 
 const store = configureStore({
-  _reducer: {
+  reducer: {
     roleSliceReducer,
     industrySliceReducer,
     domainSkillSliceReducer,
@@ -51,12 +51,6 @@ const store = configureStore({
     rootSliceReducer,
     createUserManagementSliceReducer,
     [apiSlice.reducerPath]: apiSlice.reducer
-  },
-  get reducer() {
-    return this._reducer;
-  },
-  set reducer(value) {
-    this._reducer = value;
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware().concat(apiSlice.middleware)
 });

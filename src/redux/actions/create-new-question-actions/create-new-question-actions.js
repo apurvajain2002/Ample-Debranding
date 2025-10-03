@@ -425,11 +425,18 @@ const getAllOpeningScriptQuestions = createAsyncThunk(
       entityId,
       hiringType,
       userType,
-      responseType,
+      // responseType,
     },
     { rejectWithValue }
   ) => {
     if (!scriptType) return;
+    
+    // Add validation for userType
+    if (!userType) {
+      console.warn('userType is not provided to getAllOpeningScriptQuestions action');
+      return rejectWithValue('User type is required');
+    }
+    
     try {
       const { data } = await axiosInstance.post(
         `${baseUrl}/job-posting/opening-closing-script/get-all`,
@@ -439,8 +446,8 @@ const getAllOpeningScriptQuestions = createAsyncThunk(
           interviewRound: interviewRound,
           entityId: entityId,
           hiringType: hiringType,
-          userType: userType,
-          ...(responseType && { responseType: responseType }),
+          userType: "recruiter",
+          // ...(responseType && { responseType: responseType }),
         }
       );
       if (data.status || data.success) {

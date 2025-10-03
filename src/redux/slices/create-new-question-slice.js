@@ -201,8 +201,8 @@ const createNewQuestionSlice = createSlice({
       })
       .addCase(getAllOpeningScriptQuestions.fulfilled, (state, action) => {
         state.isLoadingJobQuestions = false;
-        const userType = action.payload.userType;
-        const scriptType = action.payload.scriptType;
+        const userType = action.payload?.userType || '';
+        const scriptType = action.payload?.scriptType || '';
         const questions = [
           ...(action.payload.openingAndClosingScriptDynamicQuestionList || []),
           ...(action.payload.openingClosingScriptDefaultQuestions || []),
