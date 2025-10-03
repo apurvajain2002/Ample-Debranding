@@ -76,7 +76,7 @@ const EditProfile2 = () => {
       } else if (inputId === "workEndDate") {
         setWorkEndDate(data.date);
       } else if (inputId === "dateOfBirth") {
-        setUserProfile({ ...userProfile, dateOfBirth: data.date });
+        setUserProfile(prev => ({ ...prev, dateOfBirth: data.date }));
       }
     };
     handleDate(inputId, callback);
@@ -89,17 +89,17 @@ const EditProfile2 = () => {
         ...(nextWorkExperience[workIndex] || {}),
         [fieldName]: data.date,
       };
-      setUserProfile({ ...userProfile, workExperience: nextWorkExperience });
+      setUserProfile(prev => ({ ...prev, workExperience: nextWorkExperience }));
     };
     handleDate(inputId, callback);
   };
 
   const handleDateOfBirthInput = () => {
     const callback = (data) => {
-      setUserProfile({
-        ...userProfile,
+      setUserProfile(prev => ({
+        ...prev,
         dateOfBirth: data.date,
-      });
+      }));
     };
     handleDate("dateOfBirth", callback);
   };
@@ -112,6 +112,7 @@ const EditProfile2 = () => {
   // Debug logging for selectedCandidateInfo and userDetailsInfo
   console.log('selectedCandidateInfo:', selectedCandidateInfo);
   console.log('userDetailsInfo:', userDetailsInfo);
+  console.log('userProfile (current form state):', userProfile);
   console.log('Extracted values - id:', id, 'username:', username, 'totalExperience:', totalExperience, 'higherEducation:', higherEducation);
   const handleSave = async () => {
     try {
@@ -158,6 +159,7 @@ const EditProfile2 = () => {
       };
       
       // Construct the complete payload with all required fields
+      // Use userProfile for all fields since it contains the most up-to-date data
       const userProfilePayload = {
         id: userId,
         firstName: userProfile.firstName || "",
@@ -205,7 +207,7 @@ const EditProfile2 = () => {
       ...(nextWorkExperience[index] || {}),
       [fieldName]: value,
     };
-    setUserProfile({ ...userProfile, workExperience: nextWorkExperience });
+    setUserProfile(prev => ({ ...prev, workExperience: nextWorkExperience }));
   };
 
   const handleAddWorkExperience = () => {
@@ -224,10 +226,10 @@ const EditProfile2 = () => {
     const current = Array.isArray(userProfile.workExperience)
       ? userProfile.workExperience
       : [];
-    setUserProfile({
-      ...userProfile,
+    setUserProfile(prev => ({
+      ...prev,
       workExperience: [...current, emptyWorkExperience],
-    });
+    }));
   };
 
   const handleRemoveWorkExperience = () => {
@@ -237,16 +239,16 @@ const EditProfile2 = () => {
 
     if (current.length > 1) {
       current.pop();
-      setUserProfile({
-        ...userProfile,
+      setUserProfile(prev => ({
+        ...prev,
         workExperience: current,
-      });
+      }));
     }
   };
 
   const handleProfileDateInput = (fieldName) => {
     const callback = (data) => {
-      setUserProfile({ ...userProfile, [fieldName]: data.date });
+      setUserProfile(prev => ({ ...prev, [fieldName]: data.date }));
     };
     handleDate(fieldName, callback);
   };
@@ -259,7 +261,7 @@ const EditProfile2 = () => {
       ...(nextUserAcademics[index] || {}),
       [fieldName]: value,
     };
-    setUserProfile({ ...userProfile, userAcademics: nextUserAcademics });
+    setUserProfile(prev => ({ ...prev, userAcademics: nextUserAcademics }));
   };
 
   const handleAcademicDateInput = (index, inputId, fieldName) => {
@@ -269,7 +271,7 @@ const EditProfile2 = () => {
         ...(nextUserAcademics[index] || {}),
         [fieldName]: data.date,
       };
-      setUserProfile({ ...userProfile, userAcademics: nextUserAcademics });
+      setUserProfile(prev => ({ ...prev, userAcademics: nextUserAcademics }));
     };
     handleDate(inputId, callback);
   };
@@ -290,10 +292,10 @@ const EditProfile2 = () => {
       ? userProfile.userAcademics
       : [];
       
-    setUserProfile({
-      ...userProfile,
+    setUserProfile(prev => ({
+      ...prev,
       userAcademics: [...current, emptyAcademic],
-    });
+    }));
   };
 
   const handleRemoveAcademic = () => {
@@ -302,7 +304,7 @@ const EditProfile2 = () => {
       : [];
     if (current.length > 1) {
       current.pop();
-      setUserProfile({ ...userProfile, userAcademics: current });
+      setUserProfile(prev => ({ ...prev, userAcademics: current }));
     }
   };
 
@@ -314,45 +316,62 @@ const EditProfile2 = () => {
   }, []);
 
   // Initialize userProfile with selectedCandidateInfo or userDetailsInfo values
+  // Only initialize if userProfile is empty or doesn't have the basic fields
   useEffect(() => {
     const sourceData = selectedCandidateInfo || userDetailsInfo;
     if (sourceData && Object.keys(sourceData).length > 0) {
-      // Helper function to filter out '-' values and convert to empty string
-      const getValue = (value) => {
-        if (value === '-' || value === null || value === undefined) return "";
-        return value;
-      };
+      // Only initialize if userProfile doesn't have firstName (indicating it's not initialized)
+      if (!userProfile.firstName && !userProfile.lastName && !userProfile.mobileNumber1) {
+        // Helper function to filter out '-' values and convert to empty string
+        const getValue = (value) => {
+          if (value === '-' || value === null || value === undefined) return "";
+          return value;
+        };
 
-      console.log('Processing sourceData:', sourceData);
-      console.log('currentCTC before processing:', sourceData.currentCTC);
-      console.log('noticePeriod before processing:', sourceData.noticePeriod);
+        console.log('Initializing userProfile with sourceData:', sourceData);
+        console.log('firstName before processing:', sourceData.firstName);
+        console.log('lastName before processing:', sourceData.lastName);
+        console.log('mobileNumber1 before processing:', sourceData.mobileNumber1);
 
-      setUserProfile(prev => ({
-        ...prev,
-        currentCTC: getValue(sourceData.currentCTC),
-        fixedCTC: getValue(sourceData.fixedCTC),
-        variableCTC: getValue(sourceData.variableCTC),
-        noticePeriod: getValue(sourceData.noticePeriod),
-        negotiableNoticePeriod: getValue(sourceData.negotiableNoticePeriod),
-        dateOfBirth: getValue(sourceData.dateOfBirth),
-        firstName: getValue(sourceData.firstName),
-        lastName: getValue(sourceData.lastName),
-        mobileNumber1: getValue(sourceData.mobileNumber1),
-        mobileNumber2: getValue(sourceData.mobileNumber2),
-        primaryEmailId: getValue(sourceData.primaryEmailId),
-        secondaryEmailId: getValue(sourceData.secondaryEmailId),
-        whatsappNumber: getValue(sourceData.whatsappNumber),
-        currentLocation: getValue(sourceData.currentLocation),
-        workExperience: sourceData.workExperience || [],
-        userAcademics: sourceData.userAcademics || [],
-        userSocialProfileDTO: sourceData.userSocialProfileDTO || {},
-      }));
+        setUserProfile(prev => {
+          const updated = {
+            ...prev,
+            currentCTC: getValue(sourceData.currentCTC),
+            fixedCTC: getValue(sourceData.fixedCTC),
+            variableCTC: getValue(sourceData.variableCTC),
+            noticePeriod: getValue(sourceData.noticePeriod),
+            negotiableNoticePeriod: getValue(sourceData.negotiableNoticePeriod),
+            dateOfBirth: getValue(sourceData.dateOfBirth),
+            firstName: getValue(sourceData.firstName),
+            lastName: getValue(sourceData.lastName),
+            mobileNumber1: getValue(sourceData.mobileNumber1),
+            mobileNumber2: getValue(sourceData.mobileNumber2),
+            primaryEmailId: getValue(sourceData.primaryEmailId),
+            secondaryEmailId: getValue(sourceData.secondaryEmailId),
+            whatsappNumber: getValue(sourceData.whatsappNumber),
+            currentLocation: getValue(sourceData.currentLocation),
+            workExperience: sourceData.workExperience || [],
+            userAcademics: sourceData.userAcademics || [],
+            userSocialProfileDTO: sourceData.userSocialProfileDTO || {},
+          };
+          console.log('Initialized userProfile:', updated);
+          return updated;
+        });
+      } else {
+        console.log('userProfile already initialized, skipping initialization');
+      }
     }
-  }, [selectedCandidateInfo, userDetailsInfo]);
+  }, [selectedCandidateInfo, userDetailsInfo, userProfile.firstName, userProfile.lastName, userProfile.mobileNumber1]);
 
   const handleUserProfileFormChange = (e) => {
     const { name, value } = e.target;
-    setUserProfile({ ...userProfile, [name]: value });
+    console.log('Form input changed:', { name, value });
+    console.log('Current userProfile before update:', userProfile);
+    setUserProfile(prev => {
+      const updated = { ...prev, [name]: value };
+      console.log('Updated userProfile:', updated);
+      return updated;
+    });
   };
 
   const userProfileFormData1 = useMemo(

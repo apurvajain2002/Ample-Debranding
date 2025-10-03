@@ -240,8 +240,8 @@ const SendLaterModal = ({ sendLaterHandler, isOpen, onClose }) => {
     }
   
     if (selectedTime <= currentTime) {
-      console.log("xxxxxxxxxx--->",selectedTime);
-      console.log("xxxxxxxxxx--->",currentTime);
+      // console.log("xxxxxxxxxx--->",selectedTime);
+      // console.log("xxxxxxxxxx--->",currentTime);
       
       return "Selected time should be later than the current time.";
     }
@@ -291,7 +291,7 @@ const SendLaterModal = ({ sendLaterHandler, isOpen, onClose }) => {
   }, [isOpen]);
 
   return (
-    <Modal isOpen={isOpen} onClose={handleModalClose} title="Interview Timing" style={{ marginBottom: "150px" }}>
+    <Modal isOpen={isOpen} onClose={handleModalClose} title="Interview Timing" style={{ marginBottom: "190px" }}>
       <form onSubmit={handleSubmit}>
         <div >
           <label style={{ display: "block", marginBottom: "8px" }}>

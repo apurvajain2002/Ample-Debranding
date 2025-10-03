@@ -173,6 +173,17 @@ const NewQuestion = ({ jobName, roundName, entityId, jobId, hiringType }) => {
   };
 
   const getAllOpeningClosingScripts = (scriptType) => {
+    // Check if currentEntity and currentJob exist before accessing their properties
+    if (!currentEntity || !currentEntity.id) {
+      console.warn('currentEntity is not available, cannot fetch opening/closing scripts');
+      return;
+    }
+    
+    if (!currentJob || !currentJob.hiringType) {
+      console.warn('currentJob is not available, cannot fetch opening/closing scripts');
+      return;
+    }
+    
     dispatch(
       getAllOpeningScriptQuestions(
         {
@@ -197,7 +208,16 @@ const NewQuestion = ({ jobName, roundName, entityId, jobId, hiringType }) => {
     ];
     if (jobId && roundName) {
       if (openingClosingScriptTypes.includes(questionType)) {
-        getAllOpeningClosingScripts(questionType);
+        // Only call getAllOpeningClosingScripts if we have the required data
+        if (currentEntity && currentEntity.id && currentJob && currentJob.hiringType) {
+          getAllOpeningClosingScripts(questionType);
+        } else {
+          console.warn('Missing required data for opening/closing scripts:', {
+            currentEntity: !!currentEntity,
+            currentJob: !!currentJob,
+            questionType
+          });
+        }
       } else {
         dispatch(getAllQuestions({ jobId, roundName }));
       }

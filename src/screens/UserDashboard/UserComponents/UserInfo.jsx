@@ -13,15 +13,15 @@ const UserInfo = ({ userData }) => {
     firstName, lastName, primaryEmailId, username,
     mobileNumber1, mobileNumber2, whatsappNumber,
     currentLocation, noticePeriod, dateOfBirth,
-    currentCTC, higherEducation,
+    currentCTC, higherEducation,photoFile,userSocialProfileDTO
   } = userData || {}
 
   return (
     <div className="row row-margin">
       <aside className="col xl2 l2 m2 s12">
         <div className="candnamewr">
-          <div className="img-cand">
-            <img src={image.candImage} alt="" />
+          <div className="img-cand" style={{height:140,width:140, margin:"0 auto",marginBottom:"10px", overflow:"hidden", borderRadius:"100%"}}>
+            <img src={userSocialProfileDTO?.photoFile ?? image.candImage} alt="" />
           </div>
           <h3>{`${firstName} ${lastName}` || 'N/A'}</h3>
           <p>{primaryEmailId || username || 'N/A'}</p>

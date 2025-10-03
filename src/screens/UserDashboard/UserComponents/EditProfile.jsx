@@ -67,14 +67,28 @@ const EditProfile = () => {
   };
 
   const handleNextbutton = () => {
+    // Check if CV and Photo are uploaded
+    if (!userCV) {
+      setCvError("CV is required. Please upload a PDF file.");
+      return;
+    }
+    if (!userPhoto) {
+      setPhotoError("Photo is required. Please upload an image file.");
+      return;
+    }
+    
+    // Clear any existing errors
+    setCvError("");
+    setPhotoError("");
+    
     // console.log('userProfile ::::: ', userProfile);
     // return;
     navigate("/user/editWorkExperience");
   };
 
   useEffect(() => {
-    setUserProfile({...userDetailsInfo, workExperience : userProfile.workExperience, 
-      userAcademics:userProfile.userAcademics })
+    setUserProfile(prev => ({...userDetailsInfo, workExperience : prev.workExperience, 
+      userAcademics: prev.userAcademics }))
       console.log(userProfile);
       
     setUserEditProfilePageYN(true);
@@ -88,13 +102,13 @@ const EditProfile = () => {
   const handleUserProfileFormChange = (e) => {
     const { name, value } = e.target;
     // console.log('e ::::: ', name, value);
-    setUserProfile({ ...userProfile, [name]: value });
+    setUserProfile(prev => ({ ...prev, [name]: value }));
   };
 
   const handleUserProfileSocialFormChange = (e) => {
     const { name, value } = e.target;
     // console.log('e ::::: ', e, name, value);
-    setUserProfile({ ...userProfile, userSocialProfileDTO: {...userProfile.userSocialProfileDTO, [name]: value } });
+    setUserProfile(prev => ({ ...prev, userSocialProfileDTO: {...prev.userSocialProfileDTO, [name]: value } }));
   };
 
   const userProfileFormData1 = useMemo(() => [
@@ -148,7 +162,7 @@ const EditProfile = () => {
         const digitsOnly = e.target.value.replace(/\D/g, "").slice(0, 10);
         console.log("ee---->",e.target.name);
         
-        setUserProfile({ ...userProfile, mobileNumber1: digitsOnly });},
+        setUserProfile(prev => ({ ...prev, mobileNumber1: digitsOnly }));},
       required: true,
       labelText: "Mobile Number 1"
     },
@@ -165,7 +179,7 @@ const EditProfile = () => {
       value: userProfile.mobileNumber2,
       onChange: (e) => {
         const digitsOnly = e.target.value.replace(/\D/g, "").slice(0, 10);
-        setUserProfile({ ...userProfile, mobileNumber2: digitsOnly });
+        setUserProfile(prev => ({ ...prev, mobileNumber2: digitsOnly }));
       },
       required: true,
       labelText: "Mobile Number 2"
@@ -363,7 +377,7 @@ const EditProfile = () => {
                 ))}
                 <div className="file-field input-field col xl4 l4 m6 s12">
                   <div className="file-path-wrapper">
-                    <input type="file" accept="application/pdf" onChange={handleCvChange} />
+                    <input type="file" accept="application/pdf" onChange={handleCvChange} required />
                     <input
                     id="cv"
                       className={`file-path ${cvError ? 'invalid' : (userCV ? 'valid' : '')}`}
@@ -372,19 +386,19 @@ const EditProfile = () => {
                       value={userCV ? userCV.name : ""}
                       readOnly
                     />
-                    <label htmlFor="cv">Upload CV </label>
+                    <label htmlFor="cv">Upload CV *</label>
                     <span
                       className="helper-text"
                       data-error={cvError || "Invalid file"}
                       data-success="Looks good"
                     >
-                      {cvError ? cvError : "PDF format, Max size 200 Kb"}
+                      {cvError ? cvError : "PDF format, Max size 200 Kb (Required)"}
                     </span>
                   </div>
                 </div>
                 <div className="file-field input-field col xl4 l4 m6 s12">
                   <div className="file-path-wrapper">
-                    <input type="file" accept="image/*" onChange={handlePhotoChange} />
+                    <input type="file" accept="image/*" onChange={handlePhotoChange} required />
                     <input
                       id="photo"
                       className={`file-path ${photoError ? 'invalid' : (userPhoto ? 'valid' : '')}`}
@@ -393,13 +407,13 @@ const EditProfile = () => {
                       value={userPhoto ? (userPhoto.name || "") : ""}
                       readOnly
                     />
-                    <label htmlFor="photo">Upload Photo </label>
+                    <label htmlFor="photo">Upload Photo *</label>
                     <span
                       className="helper-text"
                       data-error={photoError || "Invalid file"}
                       data-success="Looks good"
                     >
-                      {photoError ? photoError : "Image format, Max size 200 Kb"}
+                      {photoError ? photoError : "Image format, Max size 200 Kb (Required)"}
                     </span>
                   </div>
                 </div>

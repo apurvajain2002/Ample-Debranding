@@ -76,20 +76,28 @@ export const mergeAndRemoveDuplicates = (existing, newItems) => {
     return Array.from(map.values());
 };
 
+// Helper function to capitalize each word
+const capitalizeEachWord = (str) => {
+    return str
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+};
+
 export function generateTemplateOptions(templates) {
     const unique = new Map();
 
     templates.forEach(({ name }) => {
         if (!unique.has(name)) {
             unique.set(name, {
-                optionKey: name,
+                optionKey: capitalizeEachWord(name),
                 optionValue: name,
             });
         }
     });
 
     return [
-        { optionKey: "Select template", optionValue: "" },
+        { optionKey: "Select Template", optionValue: "" },
         ...Array.from(unique.values()),
     ];
 }
