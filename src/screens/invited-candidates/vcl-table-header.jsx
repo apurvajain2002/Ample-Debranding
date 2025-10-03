@@ -12,6 +12,7 @@ import SuccessToast from "../../components/toasts/success-toast";
 const VCPLHeader = ({
   selectedCandidates = [],
   setSelectedCandidates = () => { },
+  tableData = [],
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -22,7 +23,16 @@ const VCPLHeader = ({
   // send selected candidates to next round
   const nextRoundHandler = () => {
     if (isDisabled) return;
-    navigate("/admin/invite-candidates?type=invited-candidates");
+    
+    // Get the full candidate data for selected candidates
+    const selectedCandidateData = tableData.filter(candidate => 
+      selectedCandidates.includes(candidate.id)
+    );
+    
+    // Navigate with multiple candidate invitations
+    navigate("/admin/invite-candidates?type=invited-candidates", {
+      state: { candidateInvitations: selectedCandidateData }
+    });
   };
 
   // change time of selected candidates

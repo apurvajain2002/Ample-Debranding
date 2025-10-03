@@ -193,10 +193,13 @@ const moveToNextRound = createAsyncThunk(
         }
       );
       if (data) {
-        if(data.status)
-        SuccessToast(data?.message??"Users successfully moved to the next round!");
-        else 
-        ErrorToast("Users are not moved to the next round!");
+        if(data.status) {
+          SuccessToast(data?.message??"Users successfully moved to the next round!");
+          return data; // Return the data for Redux state
+        } else {
+          ErrorToast("Users are not moved to the next round!");
+          return rejectWithValue(data.message);
+        }
       } else {
         return rejectWithValue(data.message);
       }

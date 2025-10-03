@@ -790,6 +790,9 @@ const InviteCandidates = () => {
   }
 
   const handleInterviewLinkInviteDetails = () => {
+    console.log("inviteCandidate",inviteCandidate);
+    
+    // setInviteCandidate({...inviteCandidate, candidateInfo: []})
     dispatch(interviewLinkInviteDetails({
       "jobId": jobId,
       "interviewRoundName": roundName,
@@ -1043,6 +1046,9 @@ const InviteCandidates = () => {
                       style={isInviteCandidateButtonDisable ? { backgroundColor: '#666666' } : {}}
                       onClick={() => {
                         if (isSubmitDisabled || isInviteCandidateButtonDisable) return;
+                        // Clear the textarea field and context
+                        setInviteCandidate({...inviteCandidate, candidateInfo: ''});
+                        setCandidatesToInvite(''); // Clear context value
                         handleInterviewLinkInviteDetails()
                       }}
                     >

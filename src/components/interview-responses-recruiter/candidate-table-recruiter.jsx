@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import EvuemeModalTrigger from "../modals/evueme-modal-trigger";
 import TableComponent from "../table-components/table-component";
-import { audio, icon, image } from "../assets/assets";
+import {  icon, image } from "../assets/assets";
 import AudioPopupModal from "./audio-popup-modal";
 import EvuemeSelectTag from "../evueme-html-tags/evueme-select-tag";
 import InterviewerTextNote from "./interviewerTextNote";
+import { getAllInvitedCandidates } from "../../redux/actions/invited-candidates";
 import { useDispatch, useSelector } from "react-redux";
 import InterviewerModalRecruiter from "./interviewerModalRecruiter";
 import CandidateEmailModal from "./candidateEmailModal";
@@ -21,7 +22,10 @@ import JobDetails from "../../screens/job-details";
 import {
   setIsStatusUpdateSuccessful,
   setSelectedCandidateEmailWpInfo,
+  clearMoveToNextRoundResponse,
 } from "../../redux/slices/interview-responses-recuriter-dashboard-slice";
+import { setIsGetJobsApiCalled, selectJobId, setRoundName } from "../../redux/slices/create-new-job-slice";
+import { setIsNotPublishedJobsApiCalled } from "../../redux/slices/define-interview-slice";
 import {
   moveToNextRound,
   updateCandidateStatus,
@@ -37,10 +41,6 @@ import { statusColorCode } from "../../resources/constant-data/candidate-status-
 import DownloadCandidateReport from "../../screens/candidate-report/report-page-pdf";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import {
-  selectJobId,
-  setRoundName,
-} from "../../redux/slices/create-new-job-slice";
 import { showRowsList } from "../../resources/constant-data/common";
 import { useGlobalContext } from "../../context";
 const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
@@ -61,7 +61,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
   ];
   const navigate = useNavigate();
   const pageRef = useRef();
-
+  const { jobId } = useSelector((state) => state.createNewJobSliceReducer);
   const [selectedQueTypes, setSelectedQueTypes] = useState([]);
   const {
     selectedQuestionsMap,
@@ -74,8 +74,18 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
     videoSkills,
     isStatusUpdateSuccessful,
     domainSkills,
+    moveToNextRoundResponse,
+    moveToNextRoundStatus,
+    moveToNextRoundError,
   } = useSelector(
-    (state) => state.interviewResponsesRecruiterDashboardSliceReducer
+    (state) => {
+      console.log('Redux state for moveToNextRound:', {
+        response: state.interviewResponsesRecruiterDashboardSliceReducer.moveToNextRoundResponse,
+        status: state.interviewResponsesRecruiterDashboardSliceReducer.moveToNextRoundStatus,
+        error: state.interviewResponsesRecruiterDashboardSliceReducer.moveToNextRoundError
+      });
+      return state.interviewResponsesRecruiterDashboardSliceReducer;
+    }
   );
 
   const [tableHeadValues, setTableHeadValues] = useState([]);
@@ -877,10 +887,107 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
 
   const { rootColor } = useGlobalContext();
 
+  const handleGetAllCandidates = async () => {
+    // if (!jobId) return;
+    dispatch(
+      getAllInvitedCandidates({
+        currentPage,
+        showRows,
+        filterArray,
+        customSortArray,
+      })
+    );
+  };
 
+  useEffect(() => {
+    handleGetAllCandidates();
+  }, [showRows, currentPage, customSortArray, filterArray, jobId]);
+
+  // Handle moveToNextRound response
+  useEffect(() => {
+    console.log('useEffect triggered - Status:', moveToNextRoundStatus, 'Response:', moveToNextRoundResponse);
+    
+    if (moveToNextRoundStatus === 'succeeded' && moveToNextRoundResponse) {
+      console.log('Move to next round successful:', moveToNextRoundResponse);
+      
+      // Navigate to invite candidates page with the users data
+      if (moveToNextRoundResponse.users && moveToNextRoundResponse.users.length > 0) {
+        console.log('candidateInvitations :: ', moveToNextRoundResponse.users);
+        
+        // Transform the users data to match the expected format
+        const candidateInvitations = moveToNextRoundResponse.users.map(user => ({
+          emailAddress: user.primaryEmailId,
+          username: user.userName,
+          mobileNumber: user.mobileNumber1,
+          whatsappNumber: user.whatsappNumber,
+          interviewRound: selectedRoundId, // Use the current round ID
+          vacancyLocations: "Multiple locations", // You might want to get this from somewhere
+          agencyName: "Multiple agencies", // You might want to get this from somewhere
+          // Add any other required fields
+        }));
+        
+        // Set the jobId and roundName in Redux state
+        dispatch(selectJobId(selectedJobId));
+        dispatch(setRoundName(selectedRoundId));
+        
+        // Set the flags to trigger the API call
+        dispatch(setIsGetJobsApiCalled(false));
+        dispatch(setIsNotPublishedJobsApiCalled(false));
+        
+        navigate("/admin/invite-candidates?type=invited-candidates", {
+          state: { candidateInvitations: candidateInvitations }
+        });
+        
+        // Clear the response state to prevent re-navigation
+        dispatch(clearMoveToNextRoundResponse());
+      }
+    } else if (moveToNextRoundStatus === 'failed' && moveToNextRoundError) {
+      console.log('Move to next round failed:', moveToNextRoundError);
+      // Handle error case if needed
+    }
+  }, [moveToNextRoundStatus, moveToNextRoundResponse, moveToNextRoundError, navigate]);
+
+  // Clear the response state when component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(clearMoveToNextRoundResponse());
+    };
+  }, [dispatch]);
 
   return (
     <>
+      {/* Debug: Move to Next Round Response Status */}
+      {moveToNextRoundStatus !== 'idle' && (
+        <div style={{ 
+          padding: '10px', 
+          margin: '10px', 
+          backgroundColor: moveToNextRoundStatus === 'succeeded' ? '#d4edda' : '#f8d7da',
+          border: `1px solid ${moveToNextRoundStatus === 'succeeded' ? '#c3e6cb' : '#f5c6cb'}`,
+          borderRadius: '4px',
+          fontSize: '14px'
+        }}>
+          <strong>Move to Next Round Status:</strong> {moveToNextRoundStatus}
+          {moveToNextRoundResponse && (
+            <div style={{ marginTop: '5px' }}>
+              <strong>Response:</strong> 
+              <div style={{ marginTop: '5px', fontSize: '12px', maxHeight: '200px', overflow: 'auto' }}>
+                <pre>{JSON.stringify(moveToNextRoundResponse, null, 2)}</pre>
+              </div>
+              {moveToNextRoundResponse.users && (
+                <div style={{ marginTop: '5px' }}>
+                  <strong>Users Count:</strong> {moveToNextRoundResponse.users.length}
+                </div>
+              )}
+            </div>
+          )}
+          {moveToNextRoundError && (
+            <div style={{ marginTop: '5px', color: '#721c24' }}>
+              <strong>Error:</strong> {JSON.stringify(moveToNextRoundError, null, 2)}
+            </div>
+          )}
+        </div>
+      )}
+      
       {filteredResponses?.length !== 0 ? (
         <>
           <div className="right-sidebar candidate-rightwrapper-recruiter">

@@ -258,6 +258,7 @@ const InvitedCandidates = () => {
             selectedCandidates={selectedCandidates}
             setSelectedCandidates={setSelectedCandidates}
             isVCPLHeaderVisible={true}
+            vclTableData={tableData}
           >
             {tableData.map((row, index) => (
               <InvitedCandidateTableRow

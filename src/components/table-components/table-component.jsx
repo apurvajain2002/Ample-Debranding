@@ -86,6 +86,7 @@ const TableComponent = ({
   getExcel,
   selectedJobId,
   isVCPLHeaderVisible,
+  vclTableData = [],
   showPrintButton = true,
   showExcelButton = true,
   showPDFButton = true,
@@ -111,6 +112,7 @@ const TableComponent = ({
           <VCPLHeader
             selectedCandidates={selectedCandidates}
             setSelectedCandidates={setSelectedCandidates}
+            tableData={vclTableData}
           />
         )}
 
