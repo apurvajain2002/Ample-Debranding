@@ -84,7 +84,9 @@ const Question = ({ question, setAnswer, options, type }) => {
       <div className="rochat-wrap">
         <div className="chatt-text">{question.questionText}</div>
         {isEnhanced ? (
-          <div className="chatt-text chatt-notext">{enhancedMediaJSX}</div>
+          <div className="chatt-text chatt-notext" style={{ display: 'block', marginTop: '10px' }}>
+            {enhancedMediaJSX}
+          </div>
         ) : null}
         <div className="btn-wr">
           {options.map((option) =>

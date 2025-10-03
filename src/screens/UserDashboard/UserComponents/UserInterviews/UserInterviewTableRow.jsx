@@ -1,6 +1,8 @@
 import NormalButton from "../../../../components/buttons/normal-button";
 import { icon } from "../../../../components/assets/assets";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setUserInterviewStatus } from "../../../../redux/slices/interview-slice";
 
 
 
@@ -137,6 +139,7 @@ const defaultBtnClassName =
 //   " btn-status";
 
 const UserInterviewTableRow = ({ userData, index }) => {
+    const dispatch = useDispatch();
     //   const getButtonClassName = (map, status = "") => {
     //     status = status?.replace(/\s+/g, "").toLowerCase().toLowerCase();
     //     let css = "";
@@ -206,6 +209,8 @@ const UserInterviewTableRow = ({ userData, index }) => {
                         leftIconSrc={getButtonIcons("interviewLink", userInterviewStatus)}
                         onClick={() => {
                             console.log(userData);
+                            // Update userInterviewStatus in Redux before navigation
+                            dispatch(setUserInterviewStatus(userInterviewStatus));
                             // return;
                             window.location.href = userData.interviewLink
                         }}

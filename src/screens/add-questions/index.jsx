@@ -20,12 +20,13 @@ import { getAllEntities } from "../../redux/actions/entity-actions/entity-action
 import { setCurrentEntity } from "../../redux/slices/entity-slice";
 import { setCurrentJob } from "../../redux/slices/define-interview-slice";
 import { clearCurrentQuestion } from "../../redux/slices/create-new-question-slice";
+import { useGlobalContext } from "../../context";
 
 const AddQuestions = () => {
   const locationPathName = window.location.pathname;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const { hostname } = useGlobalContext();
   const { userType, userId } = useSelector((state) => state.signinSliceReducer);
   const { tableData: entities, currentEntity } = useSelector(
     (state) => state.entitySliceReducer
@@ -59,7 +60,7 @@ const AddQuestions = () => {
   }, [entities]);
 
   useEffect(() => {
-    dispatch(getAllEntities({ userId, userType }));
+    dispatch(getAllEntities({ url : hostname }));
   }, []);
 
   return (

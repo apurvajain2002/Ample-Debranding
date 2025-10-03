@@ -87,7 +87,7 @@ const OtherRecRound = () => {
   const { isStreaming, startStreaming, stopStream, videoRef } = useStreamCamera(
     { timeBased: false }
   );
-  const { preferredLanguage } = useSelector((state) => state.interviewSlice);
+  const { preferredLanguage, userInterviewStatus } = useSelector((state) => state.interviewSlice);
   const userId = useSelector((state) => state.signinSliceReducer.userId);
   const navigate = useNavigate();
   const { dynamicErrorMessage, containerRef, startInterviewMonitoring } = useForceFullscreen();
@@ -134,7 +134,6 @@ const OtherRecRound = () => {
 
     return () => (isStreaming ? stopStream() : null);
   }, [currentScriptType]);
-
   useEffect(() => {
     document.title = "EvueMe | Recruiter Round";
   });
@@ -898,20 +897,28 @@ const OtherRecRound = () => {
 
         // Filter skillBased array based on IDs from another API
         let filteredSkillBased = data.skillBased || [];
-        console.log("before",filteredSkillBased);
+        let filterIds = []; // Initialize as empty array
+        console.log("before rec round",userInterviewStatus,filteredSkillBased);
+        console.log("Current interview status:", userInterviewStatus);
+
         try {
           // Call your API to get the array of IDs
-          const { data: filterIds } = await axiosInstance.get(
-            `${baseUrl}/job-posting/api/enablex/interview-questions`, 
-            {
-              params: {
-                interviewId: interviewId,
-                userId: userId,
+          if(userInterviewStatus && userInterviewStatus.toLowerCase() === "started"){
+            const { data: apiFilterIds } = await axiosInstance.get(
+              `${baseUrl}/job-posting/api/enablex/interview-questions`, 
+              {
+                params: {
+                  interviewId: interviewId,
+                  userId: userId,
+                }
               }
-            }
-          );
+            );
+            filterIds = apiFilterIds || []; // Ensure it's always an array
+          } else {
+            filterIds = [];
+          }
           console.log("filterIds",filterIds);
-          console.log("before",filteredSkillBased);
+          console.log("before rec round",filteredSkillBased);
           
           
           // Filter skillBased array to only include questions with matching IDs
@@ -919,10 +926,12 @@ const OtherRecRound = () => {
             filteredSkillBased = data.skillBased.filter(question => 
               !filterIds.includes(question.id)
             );
-          } } catch (filterError) {
-            console.warn('Failed to fetch filter IDs, using all skillBased questions:', filterError);
-            // Continue with original data if filtering fails
           }
+        } catch (filterError) {
+          console.warn('Failed to fetch filter IDs, using all skillBased questions:', filterError);
+          filterIds = []; // Ensure it's empty array on error
+          // Continue with original data if filtering fails
+        }
           console.log("after",filteredSkillBased);
 
         await loadVideosFromArray(data.openingScript, "openingScript");
@@ -1013,6 +1022,7 @@ const OtherRecRound = () => {
                 totalQuestions={totalQuestions}
                 isVideoEnded={isVideoEnded}
                 repeatingTimeoutRef={repeatingTimeoutRef}
+                userInterviewStatus={userInterviewStatus}
                 localCameraRef={videoRef}
                 startStreaming={startStreaming}
                 roomIdRef={roomIdRef}

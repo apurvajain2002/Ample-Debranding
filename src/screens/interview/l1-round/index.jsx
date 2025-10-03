@@ -84,7 +84,7 @@ const L1Round = () => {
   const currentUser = useSelector(
     (state) => state.signinSliceReducer.currentUser
   );
-  const { preferredLanguage } = useSelector((state) => state.interviewSlice);
+  const { preferredLanguage, userInterviewStatus } = useSelector((state) => state.interviewSlice);
   const userId = useSelector((state) => state.signinSliceReducer.userId);
   const forceCameraOn = useSelector(
     (state) => state.interviewSlice.forceCameraOn
@@ -126,7 +126,7 @@ const L1Round = () => {
   const [videoLoadError, setVideoLoadError] = useState(false);
 
   const payloadUserId = link_access_type === "privateLink" ? privateUserId : userId ?? '';
-
+  console.log("Current interview status:", userInterviewStatus);
   // Camera activation logic - only turn on camera for skillBased script type
   useEffect(() => {
     if (currentScriptType === "skillBased" && forceCameraOn) {
@@ -135,6 +135,8 @@ const L1Round = () => {
 
     return () => (isStreaming ? stopStream() : null);
   }, [currentScriptType]);
+
+  
 
   useEffect(() => {
     document.title = "EvueMe | L1 Round";
@@ -912,20 +914,26 @@ const L1Round = () => {
 
         // Filter skillBased array based on IDs from another API
         let filteredSkillBased = data.skillBased || [];
-        console.log("before",filteredSkillBased);
+        let filterIds = []; // Initialize as empty array
+        console.log("before l1 round",filteredSkillBased);
         try {
           // Call your API to get the array of IDs
-          const { data: filterIds } = await axiosInstance.get(
-            `${baseUrl}/job-posting/api/enablex/interview-questions`, 
-            {
-              params: {
-                interviewId: interviewId,
-                userId: userId,
+          if(userInterviewStatus && userInterviewStatus.toLowerCase() === "started"){
+            const { data: apiFilterIds } = await axiosInstance.get(
+              `${baseUrl}/job-posting/api/enablex/interview-questions`, 
+              {
+                params: {
+                  interviewId: interviewId,
+                  userId: userId,
+                }
               }
-            }
-          );
+            );
+            filterIds = apiFilterIds || []; // Ensure it's always an array
+          } else {
+            filterIds = [];
+          }
           console.log("filterIds",filterIds);
-          console.log("before",filteredSkillBased);
+          console.log("before l1 round",filteredSkillBased);
           
           
           // Filter skillBased array to only include questions with matching IDs
@@ -936,6 +944,7 @@ const L1Round = () => {
           }
         } catch (filterError) {
           console.warn('Failed to fetch filter IDs, using all skillBased questions:', filterError);
+          filterIds = []; // Ensure it's empty array on error
           // Continue with original data if filtering fails
         }
         console.log("after",filteredSkillBased);
