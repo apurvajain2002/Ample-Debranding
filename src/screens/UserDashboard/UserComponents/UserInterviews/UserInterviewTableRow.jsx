@@ -211,8 +211,11 @@ const UserInterviewTableRow = ({ userData, index }) => {
                             console.log(userData);
                             // Update userInterviewStatus in Redux before navigation
                             dispatch(setUserInterviewStatus(userInterviewStatus));
-                            // return;
-                            window.location.href = userData.interviewLink
+                            
+                            // Add status as URL parameter to ensure it's available immediately
+                            const url = new URL(userData.interviewLink);
+                            url.searchParams.set('status', userInterviewStatus);
+                            window.location.href = url.toString();
                         }}
                         disabled={(userInterviewStatus).toLowerCase() === 'completed'}
                     />

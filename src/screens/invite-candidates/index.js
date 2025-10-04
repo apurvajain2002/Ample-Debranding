@@ -435,12 +435,12 @@ const InviteCandidates = () => {
   useEffect(() => {
     if (isNotPublishedJobsApiCalled && isGetJobsApiCalled) {
       console.log('isNotPublishedJobsApiCalled, isGetJobsApiCalled ::: ', isNotPublishedJobsApiCalled, isGetJobsApiCalled);
-      dispatch(interviewLinkInviteDetails({
-        "jobId": jobId,
-        "interviewRoundName": roundName,
-        "agencyName": selectedPlacementAgency,
-        "vacancyLocations": selectedLocation
-      }));
+      // dispatch(interviewLinkInviteDetails({
+      //   "jobId": jobId,
+      //   "interviewRoundName": roundName,
+      //   "agencyName": selectedPlacementAgency,
+      //   "vacancyLocations": selectedLocation
+      // }));
       dispatch(setIsGetJobsApiCalled(false));
       dispatch(setIsNotPublishedJobsApiCalled(false));
     }

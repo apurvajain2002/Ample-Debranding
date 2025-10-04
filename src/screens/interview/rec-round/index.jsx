@@ -75,7 +75,6 @@ const LIVE_RECORDING_CONFIG = {
 const OtherRecRound = () => {
   const location = useLocation();
   const link_access_type = location?.state?.link_access_type;
-  console.log('rec round link_access_type ::: ', link_access_type); 
   const { privateUserId, interviewSource } = useGlobalContext();
   const jobId = useSelector((state) => state.interviewSlice.jobId);
   const roundName = useSelector((state) => state.interviewSlice.roundName);
@@ -90,9 +89,14 @@ const OtherRecRound = () => {
   const { isStreaming, startStreaming, stopStream, videoRef } = useStreamCamera(
     { timeBased: false }
   );
-  const { preferredLanguage, userInterviewStatus } = useSelector(
+  const { preferredLanguage, userInterviewStatus: reduxUserInterviewStatus } = useSelector(
     (state) => state.interviewSlice
   );
+  
+  // Get status from URL parameter as fallback if Redux state is not updated yet
+  const urlParams = new URLSearchParams(location.search);
+  const urlStatus = urlParams.get('status');
+  const userInterviewStatus = urlStatus || reduxUserInterviewStatus || 'notstarted';
   const userId = useSelector((state) => state.signinSliceReducer.userId);
   const navigate = useNavigate();
   const { dynamicErrorMessage, containerRef, startInterviewMonitoring } =
