@@ -10,6 +10,7 @@ import { parseJwt } from "../../utils/parseJwt";
 import { useGlobalContext } from "../../context";
 const AUTH_API_BASE_URL = process.env.REACT_APP_APP_AUTH_BASE_URL;
 const AUTH_API_URL = process.env.REACT_APP_APP_AUTH_URL;
+import { APP_AUTH_URL, baseUrl } from "../../../config/config";
 
 const USER_TYPE_MAP = {
   1: "org_person",
@@ -51,7 +52,8 @@ const AuthCallback = () => {
       try {
         let res = await axios.post(
           // `https://${hostname}${AUTH_API_URL}/oauth2/token`,
-          `https://${hostname}-auth.evueme.dev/oauth2/token`,
+          // `https://${hostname}-auth.evueme.dev/oauth2/token`,
+          `${APP_AUTH_URL}/oauth2/token`,
           data.toString(),
           {
             headers: {
