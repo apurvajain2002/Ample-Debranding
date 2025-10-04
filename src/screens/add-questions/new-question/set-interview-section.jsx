@@ -83,9 +83,10 @@ const SetInterviewSection = ({
   handleGetAllQuestions = () => { },
   clearQuestion = () => { },
 }) => {
-  const { recruiterRound, l1Round } = useSelector(
+  const { recruiterRound, l1Round ,currentJob} = useSelector(
     (state) => state.defineInterviewSliceReducer
   );
+  
   const [attachQuestionMediaType, setAttachQuestionMediaType] = useState(""); //audio, video, picture, document, code snippet, text
   const [mediaFile, setMediaFile] = useState("");
   const [mediaPreview, setMediaPreview] = useState("");
@@ -133,7 +134,7 @@ const SetInterviewSection = ({
         editOpeningClosingScriptQuestion(
           {
             newQuestion,
-            entityId,
+            entityId:currentJob.orgId,
             interviewRound: roundName,
             jobId,
             hiringType,

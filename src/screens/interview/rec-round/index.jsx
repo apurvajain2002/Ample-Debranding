@@ -28,19 +28,21 @@ let aviSmilingImageRef = null;
 const videoElementsDOM = {};
 
 // Sources that skip opening script and start from practice
-const SKIP_OPENING_SCRIPT_SOURCES = ['login'];
+const SKIP_OPENING_SCRIPT_SOURCES = ["login"];
 
 // Dynamic first script based on interview source
 const getFirstScript = (source) => {
-  return SKIP_OPENING_SCRIPT_SOURCES.includes(source) ? 'practice' : 'openingScript';
+  return SKIP_OPENING_SCRIPT_SOURCES.includes(source)
+    ? "practice"
+    : "openingScript";
 };
 
 // Function to find the first available script with data
 const findFirstAvailableScript = (questionData, interviewSource) => {
-  const scriptFlow = SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource) 
-    ? SCRIPT_FLOW.filter(script => script !== 'openingScript') 
+  const scriptFlow = SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource)
+    ? SCRIPT_FLOW.filter((script) => script !== "openingScript")
     : SCRIPT_FLOW;
-  
+
   for (const scriptType of scriptFlow) {
     if (
       questionData[scriptType] &&
@@ -50,9 +52,9 @@ const findFirstAvailableScript = (questionData, interviewSource) => {
       return scriptType;
     }
   }
-  
+
   // If no script has data, return the first script in flow
-  return scriptFlow[0] || 'openingScript';
+  return scriptFlow[0] || "openingScript";
 };
 
 const SCRIPT_FLOW = [
@@ -87,10 +89,13 @@ const OtherRecRound = () => {
   const { isStreaming, startStreaming, stopStream, videoRef } = useStreamCamera(
     { timeBased: false }
   );
-  const { preferredLanguage, userInterviewStatus } = useSelector((state) => state.interviewSlice);
+  const { preferredLanguage, userInterviewStatus } = useSelector(
+    (state) => state.interviewSlice
+  );
   const userId = useSelector((state) => state.signinSliceReducer.userId);
   const navigate = useNavigate();
-  const { dynamicErrorMessage, containerRef, startInterviewMonitoring } = useForceFullscreen();
+  const { dynamicErrorMessage, containerRef, startInterviewMonitoring } =
+    useForceFullscreen();
   const [currentQuestion, setCurrentQuestion] = useState({});
   const [questionData, setQuestionData] = useState({});
   const [showComponent, setShowComponent] = useState(null);
@@ -119,7 +124,8 @@ const OtherRecRound = () => {
   const [room, setRoom] = useState(null);
   const [enxResult, setEnxResult] = useState(null);
   const [splitView, setSplitView] = useState(false);
-  const payloadUserId = link_access_type === "privateLink" ? privateUserId : userId ?? '';
+  const payloadUserId =
+    link_access_type === "privateLink" ? privateUserId : userId ?? "";
 
   /* console.log('rec round location ::: ', location);
   console.log('rec round payloadUserId ::: ', payloadUserId);
@@ -150,7 +156,7 @@ const OtherRecRound = () => {
           roomName: `${currentUser} Interview Room`,
           candidateName: currentUser || "keshav",
           userId: userId || 1331,
-          tenantId: tenantId || '0',
+          tenantId: tenantId || "0",
         }
       );
 
@@ -499,7 +505,7 @@ const OtherRecRound = () => {
           "Recruiter Round",
           "Started",
           preferredLanguage || "English Indian",
-          tenantId || '0'
+          tenantId || "0"
         );
       }
       // when index reaches the end of the array
@@ -510,7 +516,7 @@ const OtherRecRound = () => {
           "Recruiter Round",
           "Completed",
           preferredLanguage || "English Indian",
-          tenantId || '0'
+          tenantId || "0"
         );
         handleNextScriptType();
         return;
@@ -591,8 +597,8 @@ const OtherRecRound = () => {
 
   // move to next script type
   const handleNextScriptType = async (prevScriptType = currentScriptType) => {
-    const scriptFlow = SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource) 
-      ? SCRIPT_FLOW.filter(script => script !== 'openingScript') 
+    const scriptFlow = SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource)
+      ? SCRIPT_FLOW.filter((script) => script !== "openingScript")
       : SCRIPT_FLOW;
     let nextScriptType = "";
     let nextScriptTypeIndex = null;
@@ -651,7 +657,7 @@ const OtherRecRound = () => {
     ) {
       // Skip to practice for sources that skip opening script, otherwise use normal logic
       if (SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource)) {
-        moveToNextQuestion(12, 'practice');
+        moveToNextQuestion(12, "practice");
       } else {
         moveToNextQuestion(
           candidateVerified ? 12 : question.nextQuestionIfYes,
@@ -801,7 +807,11 @@ const OtherRecRound = () => {
         currentQuestion.questionVideoLink || currentQuestion.lipSyncVideoLink;
       if (!videoLink) {
         // Use practice script as fallback for sources that skip opening script, otherwise use opening script
-        const fallbackScript = SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource) ? 'practice' : 'openingScript';
+        const fallbackScript = SKIP_OPENING_SCRIPT_SOURCES.includes(
+          interviewSource
+        )
+          ? "practice"
+          : "openingScript";
         const fallbackQuestion = questionData[fallbackScript]?.[0];
         if (fallbackQuestion?.questionVideoLink) {
           videoToPlay = `${fallbackScript}_${fallbackQuestion.questionVideoLink}`;
@@ -837,7 +847,10 @@ const OtherRecRound = () => {
   useEffect(() => {
     if (questionData.status) {
       // Find the first available script with data, skipping empty ones
-      const initialScript = findFirstAvailableScript(questionData, interviewSource);
+      const initialScript = findFirstAvailableScript(
+        questionData,
+        interviewSource
+      );
       setCurrentScriptType(initialScript);
     }
   }, [questionData, interviewSource]);
@@ -877,7 +890,7 @@ const OtherRecRound = () => {
             jobId: jobId,
             interviewRound: roundName,
             language: preferredLanguage || "English Indian",
-            tenantId: tenantId || '0',
+            tenantId: tenantId || "0",
           }
         );
 
@@ -898,41 +911,50 @@ const OtherRecRound = () => {
         // Filter skillBased array based on IDs from another API
         let filteredSkillBased = data.skillBased || [];
         let filterIds = []; // Initialize as empty array
-        console.log("before rec round",userInterviewStatus,filteredSkillBased);
+        console.log(
+          "before rec round",
+          userInterviewStatus,
+          filteredSkillBased
+        );
         console.log("Current interview status:", userInterviewStatus);
 
         try {
           // Call your API to get the array of IDs
-          if(userInterviewStatus && userInterviewStatus.toLowerCase() === "started"){
+          const myUserId = localStorage.getItem("myUserId");
+          console.log("local storage data", myUserId);
+
+          if (myUserId) {
             const { data: apiFilterIds } = await axiosInstance.get(
-              `${baseUrl}/job-posting/api/enablex/interview-questions`, 
+              `${baseUrl}/job-posting/api/enablex/interview-questions`,
               {
                 params: {
                   interviewId: interviewId,
-                  userId: userId,
-                }
+                  userId: myUserId,
+                },
               }
             );
             filterIds = apiFilterIds || []; // Ensure it's always an array
           } else {
             filterIds = [];
           }
-          console.log("filterIds",filterIds);
-          console.log("before rec round",filteredSkillBased);
-          
-          
+          console.log("filterIds", filterIds);
+          console.log("before rec round", filteredSkillBased);
+
           // Filter skillBased array to only include questions with matching IDs
           if (filterIds && Array.isArray(filterIds)) {
-            filteredSkillBased = data.skillBased.filter(question => 
-              !filterIds.includes(question.id)
+            filteredSkillBased = data.skillBased.filter(
+              (question) => !filterIds.includes(question.id)
             );
           }
         } catch (filterError) {
-          console.warn('Failed to fetch filter IDs, using all skillBased questions:', filterError);
+          console.warn(
+            "Failed to fetch filter IDs, using all skillBased questions:",
+            filterError
+          );
           filterIds = []; // Ensure it's empty array on error
           // Continue with original data if filtering fails
         }
-          console.log("after",filteredSkillBased);
+        console.log("after", filteredSkillBased);
 
         await loadVideosFromArray(data.openingScript, "openingScript");
         await loadVideosFromArray(data.practice, "practice");
@@ -941,9 +963,10 @@ const OtherRecRound = () => {
         await loadVideosFromArray(data.feedBack, "feedBack");
         await loadVideosFromArray(data.closingScript, "closingScript");
         addAvisImage();
-        setQuestionData({...data,
-          skillBased: filteredSkillBased});
-          setMcqQuestionCounter(data.skillBased.length - filteredSkillBased.length + 1);
+        setQuestionData({ ...data, skillBased: filteredSkillBased });
+        setMcqQuestionCounter(
+          data.skillBased.length - filteredSkillBased.length + 1
+        );
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -996,7 +1019,10 @@ const OtherRecRound = () => {
               }}
             />
           ) : (
-            <div ref={containerRef} className={!splitView ? "parent" : undefined}>
+            <div
+              ref={containerRef}
+              className={!splitView ? "parent" : undefined}
+            >
               <RecruiterRoundInterviewSection
                 forceCamera={
                   forceCameraOn && currentScriptType === "skillBased"
