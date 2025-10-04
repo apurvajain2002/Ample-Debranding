@@ -4,7 +4,7 @@ import SuccessToast from "../../../components/toasts/success-toast";
 import ErrorToast from "../../../components/toasts/error-toast";
 import EvuemeLoader from "../../../components/loaders/evueme-loader";
 import axiosInstance from "../../../interceptors";
-import { baseUrl } from "../../../config/config";
+import { baseUrl } from "../../config/config";
 
 const ConfirmEmail = () => {
   const navigate = useNavigate();

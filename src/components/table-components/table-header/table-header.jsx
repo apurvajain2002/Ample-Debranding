@@ -4,7 +4,7 @@ import TableSearchField from "../table-miscellaneous/table-search-field";
 import { icon } from "../../assets/assets";
 import CustomFilter from "../table-miscellaneous/custom-filter";
 import axiosInstance from "../../../interceptors";
-import { baseUrl } from "../../../config/config";
+import { baseUrl } from "../../config/config";
 import downloadExcelPdfFile from "../../../utils/download-excel-pdf-file";
 import ErrorToast from "../../toasts/error-toast";
 import { useSelector } from "react-redux";

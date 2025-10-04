@@ -5,7 +5,7 @@ import AdminHeader2 from "../../../components/admin/admin-header-2/admin-header-
 import ErrorToast from "../../../components/toasts/error-toast.jsx";
 import { useSelector } from "react-redux";
 import WarningToast from "../../../components/toasts/warning-toast";
-import { baseUrl } from "../../../config/config";
+import { baseUrl } from "../../config/config";
 import DeviceChecking from "../../device-checking";
 import aviSmiling from "../../../resources/videos/aviSmiling.mp4";
 import aviListening from "../../../resources/videos/aviListening.mp4";

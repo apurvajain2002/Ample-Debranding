@@ -22,7 +22,7 @@ import QuestionSection from "../../../components/interview/rec-round/question-se
 import InputSubmitComponent from "../../../components/interview/InputSubmitComponent";
 import StarRating from "../../../components/interview/StarRating";
 import OTPInputComponent from "../../../components/interview/OTPInputComponent";
-import { baseUrl } from "../../../config/config";
+import { baseUrl } from "../../config/config";
 import { saveCandidateResponse } from "../api";
 import { useGlobalContext } from "../../../context";
 import { wait200ms } from "../../../utils/functions";
@@ -933,8 +933,8 @@ const RecruiterRoundInterviewSection = ({
                     }}
                     stopVideoStream={handleStopRecording}
                     terminateInterview={terminateInterview}
-                    // currentQuestionIndex={currentQuestionIndex}
-                    mcqQuestionCounter={mcqQuestionCounter}
+                    currentQuestionIndex={currentQuestionIndex}
+                    mcqQuestionCounter={currentQuestionIndex}
                     totalQuestions={totalQuestions}
                     enableCandidateActionButton={isVideoEnded}
                     timer={timer}

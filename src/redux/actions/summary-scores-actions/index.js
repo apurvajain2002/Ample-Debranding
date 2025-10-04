@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { baseUrl } from "../../../config/config";
+import { baseUrl } from "../../config/config";
 import axiosInstance from "../../../interceptors";
 import ErrorToast from "../../../components/toasts/error-toast";
 // import SuccessToast from "../../../components/toasts/success-toast";

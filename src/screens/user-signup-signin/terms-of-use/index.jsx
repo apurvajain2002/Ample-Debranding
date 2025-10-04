@@ -13,7 +13,7 @@ import { setLogout, setTnCStatus } from "../../../redux/slices/signin-slice";
 import RadioButtonInputField from "../../../components/input-fields/radio-button-input-field";
 import SuccessToast from "../../../components/toasts/success-toast";
 import Cookies from "js-cookie";
-import { baseUrl } from "../../../config/config";
+import { baseUrl } from "../../config/config";
 
 const DisagreementReason2 = ({ onClose = () => { } }) => {
   const [reason, setReason] = useState("");

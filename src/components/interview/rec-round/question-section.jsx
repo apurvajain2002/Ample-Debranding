@@ -21,7 +21,7 @@ const QuestionSection = ({
   stopAudioRecording,
   stopVideoStream,
   terminateInterview = () => { },
-  // currentQuestionIndex = 0,
+  currentQuestionIndex = 0,
   totalQuestions = 0,
   enableCandidateActionButton = false,
   timer,

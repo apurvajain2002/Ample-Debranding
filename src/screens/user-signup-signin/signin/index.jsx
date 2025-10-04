@@ -3,11 +3,11 @@ import { useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
 import EvuemeLoader from "../../../components/loaders/evueme-loader";
-import { OAUTH } from "../../../config/config";
+import { OAUTH } from "../../config/config";
 import { useGlobalContext } from "../../../context";
 import { useDispatch } from "react-redux";
 import { setLogout } from "../../../redux/slices/signin-slice";
-import { APP_AUTH_URL, baseUrl } from "../../../config/config";
+import { APP_AUTH_URL, baseUrl } from "../../config/config";
 const SigninPage = () => {
   const navigate = useNavigate();
   const { hostname } = useGlobalContext();

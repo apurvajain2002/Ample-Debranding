@@ -5,7 +5,7 @@ import EvuemeInputTag from "../../evueme-html-tags/evueme-input-tag";
 import CheckboxInputField from "../../input-fields/checkbox-input-field";
 import NormalButton from "../../buttons/normal-button";
 import axiosInstance from "../../../interceptors/index";
-import { baseUrl } from "../../../config/config";
+import { baseUrl } from "../../config/config";
 import ErrorToast from "../../toasts/error-toast";
 import { formatDateToDDMMYYYY } from "../../../utils/dateFormatter";
 import { useSelector } from "react-redux";
