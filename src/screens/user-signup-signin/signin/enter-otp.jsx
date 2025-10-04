@@ -21,7 +21,7 @@ import axiosInstance from "../../../interceptors";
 import SuccessToast from "../../../components/toasts/success-toast";
 import { useGlobalContext } from "../../../context";
 import { baseUrl } from "../../../config/config";
-
+import { APP_AUTH_URL, baseUrl } from "../../../config/config";
 const numberOfDigits = 6;
 const initialTime = 1 * 60;
 
@@ -143,7 +143,8 @@ const LoginWithOTP = ({
       formData.append("username", nationalNumber);
       formData.append("password", stringOtp);
       const response = await axios.post(
-        `https://${hostname}-auth.evueme.dev/oauth2/token`,
+        // `https://${hostname}-auth.evueme.dev/oauth2/token`,
+        `${APP_AUTH_URL}/oauth2/token`,
         // { phoneCode: countryCode, mobileNo: nationalNumber, otp: stringOtp }
         formData
       );

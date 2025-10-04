@@ -7,7 +7,7 @@ import { OAUTH } from "../../../config/config";
 import { useGlobalContext } from "../../../context";
 import { useDispatch } from "react-redux";
 import { setLogout } from "../../../redux/slices/signin-slice";
-
+import { APP_AUTH_URL, baseUrl } from "../../../config/config";
 const SigninPage = () => {
   const navigate = useNavigate();
   const { hostname } = useGlobalContext();
@@ -28,7 +28,9 @@ const AUTH_API_URL = process.env.REACT_APP_APP_AUTH_URL;
     if (!token) {
       // Skip OAuth API call if user is logging out
       if (isLogout) {
-        window.location.href = `https://${hostname}${AUTH_API_URL}/login`;
+        // window.location.href = `https://${hostname}${AUTH_API_URL}/login`;
+        window.location.href = `${APP_AUTH_URL}/login`;
+
         // clear all cookies
         Cookies.remove("e_access_token");
         localStorage.clear();
@@ -36,7 +38,9 @@ const AUTH_API_URL = process.env.REACT_APP_APP_AUTH_URL;
         return;
       }
 
-      const authBase = `https://${hostname}${AUTH_API_URL}/oauth2/authorize`;
+      // const authBase = `https://${hostname}${AUTH_API_URL}/oauth2/authorize`;
+      const authBase = `${APP_AUTH_URL}/oauth2/authorize`;
+
       const params = new URLSearchParams();
       params.append("redirect_uri", OAUTH.REDIRECT_URI);
       params.append("response_type", "code");

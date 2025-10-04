@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import EvuemeLoader from "../../../components/loaders/evueme-loader";
 import { OAUTH } from "../../../config/config";
 import { useGlobalContext } from "../../../context";
+import { APP_AUTH_URL, baseUrl } from "../../../config/config";
 
 const OtpPage = () => {
   const navigate = useNavigate();
@@ -30,7 +31,8 @@ const OtpPage = () => {
         return;
       }
       
-      const authBase = `https://${hostname}${AUTH_API_URL}/oauth2/authorize`;
+      // const authBase = `https://${hostname}${AUTH_API_URL}/oauth2/authorize`;
+      const authBase = `${APP_AUTH_URL}/oauth2/authorize`;
       const params = new URLSearchParams();
       params.append("redirect_uri", OAUTH.REDIRECT_URI);
       params.append("response_type", "code");

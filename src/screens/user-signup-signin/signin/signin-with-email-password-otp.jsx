@@ -28,7 +28,7 @@ import {
   getPhoneNumber,
 } from "../../../utils/phoneNumberUtils";
 import { useGlobalContext } from "../../../context";
-import { baseUrl } from "../../../config/config";
+import { APP_AUTH_URL, baseUrl } from "../../../config/config";
 
 const INITIAL_ERROR_STATE = {
   emailId: false,
@@ -75,7 +75,8 @@ const SigninWithEmailPasswordOTP = ({ mobileNumber, setMobileNumber }) => {
         formData.append("username", email);
         formData.append("password", password);
         const response = await axios.post(
-          `https://${hostname}-auth.evueme.dev/oauth2/token`,
+          // `https://${hostname}-auth.evueme.dev/oauth2/token`,
+          `${APP_AUTH_URL}/oauth2/token`,
           formData,
           {
             headers: {

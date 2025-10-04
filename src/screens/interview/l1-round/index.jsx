@@ -86,9 +86,14 @@ const L1Round = () => {
   const currentUser = useSelector(
     (state) => state.signinSliceReducer.currentUser
   );
-  const { preferredLanguage, userInterviewStatus } = useSelector(
+  const { preferredLanguage, userInterviewStatus: reduxUserInterviewStatus } = useSelector(
     (state) => state.interviewSlice
   );
+  
+  // Get status from URL parameter as fallback if Redux state is not updated yet
+  const urlParams = new URLSearchParams(location.search);
+  const urlStatus = urlParams.get('status');
+  const userInterviewStatus = urlStatus || reduxUserInterviewStatus || 'notstarted';
   const userId = useSelector((state) => state.signinSliceReducer.userId);
   const forceCameraOn = useSelector(
     (state) => state.interviewSlice.forceCameraOn
@@ -132,7 +137,7 @@ const L1Round = () => {
 
   const payloadUserId =
     link_access_type === "privateLink" ? privateUserId : userId ?? "";
-  console.log("Current interview status:", link_access_type);
+  // console.log("Current interview status:", link_access_type);
   console.log('currentQuestionIndex ::: ', currentQuestionIndex); 
   // Camera activation logic - only turn on camera for skillBased script type
   useEffect(() => {
