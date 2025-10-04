@@ -75,6 +75,7 @@ const LIVE_RECORDING_CONFIG = {
 const OtherRecRound = () => {
   const location = useLocation();
   const link_access_type = location?.state?.link_access_type;
+  console.log('rec round link_access_type ::: ', link_access_type); 
   const { privateUserId, interviewSource } = useGlobalContext();
   const jobId = useSelector((state) => state.interviewSlice.jobId);
   const roundName = useSelector((state) => state.interviewSlice.roundName);
@@ -130,8 +131,9 @@ const OtherRecRound = () => {
   /* console.log('rec round location ::: ', location);
   console.log('rec round payloadUserId ::: ', payloadUserId);
   console.log('rec round privateUserId ::: ', privateUserId);
-  console.log('rec round userId ::: ', userId);
-  console.log('rec round link_access_type ::: ', link_access_type); */
+  console.log('rec round userId ::: ', userId);*/
+  console.log('currentQuestionIndex ::: ', currentQuestionIndex); 
+  console.log('mcqQuestionCounter ::: ', mcqQuestionCounter); 
 
   useEffect(() => {
     if (currentScriptType === "skillBased" && forceCameraOn) {
@@ -965,6 +967,9 @@ const OtherRecRound = () => {
         addAvisImage();
         setQuestionData({ ...data, skillBased: filteredSkillBased });
         setMcqQuestionCounter(
+          data.skillBased.length - filteredSkillBased.length + 1
+        );
+        setCurrentQuestionIndex(
           data.skillBased.length - filteredSkillBased.length + 1
         );
       } catch (error) {
