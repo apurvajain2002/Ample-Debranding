@@ -507,12 +507,12 @@ setIsGeneratingPDFShare(true);
         <PositionReport />
       </div>
 
-      <div className="box-main-bg" style={{ paddingBottom: "2.2rem" }}>
-        <span>
+      <div className="box-main-bg" style={{ paddingBottom: "2.2rem"}}>
+        <div style={{textAlign:"center", margin:"0 auto", width:"80%"}}>
           <h4>EvueMe AI Rating</h4>
           <div
             className="scoregraph-wr scoregraph-cus"
-            style={{ width: "50%", marginRight: 0 }}
+            style={{ width: "100%", marginRight: 0 ,}}
           >
             <div className="multigraph">
               <span
@@ -538,7 +538,10 @@ setIsGeneratingPDFShare(true);
             </div>
             <p>{selectedQuestionData?.competancy ?? "-"}</p>
           </div>
-          <div className="cheating-wr">
+          </div>
+
+         
+          {/* <div className="cheating-wr">
             <h4>Cheating Probability</h4>
             <div
               class="btn-cheat"
@@ -561,8 +564,12 @@ setIsGeneratingPDFShare(true);
                 }}
               ></span>
             </div>
-          </div>
-        </span>
+          </div> */}
+
+
+
+
+        
         <aside className="input-field textarea-full">
           <a
             href="#com_full_screen"
@@ -576,6 +583,7 @@ setIsGeneratingPDFShare(true);
           <textarea
             placeholder={"Comments"}
             id="aicomments"
+            style={{textAlign:"left"}}
             value={selectedQuestionData?.aiComment ?? ""}
             className={`materialize-textarea aicomments-rating ${styles['scrollable-textarea']}`}
             readOnly={true}

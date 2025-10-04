@@ -168,8 +168,8 @@ const CandidateVideo = ({ setSelectedQuestionData }) => {
         />
       </div>
       <div className="quest-bottom-wr">
-        <div className="row">
-          <aside className="col xl5 l7 m7 s12">
+        <div className="row" style={{display:"flex", justifyContent:"space-between",alignItems:"center"}}>
+          <div className="col xl5 l7 m7 s12" style={{width:"60%",marginLeft:10}}>
             <p className="inlineblock">Question No.</p>
             <ul className="paginationul">
               {filteredCandidateResponseList.map((qNum, index) => (
@@ -205,9 +205,10 @@ const CandidateVideo = ({ setSelectedQuestionData }) => {
                 <EvuemeImageTag imgSrc={icon.next} />
               </a>
             </div>
-          </aside>
-          <aside className="col xl3 l5 m5 s12" style={{ display: "contents" }}>
-            <ul class="video-speed">
+          </div>
+          <div style={{display:"flex",flexDirection:"column",width:"30%", justifyContent:"space-between",gap:"10px"}}>
+          <div className=" xl3 l5 m5 s12" style={{ display: "contents"  }}>
+            <ul class="video-speed" style={{margin:"0 auto"}}>
               <li>
                 <a
                   onClick={() => {
@@ -259,10 +260,11 @@ const CandidateVideo = ({ setSelectedQuestionData }) => {
                 </a>
               </li>
             </ul>
-          </aside>
-          <aside
-            className="col xl4 l5 m5 s12"
+          </div>
+          <div
+            className=" xl4 l5 m5 s12"
             style={{
+              backgroundColor:"00f",
               display: "flex",
               flexDirection: "row",
               gap: "3px",
@@ -292,7 +294,8 @@ const CandidateVideo = ({ setSelectedQuestionData }) => {
             >
               Finish
             </button>
-          </aside>
+          </div>
+          </div>
         </div>
 
         {!isViewByApplicant && (

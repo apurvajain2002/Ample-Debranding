@@ -5,6 +5,7 @@ import { icon, image } from "../assets/assets";
 import NormalButton from "../buttons/normal-button";
 import { useNavigate } from "react-router-dom";
 import M from "materialize-css";
+import styles from '../interview-responses/style.module.css'
 
 const EachRow = ({ question, index, filteredCandidateResponseList }) => {
   const [isAICommentModalOpen, setAICommentModalOpen] = useState(false);
@@ -215,10 +216,11 @@ const EachRow = ({ question, index, filteredCandidateResponseList }) => {
               placeholder={"Comments"}
               id="aicomments"
               value={question?.aiComment ?? "-"}
-              className="materialize-textarea aicomments-table"
+              className={`materialize-textarea aicomments-table ${styles['scrollable-textarea']}`}
               readOnly
               style={{ border: "none" }}
-            ></textarea>
+              rows={3}
+              ></textarea>
           </aside>
           {isAICommentModalOpen && (
             <div id={`com_full_screen_comment_${index}`} className="modal open">
@@ -252,6 +254,7 @@ const EachRow = ({ question, index, filteredCandidateResponseList }) => {
               }}
             >
               {question?.aiScore ?? 0}
+              {/* {question?.aiScore ? parseFloat(question.aiScore).toFixed(2) : 0} */}
             </span>
           </div>
           <p>{question?.competancy ?? "-"}</p>
@@ -267,7 +270,8 @@ const CandidateQuestionDisplay = ({ displayBackButton = true }) => {
   const { selectedCandidateId, filteredCandidateResponseList, candidateList } =
     useSelector((state) => state.interviewResponsesL1DashboardSliceReducer);
   // const [selectedQuestion, setSelectedQuestion] = useState(-1);
-
+  console.log("filteredCandidateResponseList",filteredCandidateResponseList);
+  
   const dispatch = useDispatch();
 
   const handleBack = () => {

@@ -1,5 +1,6 @@
 import { image } from "./../../../components/assets/assets.jsx";
 import "../../../styles/style.css";
+import { formatDate } from "../../../utils/formatDate";
 
 import { useNavigate } from "react-router-dom";
 const UserInfo = ({ userData }) => {
@@ -55,7 +56,7 @@ const UserInfo = ({ userData }) => {
               </li>
               <li>
                 <span>Date of birth</span>
-                <p>{dateOfBirth || 'N/A'}</p>
+                <p>{dateOfBirth ? formatDate(dateOfBirth) : 'N/A'}</p>
               </li>
               <li>
                 <span>Current Designation</span>
