@@ -24,8 +24,7 @@ jobs:
     
     - name: Deploy to Kubernetes
       run: |
-        echo "${{ secrets.E2E_KUBE_CONFIG }}" > kubeconfig_b64
-        base64 -d kubeconfig_b64 > kubeconfig
+        echo "${{ secrets.E2E_KUBE_CONFIG }}" > kubeconfig
         export KUBECONFIG=kubeconfig
         kubectl delete -f ev-web-deployment.yml --ignore-not-found=true
         kubectl apply -f ev-web-deployment.yml
