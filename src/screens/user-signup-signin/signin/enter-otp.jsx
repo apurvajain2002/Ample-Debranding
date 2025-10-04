@@ -142,8 +142,8 @@ const LoginWithOTP = ({
       formData.append("username", nationalNumber);
       formData.append("password", stringOtp);
       const response = await axios.post(
-        // `https://${hostname}-auth.evueme.dev/oauth2/token`,
-        `${APP_AUTH_URL}/oauth2/token`,
+        `https://${hostname}-auth.evueme.dev/oauth2/token`,
+        // `${APP_AUTH_URL}/oauth2/token`,
         // { phoneCode: countryCode, mobileNo: nationalNumber, otp: stringOtp }
         formData
       );

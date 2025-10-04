@@ -75,8 +75,8 @@ const SigninWithEmailPasswordOTP = ({ mobileNumber, setMobileNumber }) => {
         formData.append("username", email);
         formData.append("password", password);
         const response = await axios.post(
-          // `https://${hostname}-auth.evueme.dev/oauth2/token`,
-          `${APP_AUTH_URL}/oauth2/token`,
+          `https://${hostname}-auth.evueme.dev/oauth2/token`,
+          // `${APP_AUTH_URL}/oauth2/token`,
           formData,
           {
             headers: {

@@ -28,8 +28,8 @@ const AUTH_API_URL = process.env.REACT_APP_APP_AUTH_URL;
     if (!token) {
       // Skip OAuth API call if user is logging out
       if (isLogout) {
-        // window.location.href = `https://${hostname}${AUTH_API_URL}/login`;
-        window.location.href = `${APP_AUTH_URL}/login`;
+        window.location.href = `https://${hostname}${AUTH_API_URL}/login`;
+        // window.location.href = `${APP_AUTH_URL}/login`;
 
         // clear all cookies
         Cookies.remove("e_access_token");
