@@ -8,7 +8,7 @@ import SuccessToast from "../../../components/toasts/success-toast";
 import EvuemeLoader from "../../../components/loaders/evueme-loader";
 import ErrorToast from "../../../components/toasts/error-toast";
 import axiosInstance from "../../../interceptors";
-import { baseUrl } from "../../config/config";
+import { baseUrl } from "../../../config/config";
 
 const ResetPassword = () => {
   const urlParams = new URL(window.location.href).searchParams;

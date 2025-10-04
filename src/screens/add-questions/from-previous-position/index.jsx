@@ -12,7 +12,7 @@ import {
 } from "../../../redux/slices/from-previous-job-slice";
 import { arrayToKeyValue } from "../../../utils/arrayToKeyValue";
 import axiosInstance from "../../../interceptors";
-import { baseUrl } from "../../config/config";
+import { baseUrl } from "../../../config/config";
 import { saveQuestionsFromPreviousPositions } from "../../../redux/actions/create-new-question-actions/create-new-question-actions";
 import ErrorToast from "../../../components/toasts/error-toast";
 import WarningToast from "../../../components/toasts/warning-toast";
