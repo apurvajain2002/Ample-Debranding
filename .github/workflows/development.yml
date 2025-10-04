@@ -21,3 +21,10 @@ jobs:
         docker tag evuemev4-frontend:development ${{ secrets.DOCKER_REGISTRY }}/evuemev4-frontend:development
         echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
         docker push ${{ secrets.DOCKER_REGISTRY }}/evuemev4-frontend:development
+    
+    - name: Deploy to Kubernetes
+      run: |
+        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+        kubectl delete -f ev-web-deployment.yml --ignore-not-found=true
+        kubectl apply -f ev-web-deployment.yml
