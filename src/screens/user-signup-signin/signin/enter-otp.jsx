@@ -20,8 +20,8 @@ import { useLocation } from 'react-router-dom';
 import axiosInstance from "../../../interceptors";
 import SuccessToast from "../../../components/toasts/success-toast";
 import { useGlobalContext } from "../../../context";
-import { baseUrl } from "../../../config/config";
-import { APP_AUTH_URL, baseUrl } from "../../../config/config";
+import { baseUrl } from "../../config/config";
+import { APP_AUTH_URL, baseUrl } from "../../config/config";
 const numberOfDigits = 6;
 const initialTime = 1 * 60;
 

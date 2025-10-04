@@ -18,7 +18,7 @@ import { saveCandidate } from "../../../redux/actions/sign-up-actions";
 import { setUserId, setUserState } from "../../../redux/slices/signin-slice";
 import { saveCandidateResponse } from "../api";
 import { TerminationQuestion } from "../../../components/interview/termination-question";
-import { baseUrl } from "../../../config/config";
+import { baseUrl } from "../../config/config";
 import { VIEWS } from "./index";
 import { useGlobalContext } from "../../../context";
 import { fullscreenAPI, getDeviceInfo } from "../../../utils/browserCompatibility";

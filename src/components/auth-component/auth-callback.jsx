@@ -10,7 +10,7 @@ import { parseJwt } from "../../utils/parseJwt";
 import { useGlobalContext } from "../../context";
 const AUTH_API_BASE_URL = process.env.REACT_APP_APP_AUTH_BASE_URL;
 const AUTH_API_URL = process.env.REACT_APP_APP_AUTH_URL;
-import { APP_AUTH_URL, baseUrl } from "../../../config/config";
+import { APP_AUTH_URL, baseUrl } from "../../config/config";
 
 const USER_TYPE_MAP = {
   1: "org_person",
