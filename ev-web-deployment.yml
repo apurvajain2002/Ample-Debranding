@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ev-web
+  namespace: ev-dev
+  labels:
+    app: ev-web
+    type: ev-frontend
+    client: evueme
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ev-web
+  template:
+    metadata:
+      name: ev-web
+      labels:
+        app: ev-web
+    spec:
+      imagePullSecrets:
+        - name: ev-container
+      containers:
+        - name: ev-web
+          image:  evueme/evuemev4-frontend:development
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: cm-ev
