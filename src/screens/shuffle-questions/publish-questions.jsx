@@ -31,7 +31,7 @@ const PublishingLoader = ({ uploadedPercentage, className }) => {
         value={uploadedPercentage}
         className="publish-questions-circular-loader"
       />
-      { uploadedPercentage == 70 ? (<p>Interview publish in progress ...</p>):"" }
+      { uploadedPercentage == 70 ? (<p>Interview publish in progress ...</p>):(<p>Interview published successfully</p>) }
       
     </div>
   );
@@ -259,7 +259,7 @@ const PublishQuestions = () => {
       </div>
       <div className="publish-colaspe center-align">
         <PublishingLoader 
-        uploadedPercentage={isPublished?100:70}
+        uploadedPercentage={publishInfo.isRoundPublished?100:70}
         />
         
         {/* <a className="waves-effect waves-light btn btn-clear btn-submit btn-small">

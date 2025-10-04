@@ -259,6 +259,14 @@ const CandidateRecruiterRoundScore = ({ selectedQuestionData }) => {
     setIsGeneratingPDF(true);
     await sleep(10000);
     const input = pageRef.current;
+    
+    // Check if pageRef.current exists before accessing its properties
+    if (!input) {
+      console.error('pageRef.current is null or undefined');
+      setIsGeneratingPDF(false);
+      return;
+    }
+    
     input.style.display = "block";
     input.style.position = "absolute";
     input.style.left = "-9999px";
@@ -309,6 +317,14 @@ const CandidateRecruiterRoundScore = ({ selectedQuestionData }) => {
     setIsGeneratingPDFMail(true);
     await sleep(10000);
     const input = pageRef.current;
+    
+    // Check if pageRef.current exists before accessing its properties
+    if (!input) {
+      console.error('pageRef.current is null or undefined');
+      setIsGeneratingPDFMail(false);
+      return;
+    }
+    
     input.style.display = "block";
     input.style.position = "absolute";
     input.style.left = "-9999px";
