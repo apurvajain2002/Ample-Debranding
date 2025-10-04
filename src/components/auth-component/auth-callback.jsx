@@ -50,7 +50,8 @@ const AuthCallback = () => {
 
       try {
         let res = await axios.post(
-          `https://${hostname}${AUTH_API_URL}/oauth2/token`,
+          // `https://${hostname}${AUTH_API_URL}/oauth2/token`,
+          `https://${hostname}-auth.evueme.dev/oauth2/token`,
           data.toString(),
           {
             headers: {
