@@ -3,9 +3,9 @@ import { useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
 import EvuemeLoader from "../../../components/loaders/evueme-loader";
-import { OAUTH } from "../../config/config";
+import { OAUTH } from "../../../config/config";
 import { useGlobalContext } from "../../../context";
-import { APP_AUTH_URL, baseUrl } from "../../config/config";
+import { APP_AUTH_URL, baseUrl } from "../../../config/config";
 
 const OtpPage = () => {
   const navigate = useNavigate();

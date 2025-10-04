@@ -28,7 +28,7 @@ import {
   getPhoneNumber,
 } from "../../../utils/phoneNumberUtils";
 import { useGlobalContext } from "../../../context";
-import { APP_AUTH_URL, baseUrl } from "../../config/config";
+import { APP_AUTH_URL, baseUrl } from "../../../config/config";
 
 const INITIAL_ERROR_STATE = {
   emailId: false,

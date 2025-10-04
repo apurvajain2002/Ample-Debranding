@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../../interceptors";
 import ErrorToast from "../../../components/toasts/error-toast";
-import { baseUrl } from "../../config/config";
+import { baseUrl } from "../../../config/config";
 
 const getUserNotifications = createAsyncThunk(
   "getUserNotifications",
