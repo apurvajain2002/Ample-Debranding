@@ -132,7 +132,8 @@ const L1Round = () => {
 
   const payloadUserId =
     link_access_type === "privateLink" ? privateUserId : userId ?? "";
-  console.log("Current interview status:", userInterviewStatus);
+  console.log("Current interview status:", link_access_type);
+  console.log('currentQuestionIndex ::: ', currentQuestionIndex); 
   // Camera activation logic - only turn on camera for skillBased script type
   useEffect(() => {
     if (currentScriptType === "skillBased" && forceCameraOn) {
@@ -988,6 +989,9 @@ const L1Round = () => {
           ...data,
           skillBased: filteredSkillBased,
         });
+        setCurrentQuestionIndex(
+          data.skillBased.length - filteredSkillBased.length + 1
+        );
         setView(VIEWS.SPLIT);
       } catch (error) {
         console.error(error);
