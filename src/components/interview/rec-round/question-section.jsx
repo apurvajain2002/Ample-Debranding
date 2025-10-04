@@ -51,6 +51,8 @@ const QuestionSection = ({
   if (respType === "mcq" || respType === "mcr") {
     options = JSON.parse(question.questionOptions);
   }
+  console.log('currentQuestionIndex ::: 03', currentQuestionIndex); 
+  console.log('mcqQuestionCounter ::: 03', mcqQuestionCounter); 
 
   const { clickPicture } = useCaptureImage();
 
