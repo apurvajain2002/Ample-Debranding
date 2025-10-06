@@ -192,6 +192,8 @@ const UserInterviewTableRow = ({ userData, index }) => {
     const startTime = userData.startValidityTime?.slice(0, 10) + "\n" + userData.startValidityTime?.slice(11, 16) + " Hrs";
     const endTime = userData.endValidityTime?.slice(0, 10) + "\n" + userData.endValidityTime?.slice(11, 16) + " Hrs";
     const userInterviewStatus = userData.interviewStatus || 'notstarted'
+    console.log("userInterviewStatus",userInterviewStatus);
+    
     return (
         <tr>
             <td>{userData.businessName}</td>
@@ -208,13 +210,13 @@ const UserInterviewTableRow = ({ userData, index }) => {
                         buttonText={getButtonText("interviewLink", userInterviewStatus)}
                         leftIconSrc={getButtonIcons("interviewLink", userInterviewStatus)}
                         onClick={() => {
-                            console.log(userData);
+                            console.log(userData,userInterviewStatus);
                             // Update userInterviewStatus in Redux before navigation
                             dispatch(setUserInterviewStatus(userInterviewStatus));
                             
                             // Add status as URL parameter to ensure it's available immediately
                             const url = new URL(userData.interviewLink);
-                            url.searchParams.set('status', userInterviewStatus);
+                            // url.searchParams.set('status', userInterviewStatus);
                             window.location.href = url.toString();
                         }}
                         disabled={(userInterviewStatus).toLowerCase() === 'completed'}
