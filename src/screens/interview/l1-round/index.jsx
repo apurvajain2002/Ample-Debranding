@@ -947,8 +947,14 @@ const L1Round = () => {
           // Call your API to get the array of IDs
           const myUserId = localStorage.getItem("myUserId");
           console.log("local storage data", myUserId);
-
-          if (myUserId) {
+          const { data: checkResumeStatusData } = await axiosInstance.post(
+            `${baseUrl}/job-posting/candidate-interviews/get-resume-status`,
+            {
+                interviewId: interviewId,
+                userId: myUserId,
+            }
+          );
+          if (checkResumeStatusData.resume) {
             const { data: apiFilterIds } = await axiosInstance.get(
               `${baseUrl}/job-posting/api/enablex/interview-questions`,
               {
