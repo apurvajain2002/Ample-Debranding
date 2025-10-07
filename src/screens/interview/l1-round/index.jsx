@@ -522,6 +522,13 @@ const L1Round = () => {
     questionId = currentQuestion.nextQuestionIfNo,
     scriptType = currentScriptType
   ) => {
+    console.log('moveToNextQuestion called with:', { 
+      questionId, 
+      scriptType, 
+      currentQuestionId: currentQuestion.questionId,
+      currentScriptType 
+    });
+    
     let nextQuestion;
 
     // different handler for skill based
@@ -561,9 +568,11 @@ const L1Round = () => {
         return;
       }
       // get the next question from questionData
+      console.log('Looking for question in openingScript:', questionData[scriptType]?.map(q => ({ id: q.questionId, text: q.questionText.substring(0, 50) + '...' })));
       nextQuestion = questionData[scriptType].find(
         (question) => Number(question.questionId) === Number(questionId)
       );
+      console.log('Found nextQuestion:', nextQuestion ? { id: nextQuestion.questionId, text: nextQuestion.questionText.substring(0, 50) + '...' } : 'NOT FOUND');
     }
     if (nextQuestion) {
       if (
@@ -582,6 +591,28 @@ const L1Round = () => {
       } else {
         questionDoneRef.current = false;
         setCurrentQuestion(nextQuestion);
+      }
+    } else {
+      console.error('Next question not found!', { 
+        questionId, 
+        scriptType, 
+        availableQuestions: questionData[scriptType]?.map(q => q.questionId),
+        currentQuestion: currentQuestion.questionId
+      });
+      
+      // Try to find the next question by index as fallback
+      const currentIndex = questionData[scriptType]?.findIndex(
+        (q) => Number(q.questionId) === Number(currentQuestion.questionId)
+      );
+      console.log('Current question index:', currentIndex);
+      
+      if (currentIndex !== -1 && currentIndex + 1 < questionData[scriptType].length) {
+        nextQuestion = questionData[scriptType][currentIndex + 1];
+        console.log('Using next question by index:', nextQuestion ? { id: nextQuestion.questionId, text: nextQuestion.questionText.substring(0, 50) + '...' } : 'NOT FOUND');
+        
+        if (nextQuestion) {
+          setCurrentQuestion(nextQuestion);
+        }
       }
     }
   };
@@ -640,8 +671,16 @@ const L1Round = () => {
   };
 
   const infoAndFillerHandler = (question) => {
+    console.log('infoAndFillerHandler called with:', {
+      questionId: question.questionId,
+      nextQuestionIfYes: question.nextQuestionIfYes,
+      currentScriptType,
+      candidateVerified
+    });
+    
     // when the current script's questions get over
     if (question.nextQuestionIfYes === "0") {
+      console.log('Moving to next script type');
       handleNextScriptType();
       return;
     }
@@ -652,6 +691,7 @@ const L1Round = () => {
       currentScriptType === "openingScript" &&
       qText.includes("help you with a practice question so")
     ) {
+      console.log('Special case: practice question transition');
       // Skip to practice for sources that skip opening script, otherwise use normal logic
       if (SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource)) {
         moveToNextQuestion(12, "practice");
@@ -662,6 +702,7 @@ const L1Round = () => {
         );
       }
     } else {
+      console.log('Normal flow: moving to next question', question.nextQuestionIfYes);
       moveToNextQuestion(question.nextQuestionIfYes, currentScriptType);
     }
   };
@@ -725,7 +766,15 @@ const L1Round = () => {
       }
       case QTYPES.INFORMATIVE:
       case QTYPES.FILLER: {
+        console.log('Handling INFORMATIVE/FILLER:', {
+          questionId: question.questionId,
+          nextQuestionIfNo: question.nextQuestionIfNo,
+          type,
+          nextQuestionIfYes: question.nextQuestionIfYes
+        });
+        
         if (question && Number(question.nextQuestionIfNo) === -1) {
+          console.log('Case 1: nextQuestionIfNo is -1, showing repeat');
           playCurrentVideo("aviSmiling");
           setShowComponent("repeat");
 
@@ -734,12 +783,14 @@ const L1Round = () => {
             infoAndFillerHandler(question);
           }, SMILING_TIMEOUT);
         } else if (type !== QTYPES.INFORMATIVE) {
+          console.log('Case 2: type is not INFORMATIVE, using filler timeout');
           playCurrentVideo("aviSmiling");
           setShowComponent(null);
           setTimeout(() => {
             infoAndFillerHandler(question);
           }, FILLER_TIMEOUT);
         } else {
+          console.log('Case 3: type is INFORMATIVE, calling infoAndFillerHandler directly');
           infoAndFillerHandler(question);
         }
         break;
@@ -767,6 +818,14 @@ const L1Round = () => {
   // when current video ends
   useEffect(() => {
     if (isVideoEnded) {
+      console.log('Video ended for question:', {
+        questionId: currentQuestion.questionId,
+        questionType: currentQuestion.questionType,
+        termination: currentQuestion.termination,
+        nextQuestionIfYes: currentQuestion.nextQuestionIfYes,
+        nextQuestionIfNo: currentQuestion.nextQuestionIfNo
+      });
+      
       if (currentQuestion.termination) {
         if (
           currentScriptType === "openingScript" &&
@@ -782,8 +841,10 @@ const L1Round = () => {
           currentScriptType === "skillBased" &&
           currentQuestion.questionType === QTYPES.SKILL_BASED
         ) {
+          console.log('Calling questionTypeHandler with responseType:', currentQuestion.responseType);
           questionTypeHandler(currentQuestion.responseType, currentQuestion);
         } else {
+          console.log('Calling questionTypeHandler with questionType:', currentQuestion.questionType);
           questionTypeHandler(currentQuestion.questionType, currentQuestion);
         }
       }
