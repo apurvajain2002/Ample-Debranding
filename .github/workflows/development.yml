@@ -2,7 +2,7 @@ name: Development Deploy
 
 on:
   push:
-    branches: [ Development ]
+    branches: [ Development , rollback-branch]
   pull_request:
     branches: [ Development ]
 
