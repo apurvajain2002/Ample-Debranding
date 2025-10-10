@@ -60,9 +60,9 @@ const UserProfile = () => {
           <UserInfo userData={userDetailsInfo} />
           <UserSkills />
           <div className="row row-margin">
-            <UserWorkExpirence workExpiernce={userData.workExpiernce} />
+            <UserWorkExpirence workExpiernce={userDetailsInfo?.workExperience || []} />
             <UserAcademicExpirence
-              academicInformation={userData.academicInformation}
+              academicInformation={userDetailsInfo?.userAcademics || []}
             />
             {/* <AdminFooter /> */}
           </div>

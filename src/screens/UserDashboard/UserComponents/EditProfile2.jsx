@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { icon, image } from "./../../../components/assets/assets.jsx";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation,useNavigate  } from "react-router-dom";
 import NormalInputField from "../../../components/input-fields/normal-input-field.jsx";
 import NormalButton from "../../../components/buttons/normal-button.jsx";
 import { useGlobalContext } from "../../../context/index.jsx";
@@ -9,7 +9,8 @@ import handleDate from "../../../utils/handleDate.js";
 import { dateFormatter } from "../../../utils/dateFormatter.js";
 import { saveUserProfile } from "../../../redux/actions/interview-responses-l1-dashboard-actions";
 import { useDispatch,useSelector } from "react-redux";
-  
+import SuccessToast from "../../../components/toasts/success-toast.jsx";
+import ErrorToast from "../../../components/toasts/error-toast.jsx";
 const EditProfile2 = () => {
   const inputFieldCssClasses = "input-field col xl4 l4 m6 s12";
   const {
@@ -23,6 +24,7 @@ const EditProfile2 = () => {
     setUserCV,
   } = useGlobalContext();
   const location = useLocation();
+  const navigate = useNavigate();
   const userData = location.state || {};
   const [currentCTC, setCurrentCTC] = useState(userData.currentCTC);
   const [fixedCTC, setFixedCTC] = useState(userData.FixedCTC);
@@ -195,8 +197,15 @@ const EditProfile2 = () => {
       console.log("");
       
       await dispatch(saveUserProfile(formData)).unwrap();
+      SuccessToast("Profile updated successfully!");
+      
+      // Navigate to user profile page after a short delay
+      setTimeout(() => {
+        navigate('/user/profile');
+      }, 1000);
     } catch (err) {
       console.error('Error saving user profile:', err);
+      ErrorToast("Failed to update profile. Please try again.");
     }
   };
 
@@ -712,7 +721,7 @@ const EditProfile2 = () => {
                       <li>
                         <a
                           href="#"
-                          style={{ backgroundColor: "#f00" }}
+                          style={{ backgroundColor: "#000",margin:"0 2px", width:"20px",height:"20px",display:"flex",justifyContent:"center",alignItems:"center", borderRadius: "50%" }}
                           onClick={(e) => {
                             e.preventDefault();
                             handleAddAcademic();
@@ -724,20 +733,19 @@ const EditProfile2 = () => {
                       <li>
                         <a
                           href="#"
-                          style={{ backgroundColor: "#000" }}
                           onClick={(e) => {
                             e.preventDefault();
                             handleRemoveAcademic();
                           }}
                         >
-                          <img src={icon.minusLogo} alt="remove" />
+                          <img src={icon.minusLogo} alt="remove" style={{ marginTop:"2px" ,width:"15px", height:"15px" }} />
                         </a>
                       </li>
                     </ul>
                   </header>
                   <div className="workex-body border-bottomdashed">
                     <h3 className="h3-title">Post Graduate</h3>
-                    {userProfile.userAcademics?.map((item, acadIndex) => {
+                    {userDetailsInfo?.userAcademics?.map((item, acadIndex) => {
                       return (
                         <div className="workex-body">
                           <NormalInputField

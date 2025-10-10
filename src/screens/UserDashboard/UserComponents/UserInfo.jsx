@@ -14,15 +14,24 @@ const UserInfo = ({ userData }) => {
     firstName, lastName, primaryEmailId, username,
     mobileNumber1, mobileNumber2, whatsappNumber,
     currentLocation, noticePeriod, dateOfBirth,
-    currentCTC, higherEducation,photoFile,userSocialProfileDTO
+    currentCTC, higherEducation,photoFile,workExperience,userAcademics
   } = userData || {}
+
+  const currentOrganization = workExperience?.find(item => item.currentOrganization);
+  console.log("userData",userData);
 
   return (
     <div className="row row-margin">
       <aside className="col xl2 l2 m2 s12">
         <div className="candnamewr">
-          <div className="img-cand" style={{height:140,width:140, margin:"0 auto",marginBottom:"10px", overflow:"hidden", borderRadius:"100%"}}>
-            <img src={userSocialProfileDTO?.photoFile ?? image.candImage} alt="" />
+        <div className="img-cand" style={{height:140,width:140, margin:"0 auto",marginBottom:"10px", overflow:"hidden", borderRadius:"100%",
+              backgroundImage:`url(${photoFile ?? image.candImage})`,
+              backgroundSize:"cover",
+              backgroundPosition:"top",
+              backgroundRepeat:"no-repeat",
+
+          }}>
+            {/* <img src={userSocialProfileDTO?.photoFile ?? image.candImage} alt="" style={{height:"auto"}}/> */}
           </div>
           <h3>{`${firstName} ${lastName}` || 'N/A'}</h3>
           <p>{primaryEmailId || username || 'N/A'}</p>
@@ -46,7 +55,7 @@ const UserInfo = ({ userData }) => {
               </li>
               <li>
                 <span>Current Org.</span>
-                <p>{currentLocation || 'N/A'}</p>
+                <p>{currentOrganization?.organizationName || 'N/A'}</p>
               </li>
             </ul>
             <ul>
@@ -60,7 +69,7 @@ const UserInfo = ({ userData }) => {
               </li>
               <li>
                 <span>Current Designation</span>
-                <p>{higherEducation || 'N/A'}</p>
+                <p>{currentOrganization?.designation || 'N/A'}</p>
               </li>
               <li>
                 <span>Current CTC</span>
