@@ -586,7 +586,7 @@ const EditProfile2 = () => {
                             e.preventDefault();
                             handleAddWorkExperience();
                           }}
-                          style={{ backgroundColor: "#f00" }}
+                          style={{ backgroundColor: "#000",margin:"0 2px", width:"20px",height:"20px",display:"flex",justifyContent:"center",alignItems:"center", borderRadius: "50%" }}
                         >
                           <img src={icon.plusIcon} alt="add" />
                         </a>
@@ -599,9 +599,9 @@ const EditProfile2 = () => {
                             e.preventDefault();
                             handleRemoveWorkExperience();
                           }}
-                          style={{ backgroundColor: "#000" }}
+                          // style={{ backgroundColor: "#000" }}
                         >
-                          <img src={icon.minusLogo} alt="remove" />
+                          <img src={icon.minusLogo} alt="remove" style={{ marginTop:"2px" ,width:"15px", height:"15px" }} />
                         </a>
                       </li>
                     </ul>
@@ -816,6 +816,7 @@ const EditProfile2 = () => {
                       );
                     })}
                     <div className="row" />
+
                   </div>
                 </div>
               </div>

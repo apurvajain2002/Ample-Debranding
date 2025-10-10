@@ -14,7 +14,7 @@ const UserInfo = ({ userData }) => {
     firstName, lastName, primaryEmailId, username,
     mobileNumber1, mobileNumber2, whatsappNumber,
     currentLocation, noticePeriod, dateOfBirth,
-    currentCTC, higherEducation,photoFile,workExperience,userAcademics
+    currentCTC, higherEducation,photoFile,workExperience,userAcademics,userSocialProfileDTO
   } = userData || {}
 
   const currentOrganization = workExperience?.find(item => item.currentOrganization);
@@ -25,7 +25,7 @@ const UserInfo = ({ userData }) => {
       <aside className="col xl2 l2 m2 s12">
         <div className="candnamewr">
         <div className="img-cand" style={{height:140,width:140, margin:"0 auto",marginBottom:"10px", overflow:"hidden", borderRadius:"100%",
-              backgroundImage:`url(${photoFile ?? image.candImage})`,
+              backgroundImage:`url(${userSocialProfileDTO?.photoFile ?? image.candImage})`,
               backgroundSize:"cover",
               backgroundPosition:"top",
               backgroundRepeat:"no-repeat",
