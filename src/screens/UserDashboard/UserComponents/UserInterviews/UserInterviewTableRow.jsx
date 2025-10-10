@@ -157,32 +157,53 @@ const UserInterviewTableRow = ({ userData, index }) => {
 
     // icons for buttons
     const getButtonIcons = (map, status = "") => {
+        // Handle null or undefined status
+        if (!status || status === null || status === undefined) {
+            if (map === "status") return interviewStatusMap["notstarted"]?.icon;
+            if (map === "result") return interviewResultMap["waitlisted"]?.icon || null;
+            return null;
+        }
+        
         status = status?.replace(/\s+/g, "").toLowerCase().trim();
         if (map === "interviewLink") return interviewLinkMap[status]?.icon;
-        else if (map === "status") return interviewStatusMap[status]?.icon;
+        else if (map === "status") return interviewStatusMap[status]?.icon || interviewStatusMap["notstarted"]?.icon;
         else if (map === "result")
-            return interviewResultMap[status]?.icon;
+            return interviewResultMap[status]?.icon || interviewResultMap["waitlisted"]?.icon;
         return recruiterActionMap[status]?.icon;
     };
 
     const getButtonText = (map, status = "") => {
+        // Handle null or undefined status
+        if (!status || status === null || status === undefined) {
+            if (map === "status") return "Not Started";
+            if (map === "result") return "Awaiting Interview";
+            return "";
+        }
+        
         status = status?.replace(/\s+/g, "").toLowerCase().trim();
         console.log("status" + status);
         if (map === "interviewLink") return interviewLinkMap[status]?.text;
-        else if (map === "status") return interviewStatusMap[status]?.text;
+        else if (map === "status") return interviewStatusMap[status]?.text || "Not Started";
         else if (map === "result")
-            return interviewResultMap[status]?.text;
+            return interviewResultMap[status]?.text || "Awaiting Interview";
         return recruiterActionMap[status]?.text;
     };
     const getButtonClassName = (map, status = "") => {
+        // Handle null or undefined status
+        if (!status || status === null || status === undefined) {
+            if (map === "status") return `${defaultBtnClassName} ${interviewStatusMap["notstarted"]?.css || ""}`;
+            if (map === "result") return `${defaultBtnClassName} ${interviewResultMap["waitlisted"]?.css || ""}`;
+            return defaultBtnClassName;
+        }
+        
         status = status?.replace(/\s+/g, "").toLowerCase().toLowerCase();
         let css = "";
         if (map === "interviewLink") {
             css = interviewLinkMapButton[(status).toLowerCase()]?.css || "";
         } else if (map === "status") {
-            css = interviewStatusMap[status]?.css || "";
+            css = interviewStatusMap[status]?.css || interviewStatusMap["notstarted"]?.css || "";
         } else if (map === "result") {
-            css = interviewResultMap[status]?.css || "";
+            css = interviewResultMap[status]?.css || interviewResultMap["waitlisted"]?.css || "";
         } else {
             css = `${interviewLinkMap[status]?.css} tooltipped` || "";
         }
