@@ -12,6 +12,7 @@ const TableHead = ({
   tableName = "",
   getFilteredRows = () => { },
   customSortArray = [],
+  tableData = [],
 }) => {
   const { isTableHeaderChecked, handleTableHeaderCheckbox } = useGlobalContext();
   const [currentOpenDropdown, setCurrentOpenDropdown] = useState(null);
@@ -22,19 +23,24 @@ const TableHead = ({
           if (tableName === "jobdetails" &&
             curTableHead.optionKey === "Select Column")
             return null;
-          if (curTableHead.optionKey === 'selectCheckbox') return (
-            <th style={{ width: '3%' }}>
-              <label style={{ float: 'left' }}>
-                <input type="checkbox" className="filled-in"
-                  checked={isTableHeaderChecked}
-                  onChange={(event) => {
-                    const { checked } = event.target;
-                    handleTableHeaderCheckbox(checked);
-                  }} />
-                <span>&nbsp;</span>
-              </label>
-            </th>
-          )
+          if (curTableHead.optionKey === 'selectCheckbox') {
+            // Extract candidate IDs from table data
+            const candidateIds = tableData.map(candidate => candidate.candidateInviteId).filter(Boolean);
+            
+            return (
+              <th style={{ width: '3%' }}>
+                <label style={{ float: 'left' }}>
+                  <input type="checkbox" className="filled-in"
+                    checked={isTableHeaderChecked}
+                    onChange={(event) => {
+                      const { checked } = event.target;
+                      handleTableHeaderCheckbox(checked, candidateIds);
+                    }} />
+                  <span>&nbsp;</span>
+                </label>
+              </th>
+            )
+          }
           return (
             <th
               key={index}

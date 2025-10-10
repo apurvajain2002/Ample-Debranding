@@ -29,6 +29,7 @@ import {
   selectOrganizationId,
   setIsGetJobsApiCalled,
   setRoundName,
+  roundName
 } from "../../redux/slices/create-new-job-slice";
 import { arrayToKeyValue } from "../../utils/arrayToKeyValue";
 import DateInputField from "../../components/input-fields/date-input-field";
@@ -89,7 +90,7 @@ const InviteCandidates = () => {
     hour: "1",
     minute: "00",
   });
-  
+
   const [round2, setRound2] = useState({
     day: "1",
     month: "Jan",
@@ -108,6 +109,8 @@ const InviteCandidates = () => {
     allCombinedTemplates, setAllCombinedTemplates,
     candidatesToInvite, setCandidatesToInvite, hostname
   } = useGlobalContext();
+  console.log("allCombinedTemplates", allCombinedTemplates);
+
   const { selectedCandidateEmailWpInfo } = useSelector(
     (state) => state.interviewResponsesRecruiterDashboardSliceReducer
   );
@@ -121,20 +124,20 @@ const InviteCandidates = () => {
   const handleRound1Change = (field, value) => {
     setRound1((prev) => ({ ...prev, [field]: value }));
   };
-  
+
   const handleRound2Change = (field, value) => {
     setRound2((prev) => ({ ...prev, [field]: value }));
   };
-  
+
   const handleSubmit2 = (e) => {
     e.preventDefault();
-  
+
     const round1StartDate = `${round1.day} ${round1.month} ${round1.year}`;
     const round1StartTime = `${round1.hour}:${round1.minute} ${round1.hour >= 12 ? "PM" : "AM"}`;
-  
+
     const round2StartDate = `${round2.day} ${round2.month} ${round2.year}`;
     const round2StartTime = `${round2.hour}:${round2.minute} ${round2.hour >= 12 ? "PM" : "AM"}`;
-  
+
     const result = {
       round1StartDate,
       round1StartTime,
@@ -142,7 +145,7 @@ const InviteCandidates = () => {
       round2StartTime,
     };
     setResult(result);
-    
+
     setOpenModal(false)
   };
 
@@ -205,6 +208,9 @@ const InviteCandidates = () => {
     isInterviewLinkInviteDetails, isInviteCandidateButtonDisable
   } = useSelector((state) => state.inviteCandidatesSliceReducer);
 
+  // Ref to prevent duplicate API calls
+  const apiCallMade = useRef(false);
+
   const isSubmitDisabled = userType === 'manpower' && isInviteCandidateButtonDisable;
 
   console.log('isInviteCandidateButtonDisable ::: ', isInviteCandidateButtonDisable, userType, isSubmitDisabled);
@@ -224,7 +230,7 @@ const InviteCandidates = () => {
     // Loop through each line
     lines.forEach((line, index) => {
       const fields = line.split(",").map((item) => item.trim());
-      
+
       // Skip empty lines
       if (fields.length === 0 || (fields.length === 1 && fields[0] === "")) {
         return;
@@ -247,12 +253,12 @@ const InviteCandidates = () => {
         const nameParts = fields[0].split(" ");
         candidateObj.firstName = nameParts[0] || "";
         candidateObj.lastName = nameParts.slice(1).join(" ") || "";
-        
+
         // Second field is email
         if (emailRegex.test(fields[1])) {
           candidateObj.primaryMailId = fields[1];
         }
-        
+
         // Third field is phone number
         if (mobileRegex.test(fields[2])) {
           candidateObj.whatsappNumber = fields[2];
@@ -303,7 +309,7 @@ const InviteCandidates = () => {
 
     lines.forEach((line, index) => {
       const fields = line.split(",").map((item) => item.trim());
-      
+
       // Skip empty lines
       if (fields.length === 0 || (fields.length === 1 && fields[0] === "")) {
         return;
@@ -326,12 +332,12 @@ const InviteCandidates = () => {
         const nameParts = fields[0].split(" ");
         candidateObj.firstName = nameParts[0] || "";
         candidateObj.lastName = nameParts.slice(1).join(" ") || "";
-        
+
         // Second field is email
         if (emailRegex.test(fields[1])) {
           candidateObj.primaryMailId = fields[1];
         }
-        
+
         // Third field is phone number
         if (mobileRegex.test(fields[2])) {
           candidateObj.whatsappNumber = fields[2];
@@ -388,6 +394,8 @@ const InviteCandidates = () => {
   useEffect(() => {
     if (location?.state) {
       const { candidateInvitation, candidateInvitations } = location.state;
+      console.log("candidateInvitation------------>,  ::: ", candidateInvitation, );
+      console.log("candidateInvitations------------>,  ::: ", candidateInvitations, );
       
       // Handle multiple candidates
       if (candidateInvitations && Array.isArray(candidateInvitations)) {
@@ -397,9 +405,9 @@ const InviteCandidates = () => {
           const phoneNumber = `${mobileNumber ? `${mobileNumber}` : whatsappNumber ? `${whatsappNumber}` : ""}`;
           return emailId.concat(phoneNumber);
         }).join('\n'); // Join multiple candidates with newlines
-        
+
         setCandidatesToInvite(candidateDetails);
-        
+
         // Handle other properties from the first candidate (if needed)
         if (candidateInvitations[0]?.interviewRound) {
           dispatch(setRoundName(candidateInvitations[0]?.interviewRound));
@@ -418,7 +426,7 @@ const InviteCandidates = () => {
         const phoneNumber = `${mobileNumber ? `${mobileNumber}` : whatsappNumber ? `${whatsappNumber}` : ""}`;
         const candidateDetails = emailId.concat(phoneNumber);
         setCandidatesToInvite(candidateDetails);
-        
+
         if (candidateInvitation?.interviewRound) {
           dispatch(setRoundName(candidateInvitation?.interviewRound));
         }
@@ -432,19 +440,36 @@ const InviteCandidates = () => {
     }
   }, [location])
 
+  // Auto-call API when conditions are met (only once)
   useEffect(() => {
-    if (isNotPublishedJobsApiCalled && isGetJobsApiCalled) {
-      console.log('isNotPublishedJobsApiCalled, isGetJobsApiCalled ::: ', isNotPublishedJobsApiCalled, isGetJobsApiCalled);
-      // dispatch(interviewLinkInviteDetails({
-      //   "jobId": jobId,
-      //   "interviewRoundName": roundName,
-      //   "agencyName": selectedPlacementAgency,
-      //   "vacancyLocations": selectedLocation
-      // }));
-      dispatch(setIsGetJobsApiCalled(false));
-      dispatch(setIsNotPublishedJobsApiCalled(false));
+    const shouldCallAPI = (candidatesToInvite && jobId && roundName) || 
+                         (isNotPublishedJobsApiCalled && isGetJobsApiCalled);
+    
+    if (shouldCallAPI && !apiCallMade.current) {
+      console.log('Auto-calling interviewLinkInviteDetails (first time only)');
+      apiCallMade.current = true; // Mark as called
+      
+      // const round_name = roundName == "Recruiter Round" ? "L1 Hiring Manager Round" : "Recruiter Round";
+      
+      dispatch(interviewLinkInviteDetails({
+        "jobId": jobId,
+        "interviewRoundName": roundName,
+        "agencyName": selectedPlacementAgency,
+        "vacancyLocations": selectedLocation
+      }));
+      
+      // Reset flags if they were set
+      if (isNotPublishedJobsApiCalled && isGetJobsApiCalled) {
+        dispatch(setIsGetJobsApiCalled(false));
+        dispatch(setIsNotPublishedJobsApiCalled(false));
+      }
     }
-  }, [isNotPublishedJobsApiCalled, isGetJobsApiCalled]);
+  }, [candidatesToInvite, jobId, roundName, selectedPlacementAgency, selectedLocation, isNotPublishedJobsApiCalled, isGetJobsApiCalled]);
+
+  // Reset API call flag when location changes (new page load)
+  useEffect(() => {
+    apiCallMade.current = false;
+  }, [location]);
 
   useEffect(() => {
     if (isInterviewLinkInviteDetails) {
@@ -619,13 +644,13 @@ const InviteCandidates = () => {
           ? inviteCandidate.whatsappTemplate
           : "",
         mailSendingTime: inviteCandidate.sendDate,
-        timezone : "Asia/Kolkata",
+        timezone: "Asia/Kolkata",
         templateName: templateTypesValue || '',
         inviteId: inviteDetailsDTO?.inviteId || '',
-        round1StartDate : result.round1StartDate,
-        round1StartTime : result.round1StartTime,
-        round2StartDate : result.round2StartDate,
-        round2StartTime : result.round2StartTime,
+        round1StartDate: result.round1StartDate,
+        round1StartTime: result.round1StartTime,
+        round2StartDate: result.round2StartDate,
+        round2StartTime: result.round2StartTime,
 
       })
     );
@@ -782,79 +807,127 @@ const InviteCandidates = () => {
     setSendLaterModalOpen(false); // Close the modal after successful submission
   };
 
+  // Access current page URL - This will log immediately when component loads
+  const currentUrl = window.location.href;
+  const currentPathname = location.pathname;
+  const currentSearch = location.search;
+
+  // Extract only the part after /admin
+  const pathAfterAdmin = currentPathname.replace('/admin', '');
+  // Alternative: Split by '/' and get the last part
+  const pathSegments = currentPathname.split('/');
+  const lastSegment = pathSegments[pathSegments.length - 1];
+  // Combine pathname and search to get full path with query parameters
+  const fullPath = currentPathname + currentSearch;
+  // Another alternative: Use substring to get everything after '/admin/'
+  const pathAfterAdminSubstring = fullPath.substring(fullPath.indexOf('/admin/') + 6);
+
+  console.log("Full path:", fullPath);
+  console.log("Path after /admin (substring):", pathAfterAdminSubstring);
+
+
   const onRedirectionSaveClick = () => {
     if (!inviteCandidate.redirectLink) {
       ErrorToast("Please Enter Redirect URL");
       return;
     }
+
+    console.log("SAVE button clicked with redirect URL:", inviteCandidate.redirectLink);
+
+    // You can now use the current URL for whatever you need
+    // For example, you might want to use it as a fallback or reference
   }
 
   const handleInterviewLinkInviteDetails = () => {
-    console.log("inviteCandidate",inviteCandidate);
-    
-    // setInviteCandidate({...inviteCandidate, candidateInfo: []})
-    dispatch(interviewLinkInviteDetails({
-      "jobId": jobId,
-      "interviewRoundName": roundName,
-      "agencyName": selectedPlacementAgency,
-      "vacancyLocations": selectedLocation
-    }));
+    console.log("inviteCandidate", inviteCandidate);
+    // API call is now handled automatically by useEffect
+    // No need to call it manually here
   }
-  
-  return (
-    <>
-      {isLoading && <EvuemeLoader />}
-      <div className="container">
-        <BreadCrome />
-        <ul className="tab-button">
-          <li>
-            <Link
-              to="#"
-              onClick={() =>
-                setInviteCandidate({
-                  ...inviteCandidate,
-                  inviteType: "individual",
-                })
-              }
-              className={
-                inviteCandidate.inviteType === "individual"
-                  ? "tab-selected"
-                  : ""
-              }
-            >
-              Invite Individually
-              <i
-                className="tooltipped infermation-ico-black"
-                data-position="top"
-                data-tooltip="Invite Individually"
-              >
-                i
-              </i>
-            </Link>
-          </li>
-          &nbsp;
-          <li>
-            <Link
-              href="#"
-              onClick={() =>
-                setInviteCandidate({ ...inviteCandidate, inviteType: "bulk" })
-              }
-              className={
-                inviteCandidate.inviteType === "bulk" ? "tab-selected" : ""
-              }
-            >
-              Bulk Invite
-              <i
-                className="tooltipped infermation-ico-black"
-                data-position="top"
-                data-tooltip="Bulk Invite"
-              >
-                i
-              </i>
-            </Link>
-          </li>
-        </ul>
-        {/* <aside className="col xl4 l5 m12 s12 add-questions-top-right padding-0">
+
+  const generateTemplateOption = () => {
+    let res = generateTemplateOptions(allCombinedTemplates)
+    console.log("Original templates:-------------->", res);
+
+    // if (pathAfterAdminSubstring == "/invite-candidates") {
+    //   console.log("Current hiring type:", currentJobDetails?.hiringType);
+    //   console.log("selectedRound:", roundName);
+
+    //   if (currentJobDetails?.hiringType === "Campus Hiring") {
+    //     res = res.filter(item => item.optionValue === "campus process intimation");
+    //     console.log("Filtered result:", res);
+    //   }
+    //   else if (currentJobDetails?.hiringType === "Lateral Hiring") {
+    //     console.log("Lateral Hiring - keeping all templates");
+    //     if (roundName == "Recruiter Round") {
+
+    //       res = res.filter(item => item.optionValue === "recruiter round interview call");
+    //       // Keep all templates for lateral hiring
+    //     } else if (roundName == "L1 Hiring Manager Round") {
+    //       res = res.filter(item => item.optionValue === "l1 round interview call");
+    //     }
+    //   }}
+    //   else if(pathAfterAdminSubstring == "/invite-candidates?type=invited-candidates"){
+    //     if (roundName == "L1 Hiring Manager Round") {
+    //       res = res.filter(item => item.optionValue === "l1 round interview call");
+    //     }
+    //   }
+        return res
+      }
+
+      return (
+        <>
+          {isLoading && <EvuemeLoader />}
+          <div className="container">
+            <BreadCrome />
+            <ul className="tab-button">
+              <li>
+                <Link
+                  to="#"
+                  onClick={() =>
+                    setInviteCandidate({
+                      ...inviteCandidate,
+                      inviteType: "individual",
+                    })
+                  }
+                  className={
+                    inviteCandidate.inviteType === "individual"
+                      ? "tab-selected"
+                      : ""
+                  }
+                >
+                  Invite Individually
+                  <i
+                    className="tooltipped infermation-ico-black"
+                    data-position="top"
+                    data-tooltip="Invite Individually"
+                  >
+                    i
+                  </i>
+                </Link>
+              </li>
+              &nbsp;
+              <li>
+                <Link
+                  href="#"
+                  onClick={() =>
+                    setInviteCandidate({ ...inviteCandidate, inviteType: "bulk" })
+                  }
+                  className={
+                    inviteCandidate.inviteType === "bulk" ? "tab-selected" : ""
+                  }
+                >
+                  Bulk Invite
+                  <i
+                    className="tooltipped infermation-ico-black"
+                    data-position="top"
+                    data-tooltip="Bulk Invite"
+                  >
+                    i
+                  </i>
+                </Link>
+              </li>
+            </ul>
+            {/* <aside className="col xl4 l5 m12 s12 add-questions-top-right padding-0">
           <SelectInputField
             selectTagIdAndName={"selectJobPosition"}
             options={optionMapper(
@@ -876,805 +949,805 @@ const InviteCandidates = () => {
             onChange={(e) => dispatch(setRoundName(e.target.value))}
           />
         </aside> */}
-        {inviteCandidate.inviteType === "individual" ? (
-          <>
-            <div className="row row-margin horizontal-cards">
-              <div className="body-box-body">
-                <div className="row valign-wrapper">
-                  {userType === 'manpower' &&
-                    <SelectInputField
-                      selectTagIdAndName={"selectOrganization"}
-                      divTagCssClasses="col xl3 l3 m4 s12"
-                      labelText={"Organization Name"}
-                      customLabelNode={<>Organization Name <span style={{ color: 'red' }}>*</span></>}
-                      options={optionMapper(
-                        organizationsList,
-                        "businessName",
-                        "id",
-                        "Select Organization Name"
-                      )}
-                      value={organizationId}
-                      onChange={(e) => {
-                        dispatch(selectOrganizationId(e.target.value));
-                        setAllCombinedTemplates([]);
-                        // Clear templates when job changes
-                        setTemplateTypesValue('');
-                        setInviteCandidate(prev => ({
-                          ...prev,
-                          emailTemplate: '',
-                          whatsappTemplate: ''
-                        }));
-                        // Clear the template flags
-                        dispatch(clearIsTemplate());
-                        dispatch(clearIsTemplateWA());
-                      }}
-                    />
-                  }
-                  <SelectInputField
-                    selectTagIdAndName={"selectJobPosition"}
-                    divTagCssClasses="col xl3 l3 m4 s12"
-                    labelText={"Position Name"}
-                    customLabelNode={<>Position Name <span style={{ color: 'red' }}>*</span></>}
-                    options={optionMapper(
-                      allNotPublishedJobs,
-                      "positionName",
-                      "jobId",
-                      "Select Position Name"
-                    )}
-                    value={jobId}
-                    onChange={(e) => {
-                      setAllCombinedTemplates([]);
-                      // Clear templates when job changes
-                      setTemplateTypesValue('');
-                      setInviteCandidate(prev => ({
-                        ...prev,
-                        emailTemplate: '',
-                        whatsappTemplate: ''
-                      }));
-                      // Clear the template flags
-                      dispatch(clearIsTemplate());
-                      dispatch(clearIsTemplateWA());
-                      dispatch(selectJobId(e.target.value))
-                      setHiringTypedd(true)
-                      
-                      console.log("currentJobDetails",currentJobDetails);
-                      
-                    }}
-                  />
-                  {(hiringTypedd && userType !== 'manpower' && currentJobDetails && currentJobDetails?.hiringType !== "Lateral Hiring") && (
-                    <SelectInputField
-                      selectTagIdAndName={"selectJobPosition"}
-                      divTagCssClasses="col xl3 l3 m4 s12"
-                      labelText={labelTexts} // plain text only
-                      customLabelNode={<>{labelTexts} <span style={{ color: 'red' }}>*</span></>}
-                      options={(() => {
-                        const agencies = currentJobDetails?.placementAgencies
-                          ?.toString()
-                          .split(",")
-                          .filter(agency => agency);
-
-                        const baseOptions = arrayToKeyValue(
-                          agencies || [],
-                          currentJobDetails?.hiringType === "Campus Hiring" ? "Select Campus" : "Select Placement Agency"
-                        );
-
-                        // Add None for placement agency when data is null or has multiple agencies
-                        if (currentJobDetails?.hiringType !== "Campus Hiring" &&
-                          (!agencies || agencies.length === 0 || agencies.length > 1)) {
-                          return [...baseOptions, { optionKey: "None", optionValue: "None" }];
-                        }
-
-                        return baseOptions;
-                      })()}
-                      value={selectedPlacementAgency}
-                      onChange={handlePlacementAgencyChange}
-                    />
-                  )}
-                  
-                  <SelectInputField
-                    selectTagIdAndName={"selectJobPosition2"}
-                    divTagCssClasses="col xl3 l3 m4 s12"
-                    labelText={'Interview Round'} // plain text only
-                    customLabelNode={<>{'Interview Round'} <span style={{ color: 'red' }}>*</span></>}
-                    options={arrayToKeyValue(
-                      currentJobDetails?.interviewRounds?.toString().split(","),
-                      "Select Interview Round"
-                    )}
-                    value={roundName}
-                    onChange={(e) => {
-                      const selectedRound = e.target.value;
-                      dispatch(setRoundName(selectedRound));
-                      // Clear templates when round changes
-                      setTemplateTypesValue('');
-                      setInviteCandidate(prev => ({
-                        ...prev,
-                        emailTemplate: '',
-                        whatsappTemplate: ''
-                      }));
-                      // Clear the template flags
-                      dispatch(clearIsTemplate());
-                      dispatch(clearIsTemplateWA());
-                      dispatch(
-                        fetchTemplateNames({
-                          type: "email",
-                          hiringType: currentJobDetails?.hiringType,
-                          interviewRounds: selectedRound,
-                          inviteType: section,
-                        })
-                      );
-                      dispatch(
-                        fetchWATemplateNames({
-                          type: "whatsapp",
-                          hiringType: currentJobDetails?.hiringType,
-                          interviewRounds: selectedRound,
-                          inviteType: section,
-                        })
-                      );
-                    }}
-                  />
-                  <SelectInputField
-                    selectTagIdAndName={"selectJobPosition"}
-                    divTagCssClasses="col xl3 l3 m4 s12"
-                    labelText={"Vacancy Location"}
-                    customLabelNode={<>Vacancy Location <span style={{ color: 'red' }}>*</span></>}
-                    options={(() => {
-                      const locations = currentJobDetails?.locations
-                        ?.toString()
-                        .split(",")
-                        .filter(location => location);
-
-                      const baseOptions = arrayToKeyValue(
-                        locations || [],
-                        "Select Location"
-                      );
-
-                      // Only add Multiple locations if we have more than one location
-                      if (locations?.length > 1) {
-                        return [...baseOptions, { optionKey: "Multiple locations", optionValue: "Multiple locations" }];
-                      }
-
-                      return baseOptions;
-                    })()}
-                    value={selectedLocation}
-                    onChange={handleLocationChange}
-                  />
-
-                  <aside className="col xl2 l2 m4 s12 right-align">
-                    <a
-                      href="javascript:void(0)"
-                      className={`waves-effect waves-light btn btn-clear btn-submit ${isSubmitDisabled && 'btn-disabled'}`}
-                      style={isInviteCandidateButtonDisable ? { backgroundColor: '#666666' } : {}}
-                      onClick={() => {
-                        if (isSubmitDisabled || isInviteCandidateButtonDisable) return;
-                        // Clear the textarea field and context
-                        setInviteCandidate({...inviteCandidate, candidateInfo: ''});
-                        setCandidatesToInvite(''); // Clear context value
-                        handleInterviewLinkInviteDetails()
-                      }}
-                    >
-                      Submit
-                    </a>
-                  </aside>
-                </div>
-              </div>
-            </div>
-            <div className="row row-margin horizontal-cards">
-              <aside className="col xl6 l6 m6 s12">
-                <div className="card cand-minheight">
-                  <div className="card-content">
-                    <span className="card-title">Instructions</span>
-                    <ul className="card-ul">
-                      {instructionsData.map((item, index) => {
-                        return <li>{index + 1}. {item}</li>
-                      })}
-                    </ul>
-                  </div>
-                </div>
-              </aside>
-              <aside className="col xl6 l6 m6 s12">
-                <div className="card">
-                  <div className="card-content">
-                    <span className="card-title">
-                      Enter Candidates to invite
-                    </span>
-                    <EvuemeModalTrigger
-                      modalId={"a"}
-                      className="tooltipped"
-                      data-position={"right"}
-                    ></EvuemeModalTrigger>
-                    <div
-                      className="candidate-boxscroll"
-                      style={{ height: "auto" }}
-                    >
-                      <textarea
-                        value={inviteCandidate.candidateInfo}
-                        onChange={(e) => {
-                          if (isBulkInvited) return;
-                          setInviteCandidate({
-                            ...inviteCandidate,
-                            candidateInfo: e.target.value,
-                          });
-                        }}
-                        style={{
-                          height: "80px",
-                          outline: "none",
-                          border: "none",
-                        }}
-                        readOnly={isBulkInvited}
-                        disabled={isBulkInvited}
-                      />
-                    </div>
-                    <div className="full-width pl-10">
-                      <label className="checkboxfor-invitetime">
-                        <input
-                          type="checkbox"
-                          className="filled-in"
-                          onChange={() => {
-                            setRestrictInviteTime((prev) => !prev);
-                            // Clear expireTime when checkbox is unchecked
-                            if (restrictInviteTime) {
-                              setInviteCandidate(prev => ({
-                                ...prev,
-                                expireTime: ""
-                              }));
-                            }
+            {inviteCandidate.inviteType === "individual" ? (
+              <>
+                <div className="row row-margin horizontal-cards">
+                  <div className="body-box-body">
+                    <div className="row valign-wrapper">
+                      {userType === 'manpower' &&
+                        <SelectInputField
+                          selectTagIdAndName={"selectOrganization"}
+                          divTagCssClasses="col xl3 l3 m4 s12"
+                          labelText={"Organization Name"}
+                          customLabelNode={<>Organization Name <span style={{ color: 'red' }}>*</span></>}
+                          options={optionMapper(
+                            organizationsList,
+                            "businessName",
+                            "id",
+                            "Select Organization Name"
+                          )}
+                          value={organizationId}
+                          onChange={(e) => {
+                            dispatch(selectOrganizationId(e.target.value));
+                            setAllCombinedTemplates([]);
+                            // Clear templates when job changes
+                            setTemplateTypesValue('');
+                            setInviteCandidate(prev => ({
+                              ...prev,
+                              emailTemplate: '',
+                              whatsappTemplate: ''
+                            }));
+                            // Clear the template flags
+                            dispatch(clearIsTemplate());
+                            dispatch(clearIsTemplateWA());
                           }}
                         />
-                        <span>Restrict above invites time</span>
-                      </label>
+                      }
+                      <SelectInputField
+                        selectTagIdAndName={"selectJobPosition"}
+                        divTagCssClasses="col xl3 l3 m4 s12"
+                        labelText={"Position Name"}
+                        customLabelNode={<>Position Name <span style={{ color: 'red' }}>*</span></>}
+                        options={optionMapper(
+                          allNotPublishedJobs,
+                          "positionName",
+                          "jobId",
+                          "Select Position Name"
+                        )}
+                        value={jobId}
+                        onChange={(e) => {
+                          setAllCombinedTemplates([]);
+                          // Clear templates when job changes
+                          setTemplateTypesValue('');
+                          setInviteCandidate(prev => ({
+                            ...prev,
+                            emailTemplate: '',
+                            whatsappTemplate: ''
+                          }));
+                          // Clear the template flags
+                          dispatch(clearIsTemplate());
+                          dispatch(clearIsTemplateWA());
+                          dispatch(selectJobId(e.target.value))
+                          setHiringTypedd(true)
+
+                          console.log("currentJobDetails", currentJobDetails);
+
+                        }}
+                      />
+                      {(hiringTypedd && userType !== 'manpower' && currentJobDetails && currentJobDetails?.hiringType !== "Lateral Hiring") && (
+                        <SelectInputField
+                          selectTagIdAndName={"selectJobPosition"}
+                          divTagCssClasses="col xl3 l3 m4 s12"
+                          labelText={labelTexts} // plain text only
+                          customLabelNode={<>{labelTexts} <span style={{ color: 'red' }}>*</span></>}
+                          options={(() => {
+                            const agencies = currentJobDetails?.placementAgencies
+                              ?.toString()
+                              .split(",")
+                              .filter(agency => agency);
+
+                            const baseOptions = arrayToKeyValue(
+                              agencies || [],
+                              currentJobDetails?.hiringType === "Campus Hiring" ? "Select Campus" : "Select Placement Agency"
+                            );
+
+                            // Add None for placement agency when data is null or has multiple agencies
+                            if (currentJobDetails?.hiringType !== "Campus Hiring" &&
+                              (!agencies || agencies.length === 0 || agencies.length > 1)) {
+                              return [...baseOptions, { optionKey: "None", optionValue: "None" }];
+                            }
+
+                            return baseOptions;
+                          })()}
+                          value={selectedPlacementAgency}
+                          onChange={handlePlacementAgencyChange}
+                        />
+                      )}
+
+                      <SelectInputField
+                        selectTagIdAndName={"selectJobPosition2"}
+                        divTagCssClasses="col xl3 l3 m4 s12"
+                        labelText={'Interview Round'} // plain text only
+                        customLabelNode={<>{'Interview Round'} <span style={{ color: 'red' }}>*</span></>}
+                        options={arrayToKeyValue(
+                          currentJobDetails?.interviewRounds?.toString().split(","),
+                          "Select Interview Round"
+                        )}
+                        value={roundName}
+                        onChange={(e) => {
+                          const selectedRound = e.target.value;
+                          dispatch(setRoundName(selectedRound));
+                          // Clear templates when round changes
+                          setTemplateTypesValue('');
+                          setInviteCandidate(prev => ({
+                            ...prev,
+                            emailTemplate: '',
+                            whatsappTemplate: ''
+                          }));
+                          // Clear the template flags
+                          dispatch(clearIsTemplate());
+                          dispatch(clearIsTemplateWA());
+                          dispatch(
+                            fetchTemplateNames({
+                              type: "email",
+                              hiringType: currentJobDetails?.hiringType,
+                              interviewRounds: selectedRound,
+                              inviteType: section,
+                            })
+                          );
+                          dispatch(
+                            fetchWATemplateNames({
+                              type: "whatsapp",
+                              hiringType: currentJobDetails?.hiringType,
+                              interviewRounds: selectedRound,
+                              inviteType: section,
+                            })
+                          );
+                        }}
+                      />
+                      <SelectInputField
+                        selectTagIdAndName={"selectJobPosition"}
+                        divTagCssClasses="col xl3 l3 m4 s12"
+                        labelText={"Vacancy Location"}
+                        customLabelNode={<>Vacancy Location <span style={{ color: 'red' }}>*</span></>}
+                        options={(() => {
+                          const locations = currentJobDetails?.locations
+                            ?.toString()
+                            .split(",")
+                            .filter(location => location);
+
+                          const baseOptions = arrayToKeyValue(
+                            locations || [],
+                            "Select Location"
+                          );
+
+                          // Only add Multiple locations if we have more than one location
+                          if (locations?.length > 1) {
+                            return [...baseOptions, { optionKey: "Multiple locations", optionValue: "Multiple locations" }];
+                          }
+
+                          return baseOptions;
+                        })()}
+                        value={selectedLocation}
+                        onChange={handleLocationChange}
+                      />
+
+                      <aside className="col xl2 l2 m4 s12 right-align">
+                        <a
+                          href="javascript:void(0)"
+                          className={`waves-effect waves-light btn btn-clear btn-submit ${isSubmitDisabled && 'btn-disabled'}`}
+                          style={isInviteCandidateButtonDisable ? { backgroundColor: '#666666' } : {}}
+                          onClick={() => {
+                            if (isSubmitDisabled || isInviteCandidateButtonDisable) return;
+                            // Clear the textarea field and context
+                            setInviteCandidate({ ...inviteCandidate, candidateInfo: '' });
+                            setCandidatesToInvite(''); // Clear context value
+                            handleInterviewLinkInviteDetails()
+                          }}
+                        >
+                          Submit
+                        </a>
+                      </aside>
                     </div>
-                    {restrictInviteTime && (
-                      <div className="full-width">
-                        <EvuemeLabelTag>
-                          <RadioButtonInputField
-                            inputTagCssClasses={"with-gap"}
-                            groupName="expireType"
-                            labelText={"Hours"}
-                            radioButtonValue={inviteCandidate.expireType}
-                            value={"Hours"}
-                            onChange={(e) => handleOnChange(e)}
-                          />
-                          &nbsp;
-                          <span>
-                            {inviteCandidate.expireType === "Hours" && (
-                              <input
-                                type="number"
-                                name="expireTime"
-                                className="hour-input"
-                                onChange={interviewExpirationDateHandler}
-                              />
-                            )}
-                          </span>
-                          <EvuemeModalTrigger modalId={"timePickerModal"}>
-                            <RadioButtonInputField
-                              inputTagCssClasses={"with-gap"}
-                              groupName="expireType"
-                              labelText={"Custom"}
-                              radioButtonValue={inviteCandidate.expireType}
-                              value={"Custom"}
-                              onChange={(e) => handleOnChange(e)}
-                            />
-                          </EvuemeModalTrigger>
-                        </EvuemeLabelTag>
-                      </div>
-                    )}
                   </div>
                 </div>
-              </aside>
-            </div>
-            <div className="body-box-bodybg">
-              <header className="body-box-top">
-                <h3>Select WhatsApp and Email Template</h3>
-              </header>
-              <div className="row row-margin">
-                <aside className="col xl6 l6 m6 s12">
-                  <div className="emial-template">
-                    <header className="template-header" style={{ padding: '0px' }}>
-                      <label>
-                        <input
-                          type="checkbox"
-                          className="filled-in"
-                          checked={isEmailTemplate}
-                          onClick={() => setIsEmailTemplate((prev) => !prev)}
-                          onChange={() => { }}
-                        />
-                        <span>Email Invite</span>
-                      </label>
-                    </header>
-                    <header className="template-header" style={{ padding: '0px' }}>
-                      <label>
-                        <input
-                          type="checkbox"
-                          className="filled-in"
-                          checked={isWhatsappTemplate}
-                          onClick={() => setIsWhatsappTemplate((prev) => !prev)}
-                          onChange={() => { }}
-                        />
-                        <span>WhatsApp Invite</span>
-                      </label>
-                    </header>
-                    <div className="email-teplate-box-inner">
-                      <div className="input-field">
-                        <div className="message-prv candidate-boxscroll">
-                          {templateTypesValue && isEmailTemplate && !isTemplate && (
-                            <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-                              <i className="material-icons" style={{ fontSize: '24px', marginRight: '8px' }}>hourglass_empty</i>
-                              Loading email template...
-                            </div>
-                          )}
-                          <div
-                            className="media-file-preview"
-                            dangerouslySetInnerHTML={{
-                              __html: (templateTypesValue && isEmailTemplate && inviteCandidate?.emailTemplate) ? inviteCandidate?.emailTemplate : '',
+                <div className="row row-margin horizontal-cards">
+                  <aside className="col xl6 l6 m6 s12">
+                    <div className="card cand-minheight">
+                      <div className="card-content">
+                        <span className="card-title">Instructions</span>
+                        <ul className="card-ul">
+                          {instructionsData.map((item, index) => {
+                            return <li>{index + 1}. {item}</li>
+                          })}
+                        </ul>
+                      </div>
+                    </div>
+                  </aside>
+                  <aside className="col xl6 l6 m6 s12">
+                    <div className="card">
+                      <div className="card-content">
+                        <span className="card-title">
+                          Enter Candidates to invite
+                        </span>
+                        <EvuemeModalTrigger
+                          modalId={"a"}
+                          className="tooltipped"
+                          data-position={"right"}
+                        ></EvuemeModalTrigger>
+                        <div
+                          className="candidate-boxscroll"
+                          style={{ height: "auto" }}
+                        >
+                          <textarea
+                            value={inviteCandidate.candidateInfo}
+                            onChange={(e) => {
+                              if (isBulkInvited) return;
+                              setInviteCandidate({
+                                ...inviteCandidate,
+                                candidateInfo: e.target.value,
+                              });
                             }}
+                            style={{
+                              height: "80px",
+                              outline: "none",
+                              border: "none",
+                            }}
+                            readOnly={isBulkInvited}
+                            disabled={isBulkInvited}
+                          />
+                        </div>
+                        <div className="full-width pl-10">
+                          <label className="checkboxfor-invitetime">
+                            <input
+                              type="checkbox"
+                              className="filled-in"
+                              onChange={() => {
+                                setRestrictInviteTime((prev) => !prev);
+                                // Clear expireTime when checkbox is unchecked
+                                if (restrictInviteTime) {
+                                  setInviteCandidate(prev => ({
+                                    ...prev,
+                                    expireTime: ""
+                                  }));
+                                }
+                              }}
+                            />
+                            <span>Restrict above invites time</span>
+                          </label>
+                        </div>
+                        {restrictInviteTime && (
+                          <div className="full-width">
+                            <EvuemeLabelTag>
+                              <RadioButtonInputField
+                                inputTagCssClasses={"with-gap"}
+                                groupName="expireType"
+                                labelText={"Hours"}
+                                radioButtonValue={inviteCandidate.expireType}
+                                value={"Hours"}
+                                onChange={(e) => handleOnChange(e)}
+                              />
+                              &nbsp;
+                              <span>
+                                {inviteCandidate.expireType === "Hours" && (
+                                  <input
+                                    type="number"
+                                    name="expireTime"
+                                    className="hour-input"
+                                    onChange={interviewExpirationDateHandler}
+                                  />
+                                )}
+                              </span>
+                              <EvuemeModalTrigger modalId={"timePickerModal"}>
+                                <RadioButtonInputField
+                                  inputTagCssClasses={"with-gap"}
+                                  groupName="expireType"
+                                  labelText={"Custom"}
+                                  radioButtonValue={inviteCandidate.expireType}
+                                  value={"Custom"}
+                                  onChange={(e) => handleOnChange(e)}
+                                />
+                              </EvuemeModalTrigger>
+                            </EvuemeLabelTag>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </aside>
+                </div>
+                <div className="body-box-bodybg">
+                  <header className="body-box-top">
+                    <h3>Select WhatsApp and Email Template</h3>
+                  </header>
+                  <div className="row row-margin">
+                    <aside className="col xl6 l6 m6 s12">
+                      <div className="emial-template">
+                        <header className="template-header" style={{ padding: '0px' }}>
+                          <label>
+                            <input
+                              type="checkbox"
+                              className="filled-in"
+                              checked={isEmailTemplate}
+                              onClick={() => setIsEmailTemplate((prev) => !prev)}
+                              onChange={() => { }}
+                            />
+                            <span>Email Invite</span>
+                          </label>
+                        </header>
+                        <header className="template-header" style={{ padding: '0px' }}>
+                          <label>
+                            <input
+                              type="checkbox"
+                              className="filled-in"
+                              checked={isWhatsappTemplate}
+                              onClick={() => setIsWhatsappTemplate((prev) => !prev)}
+                              onChange={() => { }}
+                            />
+                            <span>WhatsApp Invite</span>
+                          </label>
+                        </header>
+                        <div className="email-teplate-box-inner">
+                          <div className="input-field">
+                            <div className="message-prv candidate-boxscroll">
+                              {templateTypesValue && isEmailTemplate && !isTemplate && (
+                                <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+                                  <i className="material-icons" style={{ fontSize: '24px', marginRight: '8px' }}>hourglass_empty</i>
+                                  Loading email template...
+                                </div>
+                              )}
+                              <div
+                                className="media-file-preview"
+                                dangerouslySetInnerHTML={{
+                                  __html: (templateTypesValue && isEmailTemplate && inviteCandidate?.emailTemplate) ? inviteCandidate?.emailTemplate : '',
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </aside>
+                    <aside className="col xl6 l6 m6 s12">
+                      <div className="emial-template">
+                        <div className="email-teplate-box-inner">
+                          <div className="input-field" style={{ marginTop: '20px',  }}>
+                            {/* {console.log('Template options:', generateTemplateOptions(allCombinedTemplates))} */}
+                            <SelectInputField
+                              options={optionMapper(
+                                generateTemplateOption(),
+                                "optionKey",
+                                "optionValue",
+                                "Choose Template"
+                              )}
+                              value={templateTypesValue}
+                              onChange={(e) => handleChange(e)}
+                            />
+                          </div>
+                          <WhatappChatView
+                            htmlContent={(templateTypesValue && isWhatsappTemplate && inviteCandidate?.whatsappTemplate) ? inviteCandidate?.whatsappTemplate : ''}
+                            isLoading={templateTypesValue && isWhatsappTemplate && !isTemplateWA}
                           />
                         </div>
                       </div>
-                    </div>
+                    </aside>
                   </div>
-                </aside>
-                <aside className="col xl6 l6 m6 s12">
-                  <div className="emial-template">
-                    <div className="email-teplate-box-inner">
-                      <div className="input-field" style={{ marginTop: '20px' }}>
-                        {/* {console.log('Template options:', generateTemplateOptions(allCombinedTemplates))} */}
-                        <SelectInputField
-                          options={optionMapper(
-                            generateTemplateOptions(allCombinedTemplates),
-                            "optionKey",
-                            "optionValue",
-                            "Choose Template"
-                          )}
-                          value={templateTypesValue}
-                          onChange={(e) => handleChange(e)}
-                        />
-                      </div>
-                      <WhatappChatView
-                        htmlContent={(templateTypesValue && isWhatsappTemplate && inviteCandidate?.whatsappTemplate) ? inviteCandidate?.whatsappTemplate : ''}
-                        isLoading={templateTypesValue && isWhatsappTemplate && !isTemplateWA}
-                      />
-                    </div>
-                  </div>
-                </aside>
-              </div>
-            </div>
-            {userType !== 'manpower' && (
-              <div className="setting-section">
-                <div className="setting-tab-wr">
-                  <div className="row">
-                    <div className="full-width">
-                      <ul className="tabs setting-tab">
-                        <li className="tab tab-btn">
-                          <Link
-                            className={
-                              inviteCandidate.settings === "fullScreen"
-                                ? "active"
-                                : ""
-                            }
-                            onClick={() =>
-                              setInviteCandidate({
-                                ...inviteCandidate,
-                                settings: "fullScreen",
-                              })
-                            }
-                          >
-                            <i>
-                              <EvuemeImageTag src={icon.zoomExpandIcon} alt="" />
-                            </i>
-                            Full Screen
-                          </Link>
-                        </li>
-                        <li className="tab tab-btn">
-                          <Link
-                            className={
-                              inviteCandidate.settings === "emailReport"
-                                ? "active"
-                                : ""
-                            }
-                            onClick={() =>
-                              setInviteCandidate({
-                                ...inviteCandidate,
-                                settings: "emailReport",
-                              })
-                            }
-                          >
-                            <i>
-                              <EvuemeImageTag src={icon.tabEmailIcon} alt="" />
-                            </i>
-                            Email Report
-                          </Link>
-                        </li>
-                        <li className="tab tab-btn">
-                          <Link
-                            className={
-                              inviteCandidate.settings === "redirection"
-                                ? "active"
-                                : ""
-                            }
-                            onClick={() =>
-                              setInviteCandidate({
-                                ...inviteCandidate,
-                                settings: "redirection",
-                              })
-                            }
-                          >
-                            <i>
-                              <EvuemeImageTag src={icon.redirectIcon} alt="" />
-                            </i>
-                            Redirection
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-                    {inviteCandidate.settings === "fullScreen" ? (
-                      <div id="test1" className="tab-body-tabsetting">
-                        <label htmlFor="">
-                          Mandate Full screen
-                          <i
-                            className="material-icons dp48 tooltipped fl-right"
-                            data-position="top"
-                            data-tooltip="The candidate will be mandated to use full screen
-                      <br> while taking the interview. (May not work on Mac)"
-                          >
-                            info
-                          </i>
-                        </label>
-
-                        <label>
-                          <input
-                            checked={inviteCandidate.mandateFullScreen}
-                            onChange={() =>
-                              setInviteCandidate({
-                                ...inviteCandidate,
-                                mandateFullScreen:
-                                  !inviteCandidate.mandateFullScreen,
-                              })
-                            }
-                            type="checkbox"
-                            className="filled-in"
-                          />
-                          <span>&nbsp;</span>
-                        </label>
-                      </div>
-                    ) : null}
-                    {inviteCandidate.settings === "emailReport" ? (
-                      <div id="test2" className="tab-body-tabsetting">
-                        <label className="lable-gap">
-                          <span>
-                            Receive mail whenever a candidate completes the test
-                          </span>
-                          <input type="checkbox" className="filled-in" />
-                          <span></span>
-                        </label>
-                        <ul className="email-report-ul">
-                          <li>
-                            <span>Receiver</span>
-                            <EvuemeModalTrigger modalId={"addReceiverModal"}>
-                              <NormalButton
-                                buttonText={"Add Receiver"}
-                                leftIconSrc={icon.plusIcon}
-                                buttonTagCssClasses={
-                                  "btn btn-porpel waves-effect waves-light green-btn"
+                </div>
+                {userType !== 'manpower' && (
+                  <div className="setting-section">
+                    <div className="setting-tab-wr">
+                      <div className="row">
+                        <div className="full-width">
+                          <ul className="tabs setting-tab">
+                            <li className="tab tab-btn">
+                              <Link
+                                className={
+                                  inviteCandidate.settings === "fullScreen"
+                                    ? "active"
+                                    : ""
+                                }
+                                onClick={() =>
+                                  setInviteCandidate({
+                                    ...inviteCandidate,
+                                    settings: "fullScreen",
+                                  })
                                 }
                               >
                                 <i>
-                                  <EvuemeImageTag
-                                    src={icon.addOrEditUsers}
-                                    alt=""
-                                  />
+                                  <EvuemeImageTag src={icon.zoomExpandIcon} alt="" />
                                 </i>
-                              </NormalButton>
-                            </EvuemeModalTrigger>
-                          </li>
-                          <li className="searchreciver-wr">
-                            <input
-                              type="search"
-                              placeholder="Search receivers"
-                              className="search-reciver"
-                            />
-
-                            {inviteCandidate?.receivers
-                              ?.filter((val) => val?.firstName !== "")
-                              .map((val, index) => {
-                                return (
-                                  <div key={getUniqueId()} className="chip">
-                                    {val?.firstName}
-                                    <i
-                                      onClick={() => handleRemoveReceiver(index)}
-                                      key={getUniqueId()}
-                                      className="close material-icons"
-                                    >
-                                      close
-                                    </i>
-                                  </div>
-                                );
-                              })}
-                          </li>
-                          <li>
-                            <button className="waves-effect waves-light btn btn-clear btn-submit btn-small btnsmall-tr">
-                              SAVE
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                    ) : null}
-                    {inviteCandidate.settings === "redirection" ? (
-                      <div id="test4" className="tab-body-tabsetting">
-                        <div className="row">
-                          <aside className="col xl2 l2 m4 s4 tabaside-p">
-                            <p>Enable URL Display</p>
-                            <p>Redirect URL</p>
-                          </aside>
-                          <aside className="col xl10 l10 m8 s8 tabside-right">
-                            <label>
-                              <input type="checkbox" className="filled-in" />
-                              <span>
-                                Show the personalized URL to the candidate
-                              </span>
-                            </label>
-                            <div className="input-wr">
-                              <input
-                                type="search"
-                                placeholder="https://www.hsc.com"
-                                onChange={handleOnChange}
-                                name="redirectLink"
-                                value={inviteCandidate.redirectLink}
-                              />
-                            </div>
-                            <button
-                              className="btn btn-porpel waves-effect waves-light green-btn"
-                              onClick={onRedirectionSaveClick}
-                            >
-                              SAVE
-                            </button>
-                          </aside>
+                                Full Screen
+                              </Link>
+                            </li>
+                            <li className="tab tab-btn">
+                              <Link
+                                className={
+                                  inviteCandidate.settings === "emailReport"
+                                    ? "active"
+                                    : ""
+                                }
+                                onClick={() =>
+                                  setInviteCandidate({
+                                    ...inviteCandidate,
+                                    settings: "emailReport",
+                                  })
+                                }
+                              >
+                                <i>
+                                  <EvuemeImageTag src={icon.tabEmailIcon} alt="" />
+                                </i>
+                                Email Report
+                              </Link>
+                            </li>
+                            <li className="tab tab-btn">
+                              <Link
+                                className={
+                                  inviteCandidate.settings === "redirection"
+                                    ? "active"
+                                    : ""
+                                }
+                                onClick={() =>
+                                  setInviteCandidate({
+                                    ...inviteCandidate,
+                                    settings: "redirection",
+                                  })
+                                }
+                              >
+                                <i>
+                                  <EvuemeImageTag src={icon.redirectIcon} alt="" />
+                                </i>
+                                Redirection
+                              </Link>
+                            </li>
+                          </ul>
                         </div>
+                        {inviteCandidate.settings === "fullScreen" ? (
+                          <div id="test1" className="tab-body-tabsetting">
+                            <label htmlFor="">
+                              Mandate Full screen
+                              <i
+                                className="material-icons dp48 tooltipped fl-right"
+                                data-position="top"
+                                data-tooltip="The candidate will be mandated to use full screen
+                      <br> while taking the interview. (May not work on Mac)"
+                              >
+                                info
+                              </i>
+                            </label>
+
+                            <label>
+                              <input
+                                checked={inviteCandidate.mandateFullScreen}
+                                onChange={() =>
+                                  setInviteCandidate({
+                                    ...inviteCandidate,
+                                    mandateFullScreen:
+                                      !inviteCandidate.mandateFullScreen,
+                                  })
+                                }
+                                type="checkbox"
+                                className="filled-in"
+                              />
+                              <span>&nbsp;</span>
+                            </label>
+                          </div>
+                        ) : null}
+                        {inviteCandidate.settings === "emailReport" ? (
+                          <div id="test2" className="tab-body-tabsetting">
+                            <label className="lable-gap">
+                              <span>
+                                Receive mail whenever a candidate completes the test
+                              </span>
+                              <input type="checkbox" className="filled-in" />
+                              <span></span>
+                            </label>
+                            <ul className="email-report-ul">
+                              <li>
+                                <span>Receiver</span>
+                                <EvuemeModalTrigger modalId={"addReceiverModal"}>
+                                  <NormalButton
+                                    buttonText={"Add Receiver"}
+                                    leftIconSrc={icon.plusIcon}
+                                    buttonTagCssClasses={
+                                      "btn btn-porpel waves-effect waves-light green-btn"
+                                    }
+                                  >
+                                    <i>
+                                      <EvuemeImageTag
+                                        src={icon.addOrEditUsers}
+                                        alt=""
+                                      />
+                                    </i>
+                                  </NormalButton>
+                                </EvuemeModalTrigger>
+                              </li>
+                              <li className="searchreciver-wr">
+                                <input
+                                  type="search"
+                                  placeholder="Search receivers"
+                                  className="search-reciver"
+                                />
+
+                                {inviteCandidate?.receivers
+                                  ?.filter((val) => val?.firstName !== "")
+                                  .map((val, index) => {
+                                    return (
+                                      <div key={getUniqueId()} className="chip">
+                                        {val?.firstName}
+                                        <i
+                                          onClick={() => handleRemoveReceiver(index)}
+                                          key={getUniqueId()}
+                                          className="close material-icons"
+                                        >
+                                          close
+                                        </i>
+                                      </div>
+                                    );
+                                  })}
+                              </li>
+                              <li>
+                                <button className="waves-effect waves-light btn btn-clear btn-submit btn-small btnsmall-tr">
+                                  SAVE
+                                </button>
+                              </li>
+                            </ul>
+                          </div>
+                        ) : null}
+                        {inviteCandidate.settings === "redirection" ? (
+                          <div id="test4" className="tab-body-tabsetting">
+                            <div className="row">
+                              <aside className="col xl2 l2 m4 s4 tabaside-p">
+                                <p>Enable URL Display</p>
+                                <p>Redirect URL</p>
+                              </aside>
+                              <aside className="col xl10 l10 m8 s8 tabside-right">
+                                <label>
+                                  <input type="checkbox" className="filled-in" />
+                                  <span>
+                                    Show the personalized URL to the candidate
+                                  </span>
+                                </label>
+                                <div className="input-wr">
+                                  <input
+                                    type="search"
+                                    placeholder="https://www.hsc.com"
+                                    onChange={handleOnChange}
+                                    name="redirectLink"
+                                    value={inviteCandidate.redirectLink}
+                                  />
+                                </div>
+                                <button
+                                  className="btn btn-porpel waves-effect waves-light green-btn"
+                                  onClick={onRedirectionSaveClick}
+                                >
+                                  SAVE
+                                </button>
+                              </aside>
+                            </div>
+                          </div>
+                        ) : null}
                       </div>
-                    ) : null}
+                    </div>
+                  </div>
+                )}
+                <div className="send-wrsection">
+                  <div className="card cand-minheight">
+                    <div className="card-content">
+                      <span className="card-title">
+                        <label className="checkboxfor-invitetime">
+                          <input
+                            className="with-gap"
+                            name="group1"
+                            type="radio"
+                            checked={!inviteCandidate.sendLater}
+                            onChange={() => {
+                              setInviteCandidate((prev) => {
+                                return {
+                                  ...prev,
+                                  sendLater: false,
+                                  sendDate: ""
+                                };
+                              });
+                            }}
+                          />
+                          <span>Send Immediately</span>
+                        </label>
+
+                        <label className="checkboxfor-invitetime">
+                          <input
+                            className="with-gap"
+                            name="group1"
+                            type="radio"
+                            checked={inviteCandidate.sendLater}
+                            onChange={() => {
+                              setInviteCandidate((prev) => {
+                                return {
+                                  ...prev,
+                                  sendLater: true
+                                };
+                              });
+                              setSendLaterModalOpen(true);
+                              console.log("Send Later selected");
+                            }}
+                          />
+                          <span>Send Later</span>
+                        </label>
+
+                        {/* Show scheduled time if set */}
+                        {inviteCandidate.sendDate && (
+                          <div style={{
+                            marginTop: "10px",
+                            padding: "8px",
+                            backgroundColor: "#e8f5e8",
+                            border: "1px solid #4caf50",
+                            borderRadius: "4px",
+                            fontSize: "14px"
+                          }}>
+                            <strong>Scheduled for:</strong> {new Date(inviteCandidate.sendDate).toLocaleString()}
+                          </div>
+                        )}
+                      </span>
+                      {!inviteCandidate.sendDate && <div className="sendnowbox">
+                        <h3>Send Now</h3>
+                        <p>Press Send Invitation to immediately send the invites</p>
+                      </div>}
+                      <a
+                        className="waves-effect waves-light btn btn-clear btn-submit"
+                        href="#"
+                        onClick={handleSubmit}
+                      >
+                        Send invitation
+                      </a>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </>
+            ) : (
+              <BulkInvite
+                setInviteCandidate={setInviteCandidate}
+                jobId={jobId}
+                roundName={roundName}
+                setIsBulkInvited={setIsBulkInvited}
+                selectedPlacementAgency={selectedPlacementAgency}
+                setSelectedPlacementAgency={setSelectedPlacementAgency}
+                selectedLocation={selectedLocation}
+                setSelectedLocation={setSelectedLocation}
+              />
             )}
-            <div className="send-wrsection">
-              <div className="card cand-minheight">
-                <div className="card-content">
-                  <span className="card-title">
-                    <label className="checkboxfor-invitetime">
-                      <input
-                        className="with-gap"
-                        name="group1"
-                        type="radio"
-                        checked={!inviteCandidate.sendLater}
-                        onChange={() => {
-                          setInviteCandidate((prev) => {
-                            return {
-                              ...prev,
-                              sendLater: false,
-                              sendDate: ""
-                            };
-                          });
-                        }}
-                      />
-                      <span>Send Immediately</span>
-                    </label>
+          </div>
+          <AddReceiverModal
+            handleAddReciver={handleAddReciver}
+          />
 
-                    <label className="checkboxfor-invitetime">
-                      <input
-                        className="with-gap"
-                        name="group1"
-                        type="radio"
-                        checked={inviteCandidate.sendLater}
-                        onChange={() => {
-                          setInviteCandidate((prev) => {
-                            return {
-                              ...prev,
-                              sendLater: true
-                            };
-                          });
-                          setSendLaterModalOpen(true);
-                          console.log("Send Later selected");
-                        }}
-                      />
-                      <span>Send Later</span>
-                    </label>
-                    
-                    {/* Show scheduled time if set */}
-                    {inviteCandidate.sendDate && (
-                      <div style={{ 
-                        marginTop: "10px", 
-                        padding: "8px", 
-                        backgroundColor: "#e8f5e8", 
-                        border: "1px solid #4caf50", 
-                        borderRadius: "4px",
-                        fontSize: "14px"
-                      }}>
-                        <strong>Scheduled for:</strong> {new Date(inviteCandidate.sendDate).toLocaleString()}
-                      </div>
-                    )}
-                  </span>
-                  {!inviteCandidate.sendDate && <div className="sendnowbox">
-                    <h3>Send Now</h3>
-                    <p>Press Send Invitation to immediately send the invites</p>
-                  </div>}
-                  <a
-                    className="waves-effect waves-light btn btn-clear btn-submit"
-                    href="#"
-                    onClick={handleSubmit}
-                  >
-                    Send invitation
-                  </a>
+          <TimePickerModal customTimeHandler={customTimeHandler} />
+          <SendLaterModal
+            sendLaterHandler={sendLaterHandler}
+            isOpen={sendLaterModalOpen}
+            onClose={() => {
+              setSendLaterModalOpen(false);
+              // Reset sendLater to false when modal is closed without submitting
+              setInviteCandidate((prev) => {
+                return {
+                  ...prev,
+                  sendLater: false,
+                  sendDate: ""
+                };
+              });
+            }}
+          />
+          {openModal && <Modal isOpen={openModal} onClose={() => setOpenModal(false)} title="Timing">
+            <form>
+              {/* Opening Time */}
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ display: "block", marginBottom: "8px" }}>
+                  Round One Start Date
+                </label>
+                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                  {/* Day */}
+                  <select style={{ width: "70px" }} value={round1.day} onChange={(e) => handleRound1Change("day", e.target.value)}>
+                    {days.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Month */}
+                  <select style={{ width: "120px" }} value={round1.month} onChange={(e) => handleRound1Change("month", e.target.value)}>
+                    {months.map((m, i) => (
+                      <option key={i} value={m.value}>
+                        {m.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Year */}
+                  <select style={{ width: "90px" }} value={round1.year} onChange={(e) => handleRound1Change("year", e.target.value)}>
+                    {years.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Hour */}
+                  <select style={{ width: "70px" }} value={round1.hour} onChange={(e) => handleRound1Change("hour", e.target.value)}>
+                    {hours.map((h) => (
+                      <option key={h} value={h}>
+                        {h}
+                      </option>
+                    ))}
+                  </select>
+
+                  <span>:</span>
+
+                  {/* Minutes */}
+                  <select style={{ width: "70px" }} value={round1.minute} onChange={(e) => handleRound1Change("minute", e.target.value)}>
+                    {minutes.map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+              </div>
+
+              {/* Expiration Time */}
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ display: "block", marginBottom: "8px" }}>
+                  Round Two Start Date
+                </label>
+                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                  {/* Day */}
+                  <select style={{ width: "70px" }} value={round2.day} onChange={(e) => handleRound2Change("day", e.target.value)}>
+                    {days.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Month */}
+                  <select style={{ width: "120px" }} value={round2.month} onChange={(e) => handleRound2Change("month", e.target.value)}>
+                    {months.map((m, i) => (
+                      <option key={i} value={m.value}>
+                        {m.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Year */}
+                  <select style={{ width: "90px" }} value={round2.year} onChange={(e) => handleRound2Change("year", e.target.value)}>
+                    {years.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Hour */}
+                  <select style={{ width: "70px" }} value={round2.hour} onChange={(e) => handleRound2Change("hour", e.target.value)}>
+                    {hours.map((h) => (
+                      <option key={h} value={h}>
+                        {h}
+                      </option>
+                    ))}
+                  </select>
+
+                  <span>:</span>
+
+                  {/* Minutes */}
+                  <select style={{ width: "70px" }} value={round2.minute} onChange={(e) => handleRound2Change("minute", e.target.value)}>
+                    {minutes.map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
-            </div>
-          </>
-        ) : (
-          <BulkInvite
-            setInviteCandidate={setInviteCandidate}
-            jobId={jobId}
-            roundName={roundName}
-            setIsBulkInvited={setIsBulkInvited}
-            selectedPlacementAgency={selectedPlacementAgency}
-            setSelectedPlacementAgency={setSelectedPlacementAgency}
-            selectedLocation={selectedLocation}
-            setSelectedLocation={setSelectedLocation}
-          />
-        )}
-      </div>
-      <AddReceiverModal
-        handleAddReciver={handleAddReciver}
-      />
 
-      <TimePickerModal customTimeHandler={customTimeHandler} />
-      <SendLaterModal 
-        sendLaterHandler={sendLaterHandler} 
-        isOpen={sendLaterModalOpen} 
-        onClose={() => {
-          setSendLaterModalOpen(false);
-          // Reset sendLater to false when modal is closed without submitting
-          setInviteCandidate((prev) => {
-            return {
-              ...prev,
-              sendLater: false,
-              sendDate: ""
-            };
-          });
-        }} 
-      />  
-      {openModal && <Modal isOpen={openModal} onClose={() => setOpenModal(false)} title="Timing">
-        <form>
-          {/* Opening Time */}
-          <div style={{ marginBottom: "20px" }}>
-            <label style={{ display: "block", marginBottom: "8px" }}>
-              Round One Start Date
-            </label>
-            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-               {/* Day */}
-               <select style={{ width: "70px" }} value={round1.day} onChange={(e) => handleRound1Change("day", e.target.value)}>
-                 {days.map((d) => (
-                   <option key={d} value={d}>
-                     {d}
-                   </option>
-                 ))}
-               </select>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                style={{
+                  backgroundColor: "#c5a55a",
+                  color: "white",
+                  border: "none",
+                  padding: "10px 24px",
+                  borderRadius: "20px",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+                onClick={handleSubmit2}
+              >
+                Submit
+              </button>
+            </form>
+          </Modal>
+          }
+        </>
+      );
+    };
 
-               {/* Month */}
-               <select style={{ width: "120px" }} value={round1.month} onChange={(e) => handleRound1Change("month", e.target.value)}>
-                 {months.map((m, i) => (
-                   <option key={i} value={m.value}>
-                     {m.name}
-                   </option>
-                 ))}
-               </select>
-
-              {/* Year */}
-              <select style={{ width: "90px" }} value={round1.year} onChange={(e) => handleRound1Change("year", e.target.value)}>
-                {years.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
-
-              {/* Hour */}
-              <select style={{ width: "70px" }} value={round1.hour} onChange={(e) => handleRound1Change("hour", e.target.value)}>
-                {hours.map((h) => (
-                  <option key={h} value={h}>
-                    {h}
-                  </option>
-                ))}
-              </select>
-
-              <span>:</span>
-
-              {/* Minutes */}
-              <select style={{ width: "70px" }} value={round1.minute} onChange={(e) => handleRound1Change("minute", e.target.value)}>
-                {minutes.map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-          </div>
-
-          {/* Expiration Time */}
-          <div style={{ marginBottom: "20px" }}>
-            <label style={{ display: "block", marginBottom: "8px" }}>
-            Round Two Start Date
-            </label>
-            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-               {/* Day */}
-               <select style={{ width: "70px" }} value={round2.day} onChange={(e) => handleRound2Change("day", e.target.value)}>
-                 {days.map((d) => (
-                   <option key={d} value={d}>
-                     {d}
-                   </option>
-                 ))}
-               </select>
-
-               {/* Month */}
-               <select style={{ width: "120px" }} value={round2.month} onChange={(e) => handleRound2Change("month", e.target.value)}>
-                 {months.map((m, i) => (
-                   <option key={i} value={m.value}>
-                     {m.name}
-                   </option>
-                 ))}
-               </select>
-
-              {/* Year */}
-              <select style={{ width: "90px" }} value={round2.year} onChange={(e) => handleRound2Change("year", e.target.value)}>
-                {years.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
-
-              {/* Hour */}
-              <select style={{ width: "70px" }} value={round2.hour} onChange={(e) => handleRound2Change("hour", e.target.value)}>
-                {hours.map((h) => (
-                  <option key={h} value={h}>
-                    {h}
-                  </option>
-                ))}
-              </select>
-
-              <span>:</span>
-
-              {/* Minutes */}
-              <select style={{ width: "70px" }} value={round2.minute} onChange={(e) => handleRound2Change("minute", e.target.value)}>
-                {minutes.map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            style={{
-              backgroundColor: "#c5a55a",
-              color: "white",
-              border: "none",
-              padding: "10px 24px",
-              borderRadius: "20px",
-              fontSize: "16px",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-            onClick={handleSubmit2}
-          >
-            Submit
-          </button>
-        </form>
-      </Modal>
-      }
-    </>
-  );
-};
-
-export default InviteCandidates;
+    export default InviteCandidates;

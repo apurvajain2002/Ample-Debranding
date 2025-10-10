@@ -11,6 +11,7 @@ const TableBody = ({
   getFilteredRows,
   loading,
   customSortArray = [],
+  tableData = [],
 }) => {
   return (
     <div className="table-bodywr table-responsive">
@@ -26,6 +27,7 @@ const TableBody = ({
             tableName={tableName}
             getFilteredRows={getFilteredRows}
             customSortArray={customSortArray}
+            tableData={tableData}
           />
           <tbody>{children}</tbody>
         </table>

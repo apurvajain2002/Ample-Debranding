@@ -45,6 +45,7 @@ const TableHeader = ({
   displayCandidateSummaryColorCodes = false,
   showCustomSort = false,
   setShowCustomSort = () => {},
+  tableData = [],
 }) => {
   const recDashboardCommonAction = [
     { optionKey: "Status", optionValue: "Status" },

@@ -272,6 +272,7 @@ export const {
   setAllEntities,
   selectJobId,
   setRoundName,
+  roundName,
   setJobDescription,
   selectEntity,
   selectHiringType,
