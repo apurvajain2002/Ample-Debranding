@@ -48,8 +48,19 @@ const EditProfile2 = () => {
     if (dateString.includes("/")) {
       return dateFormatter(dateString);
     }
+    // console.log("dateString------------>",dateString);
     return dateString;
   };
+
+  // Helper function to format ISO date string to YYYY-MM-DD
+  const formatISODate = (dateString) => {
+    if (!dateString) return "";
+    // Simple split: take everything before 'T'
+    return dateString.split('T')[0];
+  };
+
+  // console.log("userDetailsInfo------------>",userDetailsInfo);
+  
   
   const handleCurrentCTC = (e) => {
     setCurrentCTC(e.target.value);
@@ -222,7 +233,7 @@ const EditProfile2 = () => {
   const handleAddWorkExperience = () => {
     const userId = id || selectedCandidateInfo?.id || userDetailsInfo?.id;
     const emptyWorkExperience = {
-      workExperienceId: (userProfile.workExperience?.length || 0) + 1,
+      workExperienceId: userDetailsInfo.workExperience[0].id,
       userId: userId,
       organizationName: "",
       designation: "",
@@ -288,7 +299,7 @@ const EditProfile2 = () => {
   const handleAddAcademic = () => {
     const userId = id || selectedCandidateInfo?.id || userDetailsInfo?.id;
     const emptyAcademic = {
-      userAcademicId: (userProfile.userAcademics?.length || 0) + 1,
+      userAcademicId: userDetailsInfo.userAcademics[0].id,
       userId: userId,
       universityName: "",
       degreeName: "",
@@ -455,13 +466,13 @@ const EditProfile2 = () => {
     );
     
     // Ensure workExperience has userId field
-    const workExperience = (userProfile.workExperience || []).map((item) => ({
+    const workExperience = (userDetailsInfo.workExperience || []).map((item) => ({
       ...item,
       userId: id,
     }));
     
     // Ensure userAcademics has userId field
-    const userAcademics = (userProfile.userAcademics || []).map((item) => ({
+    const userAcademics = (userDetailsInfo.userAcademics || []).map((item) => ({
       ...item,
       userId: id,
     }));
@@ -562,7 +573,7 @@ const EditProfile2 = () => {
                 inputTagCssClasses="input-white validate datepicker date-ico"
                 inputTagIdAndName="dateOfBirth"
                 placeholder="Date of Birth"
-                value={convertDateFormat(userProfile.dateOfBirth)}
+                value={formatISODate(userProfile.dateOfBirth)}
                 required={true}
                 onClick={() => handlDateInput("dateOfBirth")}
                 onChange={(e) =>handleUserProfileFormChange(e)}
@@ -606,35 +617,48 @@ const EditProfile2 = () => {
                       </li>
                     </ul>
                   </header>
-                  {userProfile.workExperience?.map((item, workIndex) => {
+                  {(userProfile?.workExperience && userProfile.workExperience.length > 0 
+                    ? userProfile.workExperience 
+                    : [{
+                        designation: "",
+                        companyName: "",
+                        startDate: "",
+                        endDate: "",
+                        currentCTC: "",
+                        workDescription: "",
+                        currentOrganization: true,
+                      }]
+                  ).map((item, workIndex) => {
+                    console.log("workIndex------------>",item?.startDate);
+                    
                     return (
                       <div className="workex-body">
                         <NormalInputField
                           divTagCssClasses="input-field input-white col xl6 l6 m6 s12"
                           inputTagCssClasses="validate"
                           inputTagIdAndName={`designation_${workIndex}`}
-                          placeholder="Current Designation"
+                          placeholder= {workIndex == 0 ? "Current Designation" : "Previous Designation" }
                           value={item?.designation}
                           onChange={handleWorkExperienceChange(
                             workIndex,
                             "designation"
                           )}
                           required={true}
-                          labelText="Current Designation"
+                          labelText={workIndex == 0 ? "Current Designation" : "Previous Designation" }
                         />
 
                         <NormalInputField
                           divTagCssClasses="input-field input-white col xl6 l6 m6 s12"
                           inputTagCssClasses="validate"
                           inputTagIdAndName={`organizationName_${workIndex}`}
-                          placeholder="Current Organization"
+                          placeholder={workIndex == 0 ? "Current Designation" : "Previous Organization" } 
                           value={item?.organizationName}
                           onChange={handleWorkExperienceChange(
                             workIndex,
                             "organizationName"
                           )}
                           required={true}
-                          labelText="Current Organization"
+                          labelText= {workIndex == 0 ? "Current Designation" : "Previous Organization" } 
                         />
 
                         <DateInputField
@@ -642,7 +666,7 @@ const EditProfile2 = () => {
                           inputTagCssClasses="input-white validate datepicker date-ico"
                           inputTagIdAndName={`workStartDate_${workIndex}`}
                           placeholder="Start Date"
-                          value={convertDateFormat(item?.startDate)}
+                          value={formatISODate(item?.startDate)}
                           required={true}
                           onClick={() => handleWorkDateInput(workIndex, `workStartDate_${workIndex}`, "startDate")}
                           onChange={(e) =>
@@ -659,7 +683,7 @@ const EditProfile2 = () => {
                           inputTagCssClasses="input-white validate datepicker date-ico"
                           inputTagIdAndName={`workEndDate_${workIndex}`}
                           placeholder="End Date"
-                          value={convertDateFormat(item?.endDate)}
+                          value={formatISODate(item?.endDate)}
                           required={true}
                           onClick={() => handleWorkDateInput(workIndex, `workEndDate_${workIndex}`, "endDate")}
                           onChange={(e) =>
@@ -745,7 +769,7 @@ const EditProfile2 = () => {
                   </header>
                   <div className="workex-body border-bottomdashed">
                     <h3 className="h3-title">Post Graduate</h3>
-                    {userDetailsInfo?.userAcademics?.map((item, acadIndex) => {
+                    {userProfile?.userAcademics?.map((item, acadIndex) => {
                       return (
                         <div className="workex-body">
                           <NormalInputField
@@ -781,7 +805,7 @@ const EditProfile2 = () => {
                             inputTagCssClasses="input-white validate datepicker date-ico"
                             inputTagIdAndName={`acadStartDate_${acadIndex}`}
                             placeholder="Start Date"
-                            value={convertDateFormat(item?.startDate)}
+                            value={formatISODate(item?.startDate)}
                             required={true}
                             onClick={() => handleAcademicDateInput(acadIndex, `acadStartDate_${acadIndex}`, "startDate")}
                             onChange={(e) =>
@@ -794,7 +818,7 @@ const EditProfile2 = () => {
                             inputTagCssClasses="input-white validate datepicker date-ico"
                             inputTagIdAndName={`acadEndDate_${acadIndex}`}
                             placeholder="End Date"
-                            value={convertDateFormat(item?.endDate)}
+                            value={formatISODate(item?.endDate)}
                             required={true}
                             onClick={() => handleAcademicDateInput(acadIndex, `acadEndDate_${acadIndex}`, "endDate")}
                             onChange={(e) =>
