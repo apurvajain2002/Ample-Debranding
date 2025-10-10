@@ -437,7 +437,7 @@ const getAllInterviewrs = createAsyncThunk(
       const {data} = await axiosInstance.post(
         `${baseUrl}/job-posting/job-recruiters/get-role-users`,
         {
-          role: "Interviewers",
+          role: "Interviewer",
         }
       );
 
