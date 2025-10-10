@@ -54,10 +54,18 @@ const UserNotification = () => {
   const [messageBodyContent, setMessageBodyContent] = useState(null);
 
   const openMessageDetailsModal = (userData) => {
-    if (modalTriggerRef.current) {
-      modalTriggerRef.current.click();
-      setMessageBodyContent(userData?.messageDetails);
-    }
+    // console.log("modalTriggerRef.current",userData?.messageDetails);
+    // console.log("messageBodyContent------------>",messageBodyContent);
+    
+    // Set the content first, then open the modal
+    setMessageBodyContent(userData?.messageDetails);
+    
+    // Use setTimeout to ensure state is updated before opening modal
+    setTimeout(() => {
+      if (modalTriggerRef.current) {
+        modalTriggerRef.current.click();
+      }
+    }, 100);
   };
 
   const {

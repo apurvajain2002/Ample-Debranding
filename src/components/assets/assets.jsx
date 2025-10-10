@@ -417,6 +417,10 @@ const icon = {
   pauseIconCircle: pauseIconCircle || "pauseIconCircle",
   excelIcon: excelIcon || "excelIcon",
   excelIconWhite: excelIconWhite || "excelIconWhite",
+  addMaleUserIcon: addMaleUserIcon || "addMaleUserIcon",
+  giftHandPresentIcon: giftHandPresentIcon || "giftHandPresentIcon",
+  clockIcon: clockIcon || "clockIcon",
+  rejectedIcon: rejectedIcon || "rejectedIcon",
 };
 
 const audio = {

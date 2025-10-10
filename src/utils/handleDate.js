@@ -8,11 +8,14 @@ const handleDate = (name, callback, selectedDate, { minDate, maxDate } = {}) => 
     return `${year}-${month}-${day}`;
   };
 
+  const currentYear = new Date().getFullYear();
+  const yearRange = [currentYear - 100, currentYear + 10];
   // Options for the date picker initialization
   const options = {
     minDate: minDate || null,  // Use minDate directly without parsing
     maxDate: maxDate || null,
     defaultDate: selectedDate, 
+    yearRange: yearRange,
     setDefaultDate: !!selectedDate,
     format: "yyyy-mm-dd",
     showClearBtn: true,
