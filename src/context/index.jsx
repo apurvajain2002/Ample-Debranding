@@ -7,10 +7,13 @@ const GlobalContext = createContext(null);
 export const GlobalContextProvider = ({ children }) => {
     const [selectedCandidates, setSelectedCandidates] = useState([]);
     const [isTableHeaderChecked, setIsTableHeaderChecked] = useState(false);
-    const handleTableHeaderCheckbox = (payload) => {
+    const handleTableHeaderCheckbox = (payload, allCandidateIds = []) => {
         setIsTableHeaderChecked(payload);
         if (!payload) {
             setSelectedCandidates([]);
+        } else {
+            // When checking, select all candidates
+            setSelectedCandidates(allCandidateIds);
         }
     }
     const [allCombinedTemplates, setAllCombinedTemplates] = useState([]);

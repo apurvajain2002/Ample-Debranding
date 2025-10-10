@@ -155,6 +155,7 @@ const TableComponent = ({
             displayCandidateSummaryColorCodes={displayCandidateSummaryColorCodes}
             showCustomSort={showCustomSort}
             setShowCustomSort={setShowCustomSort}
+            tableData={vclTableData}
           />
         )}
       </div>
@@ -206,6 +207,7 @@ const TableComponent = ({
           getFilteredRows={getFilteredRows}
           loading={loading}
           customSortArray={customSortArray}
+          tableData={vclTableData}
         >
           {children}
         </TableBody>

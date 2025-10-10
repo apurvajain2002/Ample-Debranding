@@ -120,15 +120,6 @@ const InvitedCandidateTableRow = ({
 }) => {
   const { isTableHeaderChecked, selectedCandidates, setSelectedCandidates } = useGlobalContext();
 
-  useEffect(() => {
-    if (isTableHeaderChecked) {
-      // Select all candidate inviteIds
-      setSelectedCandidates((prevSelects) => {
-        return [...prevSelects, inviteId];
-      });
-    }
-  }, [isTableHeaderChecked])
-
   const modalTriggerRef = useRef(null);
   const navigate = useNavigate();
 
@@ -136,13 +127,15 @@ const InvitedCandidateTableRow = ({
     dispatch(setIsGetJobsApiCalled(false));
     dispatch(setIsNotPublishedJobsApiCalled(false));
     console.log('candidateInvitation :: ', candidateInvitation);
+    const round_name = candidateInvitation.interviewRound == "Recruiter Round" ? "L1 Hiring Manager Round" : candidateInvitation.interviewRound ;
+
     navigate("/admin/invite-candidates?type=invited-candidates", {
-      state: { candidateInvitation: candidateInvitation }
+      state: { candidateInvitation: {...candidateInvitation, interviewRound: round_name} }
     });
   };
 
   const {
-    id,
+    candidateInviteId:id,
     whatsappStatus: initialWhatsappStatus = "",
     emailStatus: initialEmailStatus = "",
     emailAddress = "",
@@ -158,6 +151,7 @@ const InvitedCandidateTableRow = ({
     statusUpdate = '0'
   } = candidateInvitation;
 
+
   const [whatsappStatus, setWhatsappStatus] = useState(
     initialWhatsappStatus || "Sent"
   );
@@ -172,7 +166,7 @@ const InvitedCandidateTableRow = ({
     isInviteCanceled || false
   );
   const [isSelected, setIsSelected] = useState(
-    selectedCandidates.includes(inviteId)
+    selectedCandidates.includes(id)
   );
 
   // Sync local state with global selectedCandidates
