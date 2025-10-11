@@ -113,6 +113,13 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
   const [selectedCandidateId, setSelectedCandidateId] = useState(null);
   const [updatedStatusMap, setUpdatedStatusMap] = useState({});
   const [checkedCandidates, setCheckedCandidates] = useState({});
+  
+  // Debug effect to monitor pageRef
+  useEffect(() => {
+    console.log("pageRef changed:", pageRef.current);
+    console.log("needData:", needData);
+    console.log("selectedCandidateId:", selectedCandidateId);
+  }, [pageRef.current, needData, selectedCandidateId]);
   const [popup, setPopup] = useState({
     isVisible: false,
     position: { top: 0, left: 0 },
@@ -731,10 +738,39 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
   }
 
   const generateDownloadPDF = async () => {
+    console.log("Starting PDF generation...");
+    console.log("Current needData state:", needData);
+    console.log("Current selectedCandidateId:", selectedCandidateId);
+    
     setNeedData(true);
     setIsGeneratingPDF(true);
     await sleep(10000);
-    const input = pageRef.current;
+    
+    console.log("After sleep, checking pageRef...");
+    console.log("pageRef:", pageRef);
+    console.log("pageRef.current:", pageRef.current);
+    console.log("needData after setting:", needData);
+    
+    let input = pageRef.current;
+    
+    // Check if pageRef.current exists before accessing its properties
+    if (!input) {
+      console.error('pageRef.current is null or undefined. Trying retry...');
+      console.log("needData state:", needData);
+      console.log("selectedCandidateId:", selectedCandidateId);
+      
+      // Try waiting a bit more
+      await sleep(5000);
+      input = pageRef.current;
+      
+      if (!input) {
+        console.error("pageRef.current is still null after retry. Component may not be rendered.");
+        setIsGeneratingPDF(false);
+        setNeedData(false);
+        return;
+      }
+    }
+    
     input.style.display = "block";
     input.style.position = "absolute";
     input.style.left = "-9999px";
@@ -784,6 +820,15 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
     setIsGeneratingPDFMail(true);
     await sleep(10000);
     const input = pageRef.current;
+    
+    // Check if pageRef.current exists before accessing its properties
+    if (!input) {
+      console.error('pageRef.current is null or undefined');
+      setIsGeneratingPDFMail(false);
+      setNeedData(false);
+      return;
+    }
+    
     input.style.display = "block";
     input.style.position = "absolute";
     input.style.left = "-9999px";
@@ -1048,7 +1093,9 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                       >
                         Next Round Invite
                       </button>
-                      <button id="rec-table-footer-btn">
+                      <button id="rec-table-footer-btn"
+                      onClick={handleInviteNextRound}
+                      >
                         Inform Next Round Shortlist
                       </button>
                     </div>
@@ -2017,7 +2064,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
               candidateList={""}
             />
             <DownloadCandidateReport
-              pageRef={pageRef}
+              ref={pageRef}
               selectedCandidateId={selectedCandidateId}
               selectedJobId={selectedJobId}
               selectedRoundId={selectedRoundId}
