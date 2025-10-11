@@ -392,7 +392,7 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
     return duration;
   };
 
-  const latestDegree = candidateInfo?.userAcademics?.sort((a, b) => {
+  const latestDegree = candidateInfo?.userAcademics?.slice().sort((a, b) => {
     // Treat null endDate as the most recent (use current date if endDate is null)
     const endDateA = a.endDate ? new Date(a.endDate) : new Date();
     const endDateB = b.endDate ? new Date(b.endDate) : new Date();

@@ -209,7 +209,7 @@ const inviteCandidatesSlice = createSlice({
         state.failMessage = "";
       })
       .addCase(fetchTemplateNames.rejected, (state, action) => {
-        state.failMessage = action.payload?.message || "Failed to load email template names";
+        state.failMessage = action.payload?.message || "";
         state.interviewRoundTemplate = false;
         state.templateNames = [];
       })

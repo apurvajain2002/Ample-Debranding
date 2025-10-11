@@ -113,6 +113,13 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
   const [selectedCandidateId, setSelectedCandidateId] = useState(null);
   const [updatedStatusMap, setUpdatedStatusMap] = useState({});
   const [checkedCandidates, setCheckedCandidates] = useState({});
+  
+  // Debug effect to monitor pageRef
+  useEffect(() => {
+    console.log("pageRef changed:", pageRef.current);
+    console.log("needData:", needData);
+    console.log("selectedCandidateId:", selectedCandidateId);
+  }, [pageRef.current, needData, selectedCandidateId]);
   const [popup, setPopup] = useState({
     isVisible: false,
     position: { top: 0, left: 0 },

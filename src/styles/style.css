@@ -10742,7 +10742,7 @@ h3 {
   height: 78px;
   float: left;
   border-radius: 100%;
-  border: 1px dashed var(--primary-color);
+  border: 2px dashed #fff;
   text-align: center;
   line-height: 88px;
 }
@@ -10772,13 +10772,17 @@ h3 {
   margin-top: 15px;
 }
 .com-logo {
+  margin-left: 15px;
   width: 58px;
   height: 58px;
   background: #f3f2ef;
   border-radius: 100%;
+  overflow: hidden;
 }
 .com-logo img {
-  width: 100%;
+  margin: 0 auto;
+  width: 95%;
+  height: 95%;
 }
 .table-strippedwr tr:nth-child(odd) {
   background: var(--primary-color);

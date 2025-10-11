@@ -28,14 +28,14 @@ const EditProfile = () => {
       return;
     }
     const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-    const isWithinSize = file.size <= 200 * 1024;
+    const isWithinSize = file.size <= 5 * 1024 * 1024; // 5MB
     if (!isPdf) {
       setCvError("Only PDF files are allowed.");
       setUserCV(null);
       return;
     }
     if (!isWithinSize) {
-      setCvError("File must be ≤ 200 KB.");
+      setCvError("File must be ≤ 5 MB.");
       setUserCV(null);
       return;
     }
@@ -392,7 +392,7 @@ const EditProfile = () => {
                       data-error={cvError || "Invalid file"}
                       data-success="Looks good"
                     >
-                      {cvError ? cvError : "PDF format, Max size 200 Kb (Required)"}
+                      {cvError ? cvError : "PDF format, Max size 5 mb (Required)"}
                     </span>
                   </div>
                 </div>

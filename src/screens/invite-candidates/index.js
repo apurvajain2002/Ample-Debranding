@@ -211,6 +211,11 @@ const InviteCandidates = () => {
   // Ref to prevent duplicate API calls
   const apiCallMade = useRef(false);
 
+  // Get section from URL params
+  const urlParams = new URLSearchParams(location.search);
+  const type = urlParams.get("type");
+  const section = type === "invited-candidates" ? "invited candidates" : "invite candidates";
+
   const isSubmitDisabled = userType === 'manpower' && isInviteCandidateButtonDisable;
 
   console.log('isInviteCandidateButtonDisable ::: ', isInviteCandidateButtonDisable, userType, isSubmitDisabled);
@@ -492,11 +497,11 @@ const InviteCandidates = () => {
     dispatch(getEntity());
     dispatch(getAllEntities({ url: hostname }));
 
-    if (roundName) {
+    if (roundName && currentJobDetails?.hiringType) {
       dispatch(
         fetchTemplateNames({
           type: "email",
-          hiringType: currentJobDetails?.hiringType,
+          hiringType: currentJobDetails.hiringType,
           interviewRounds: roundName,
           inviteType: section,
         })
@@ -504,7 +509,7 @@ const InviteCandidates = () => {
       dispatch(
         fetchWATemplateNames({
           type: "whatsapp",
-          hiringType: currentJobDetails?.hiringType,
+          hiringType: currentJobDetails.hiringType,
           interviewRounds: roundName,
           inviteType: section,
         })
@@ -516,7 +521,30 @@ const InviteCandidates = () => {
       dispatch(clearIsTemplate());
       dispatch(clearIsTemplateWA());
     };
-  }, []);
+  }, [currentJobDetails]);
+
+  // Call template APIs when currentJobDetails becomes available
+  useEffect(() => {
+    if (roundName && currentJobDetails?.hiringType) {
+      console.log('Calling template APIs with hiring type:', currentJobDetails.hiringType);
+      dispatch(
+        fetchTemplateNames({
+          type: "email",
+          hiringType: currentJobDetails.hiringType,
+          interviewRounds: roundName,
+          inviteType: section,
+        })
+      );
+      dispatch(
+        fetchWATemplateNames({
+          type: "whatsapp",
+          hiringType: currentJobDetails.hiringType,
+          interviewRounds: roundName,
+          inviteType: section,
+        })
+      );
+    }
+  }, [currentJobDetails?.hiringType, roundName, section]);
 
   useEffect(() => {
     if (userType === 'manpower') {
@@ -755,11 +783,6 @@ const InviteCandidates = () => {
     setSelectedPlacementAgency(e.target.value);
 
   const handleLocationChange = (e) => setSelectedLocation(e.target.value);
-
-  const urlParams = new URLSearchParams(location.search);
-  const type = urlParams.get("type");
-  const section =
-    type === "invited-candidates" ? "invited candidates" : "invite candidates";
 
   const labelTexts =
     currentJobDetails?.hiringType === "Campus Hiring"
