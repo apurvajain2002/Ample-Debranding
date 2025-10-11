@@ -22,6 +22,7 @@ import { useLocation } from "react-router-dom";
 import { fetchFilterRejectCandidates } from "../../redux/actions/interview-responses-recruiter-dashboard-actions";
 import { useGlobalContext } from "../../context";
 import { icon } from "../../components/assets/assets.jsx";
+import NormalInputField from "../../components/input-fields/normal-input-field";
 
 // Constants for score thresholds and colors
 const SCORE_THRESHOLDS = {
@@ -990,12 +991,12 @@ const ReportPage1 = () => {
                           // divTagCssClasses={form.divTagCssClasses}
                           value="test"
                           placeholder="Shortlisted"
-                          type={form.type}
-                          inputTagIdAndName={form.inputTagIdAndName}
-                          onChange={form.onChange}
-                          required={form.required}
-                          labelText={form.labelText}
-                          missing={form.missing}
+                          type="text"
+                          inputTagIdAndName="Shortlisted"
+                          onChange={()=>{}}
+                          required= "false"
+                          labelText="Shortlisted"
+                          // missing={form.missing}
                       />
 
         </div>
