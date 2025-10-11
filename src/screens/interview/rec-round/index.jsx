@@ -19,6 +19,7 @@ import { saveCandidateResponse, updateCandidateInterviewStatus } from "../api";
 import EvuemeTextLoader from "../../../components/loaders/evueme-text-loader";
 import { useGlobalContext } from "../../../context";
 import useForceFullscreen from "../../../customHooks/use-force-fullscreen";
+import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
 
 const SMILING_TIMEOUT = 1000 * 5;
 const FILLER_TIMEOUT = 1000 * 2;
@@ -73,6 +74,7 @@ const LIVE_RECORDING_CONFIG = {
 };
 
 const OtherRecRound = () => {
+  useInterviewDiagnostics();
   const location = useLocation();
   const link_access_type = location?.state?.link_access_type;
   const { privateUserId, interviewSource } = useGlobalContext();

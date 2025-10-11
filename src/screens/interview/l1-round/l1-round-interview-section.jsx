@@ -26,6 +26,7 @@ import BrowserCompatibilityWarning from "../../../components/miscellaneous/brows
 import OTPInputComponent from "../../../components/interview/OTPInputComponent";
 import InputSubmitComponent from "../../../components/interview/InputSubmitComponent";
 import StarRating from "../../../components/interview/StarRating";
+import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
 
 
 const initialTime = 2 * 60;
@@ -72,6 +73,7 @@ const L1RoundInterviewSection = ({
   isStreaming = false,
   videoRef = null,
 }) => {
+  useInterviewDiagnostics();
   // console.log('l1 round interview section dynamicErrorMessage ::: 121212', dynamicErrorMessage);
   const { privateUserId } = useGlobalContext();
   const interviewId = useSelector((state) => state.interviewSlice.interviewId);
@@ -1009,7 +1011,6 @@ const L1RoundInterviewSection = ({
 };
 
 export default L1RoundInterviewSection;
-
 
 
 
