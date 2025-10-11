@@ -23,12 +23,16 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
     selectedCandidateId: id,
     selectedJobId,
     selectedRoundId,
-    pageRef,
     needData,
   } = props;
 
-  console.log("DownloadCandidateReport props:", { id, selectedJobId, selectedRoundId, needData });
-  console.log("pageRef in DownloadCandidateReport:", pageRef);
+  console.log("DownloadCandidateReport props:", {
+    id,
+    selectedJobId,
+    selectedRoundId,
+    needData,
+  });
+  console.log("ref in DownloadCandidateReport:", ref);
 
   const dispatch = useDispatch();
   const location = useLocation();
@@ -56,7 +60,7 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
   // Reset all state when candidate ID changes
   useEffect(() => {
     if (id) {
-      console.log('Resetting state for new candidate:', id);
+      console.log("Resetting state for new candidate:", id);
       // Only show loading if we're not generating a PDF
       if (!needData) {
         setIsLoading(true);
@@ -75,6 +79,14 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
       setCurrentAudioUrl(null);
     }
   }, [id, needData]);
+
+  // Debug effect to track when component is mounted and ref is available
+  useEffect(() => {
+    if (needData && ref) {
+      console.log("Component mounted with needData=true, ref:", ref);
+      console.log("ref.current:", ref.current);
+    }
+  }, [needData, ref]);
 
   const handlePlayVideo = (url) => {
     // Set the video URL from candidateResponseList[0].amazonS3Link
@@ -294,7 +306,7 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
     HIGH: 60,
     MEDIUM: 40,
   };
-  
+
   const SCORE_COLORS = {
     HIGH: "#0f0", // Green
     MEDIUM: "#eb6b34", // Orange
@@ -407,23 +419,40 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
 
   const audioList = audioRecordings?.audioList || [];
 
+  // Debug logging
+  console.log(
+    "DownloadCandidateReport render - needData:",
+    needData,
+    "ref:",
+    ref
+  );
+
   return (
     <div
       className="rep-container"
-      ref={pageRef}
+      ref={ref}
       style={{
-        display: needData ? "block" : "none",
+        backgroundColor: "#f00",
+        display: "block", // Always render the component
+        visibility: needData ? "visible" : "hidden",
+        position: "absolute",
+        left: "-9999px",
+        top: "-9999px",
+        width: "210mm", // A4 width
+        minHeight: "297mm", // A4 height
       }}
     >
       {isLoading && !needData && (
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '200px',
-          fontSize: '18px',
-          color: '#666'
-        }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "200px",
+            fontSize: "18px",
+            color: "#666",
+          }}
+        >
           Loading candidate data...
         </div>
       )}
@@ -432,17 +461,19 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
         style={{
           paddingLeft: "10px",
           paddingRight: "10px",
-          margin:"10px auto",
-          display: (isLoading && !needData) ? "none" : "block"
+          margin: "0px auto",
+          display: isLoading && !needData ? "none" : "block",
         }}
-        
       >
         <header className="report-header">
           <div className="report-logo">
             <img src={rootColor.logoUrl} alt="" />
           </div>
         </header>
-        <section className="report-name-wr" style={{transform:"translateY(-50px)"}}>
+        <section
+          className="report-name-wr"
+          style={{ transform: "translateY(-50px)" }}
+        >
           <div className="row row-margin">
             <aside className="col xl8 l8 m8 s8">
               <h1>Candidate Report</h1>
@@ -463,7 +494,10 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
           </div>
         </section>
       </div>
-      <section className="report-table-wr-mt  report-table-wr" style={{width:"96%" , marginLeft: "2%", marginTop:"2%"  }}>
+      <section
+        className="report-table-wr-mt  report-table-wr"
+        style={{ width: "96%", marginLeft: "2%", marginTop: "2%" }}
+      >
         <table className="table table-report">
           <thead>
             <tr>
@@ -519,8 +553,10 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
           </tbody>
         </table>
       </section>
-      <section className="ac-information-wr"
-      style={{width:"96%" , marginLeft: "2%",marginTop:"2%" }}>
+      <section
+        className="ac-information-wr"
+        style={{ width: "96%", marginLeft: "2%", marginTop: "2%" }}
+      >
         <header>Academic Information</header>
         <div className="Information-details-wr">
           <ul>
@@ -554,8 +590,15 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
           </ul>
         </div>
       </section>
-      <section className="report-table-wr"
-      style={{width:"96%" , marginLeft: "2%",marginTop:"2%", height:"290px" }}>
+      <section
+        className="report-table-wr"
+        style={{
+          width: "96%",
+          marginLeft: "2%",
+          marginTop: "2%",
+          height: "290px",
+        }}
+      >
         {" "}
         {/* css not found */}
         <table className="table table-report table-strippedwr">
@@ -600,8 +643,9 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
         </table>
       </section>
 
-      <footer className="reportfooter-inner"
-      style={{width:"96%" , marginLeft: "2%", }}
+      <footer
+        className="reportfooter-inner"
+        style={{ width: "96%", marginLeft: "2%" }}
       >
         <div className="row row-margin-for-report">
           <aside className="col xl4 l4 m4 s4">
@@ -616,8 +660,14 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
         </div>
       </footer>
 
-      <section className="report-table-wr"
-      style={{width:"96%", height:"400px" , marginLeft: "2%",marginTop:"4%" }}
+      <section
+        className="report-table-wr"
+        style={{
+          width: "96%",
+          height: "400px",
+          marginLeft: "2%",
+          marginTop: "4%",
+        }}
       >
         <header>Candidate Scores</header>
         <h3>Overall Score</h3>
@@ -828,8 +878,14 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
           </div>
         </div>
       </section>
-      <section className="report-table-wr mt15 "
-      style={{width:"96%" , height:"390px" , marginLeft: "2%",marginTop:"2%" }}
+      <section
+        className="report-table-wr mt15 "
+        style={{
+          width: "96%",
+          height: "390px",
+          marginLeft: "2%",
+          marginTop: "2%",
+        }}
       >
         <header>Round 1 Interview Performance</header>
         <h4 className="intblack-head">Interview Score</h4>
@@ -1010,8 +1066,9 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
         </div>
       </section>
 
-      <footer className="reportfooter-inner"
-      style={{width:"96%" , marginLeft: "2%",}}
+      <footer
+        className="reportfooter-inner"
+        style={{ width: "96%", marginLeft: "2%" }}
       >
         <div className="row row-margin">
           <aside className="col xl4 l4 m4 s4">
@@ -1026,8 +1083,9 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
         </div>
       </footer>
 
-      <section className="report-table-wr"
-      style={{width:"96%" , marginLeft: "2%",marginTop:"4%" }}
+      <section
+        className="report-table-wr"
+        style={{ width: "96%", marginLeft: "2%", marginTop: "4%" }}
       >
         <header>Overall EvueMe AI Assessment</header>
         <div className="overall-box reportbox-comment">
@@ -1036,8 +1094,9 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
         </div>
       </section>
 
-      <section className="report-table-wr mt15"
-      style={{width:"96%" , marginLeft: "2%",marginTop:"2%" }}
+      <section
+        className="report-table-wr mt15"
+        style={{ width: "96%", marginLeft: "2%", marginTop: "2%" }}
       >
         <header>Video Questions</header>
         <div className="table-header-q">
@@ -1107,8 +1166,9 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
                 </aside>
 
                 <aside className="col xl5 l5 m5 cspadding">
-                  <div className="table-left-b tbl-comment-box"
-                  style={{ marginLeft: 0 }}
+                  <div
+                    className="table-left-b tbl-comment-box"
+                    style={{ marginLeft: 0 }}
                   >
                     <div className="expand-com">
                       <p>
@@ -1125,8 +1185,9 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
         </div>
       </section>
 
-      <footer className="reportfooter-inner"
-      style={{width:"96%" , marginLeft: "2%", }}
+      <footer
+        className="reportfooter-inner"
+        style={{ width: "96%", marginLeft: "2%" }}
       >
         <div className="row row-margin">
           <aside className="col xl4 l4 m4 s4">
@@ -1141,8 +1202,9 @@ const DownloadCandidateReport = forwardRef((props, ref) => {
         </div>
       </footer>
 
-      <section className="report-table-wr"
-      style={{width:"96%" , marginLeft: "2%",marginTop:"2%" }}
+      <section
+        className="report-table-wr"
+        style={{ width: "96%", marginLeft: "2%", marginTop: "2%" }}
       >
         <header>Audio Question</header>
         <div className="audio-boxwr">

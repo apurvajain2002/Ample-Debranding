@@ -744,36 +744,39 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
     
     setNeedData(true);
     setIsGeneratingPDF(true);
-    await sleep(10000);
     
-    console.log("After sleep, checking pageRef...");
+    // Wait for component to render and data to load
+    await sleep(3000);
+    
+    console.log("After initial sleep, checking pageRef...");
     console.log("pageRef:", pageRef);
     console.log("pageRef.current:", pageRef.current);
     console.log("needData after setting:", needData);
     
     let input = pageRef.current;
+    let retryCount = 0;
+    const maxRetries = 5;
     
-    // Check if pageRef.current exists before accessing its properties
-    if (!input) {
-      console.error('pageRef.current is null or undefined. Trying retry...');
-      console.log("needData state:", needData);
-      console.log("selectedCandidateId:", selectedCandidateId);
-      
-      // Try waiting a bit more
-      await sleep(5000);
+    // Retry logic with exponential backoff
+    while (!input && retryCount < maxRetries) {
+      console.log(`Retry attempt ${retryCount + 1}/${maxRetries}`);
+      await sleep(2000 * (retryCount + 1)); // Exponential backoff: 2s, 4s, 6s, 8s, 10s
       input = pageRef.current;
-      
-      if (!input) {
-        console.error("pageRef.current is still null after retry. Component may not be rendered.");
-        setIsGeneratingPDF(false);
-        setNeedData(false);
-        return;
-      }
+      retryCount++;
     }
     
+    if (!input) {
+      console.error("pageRef.current is still null after all retries. Component may not be rendered.");
+      setIsGeneratingPDF(false);
+      setNeedData(false);
+      return;
+    }
+    
+    console.log("pageRef.current found, proceeding with PDF generation");
     input.style.display = "block";
     input.style.position = "absolute";
     input.style.left = "-9999px";
+    input.style.top = "-9999px";
 
     try {
       const pdf = new jsPDF("p", "mm", "a4");
