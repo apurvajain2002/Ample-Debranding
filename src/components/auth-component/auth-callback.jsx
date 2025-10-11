@@ -13,13 +13,20 @@ const AUTH_API_BASE_URL = process.env.REACT_APP_APP_AUTH_BASE_URL;
 const AUTH_API_URL = process.env.REACT_APP_APP_AUTH_URL;
 
 const USER_TYPE_MAP = {
-  1: "org_person",
-  2: "candidate",
-  3: "campus",
-  4: "admin",
-  5: "org_admin",
-  6: "recruiter",
-  7: "manpower",
+  1: "L1 Interviewer",
+  2: "Candidate",
+  3: "Campus Admin",
+  4: "EvueMe Admin",
+  5: "Organization Admin",
+  6: "Organization Recruiter",
+  7: "Placement Agency Admin",
+  8: "L2 Interviewer",
+  9: "L3 Interviewer",
+  10: "EvueMe Support",
+  11: "Placement Agency Recruiter",
+  12: "Campus Student Coordinator",
+  13: "Campus TPO",
+  14: "IT Compliance Officer",
 }
 
 const AuthCallback = () => {
