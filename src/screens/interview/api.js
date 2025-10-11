@@ -14,6 +14,7 @@ export async function saveCandidateResponse(
   roomId = null,
   snapshotImage = null,
   tenantId = '0',
+  ipDetails = null
 ) {
   console.log('userId :: ', userId)
   console.log('question :: ', question)
