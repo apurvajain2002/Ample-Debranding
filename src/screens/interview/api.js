@@ -13,9 +13,8 @@ export async function saveCandidateResponse(
   conferenceNo = null,
   roomId = null,
   snapshotImage = null,
-  tenantId = '0'
+  tenantId = '0',
 ) {
-
   console.log('userId :: ', userId)
   console.log('question :: ', question)
   console.log('answer :: ', answer)
@@ -48,6 +47,7 @@ export async function saveCandidateResponse(
   body.append("questionType", qType);
   body.append("questionId", qId);
   body.append("answerType", rType);
+
   // backend requires practiceQuestion
   body.append("scriptType", scriptType === "practice" ? "practiceQuestion" : scriptType);
 
@@ -80,6 +80,20 @@ export async function saveCandidateResponse(
 
   body.append("tenantId", tenantId);
 
+  // Add IP details if available
+  if (ipDetails) {
+    body.append("browserName", ipDetails.browserName);
+    body.append("isAndroid", ipDetails.isAndroid);
+    body.append("isDesktop", ipDetails.isDesktop);
+    body.append("isIOS", ipDetails.isIOS);
+    body.append("isMobile", ipDetails.isMobile);
+    body.append("city", ipDetails.city);
+    body.append("region", ipDetails.region);
+    body.append("country", ipDetails.country);
+    body.append("ip", ipDetails.ip);
+    body.append("isp", ipDetails.isp);
+  }
+
   try {
     const { data } = await axiosInstance.post(
       `${baseUrl}/job-posting/api/enablex/save-candidate-response`,
@@ -105,17 +119,31 @@ export async function updateCandidateInterviewStatus(
   interviewRound,
   interviewStatus,
   language,
-  tenantId
+  tenantId,
+  ipDetails = null
 ) {
   try {
-    await axiosInstance.post(`${baseUrl}/job-posting/interview-link/candidate-interview-status`, {
+    const payload = {
       jobId,
       userId,
       interviewRound,
       interviewStatus,
       language,
       tenantId: tenantId || '0'
-    });
+    };
+
+    // Add IP details if available
+    if (ipDetails) {
+      payload.ipAddress = ipDetails.ip || '';
+      payload.city = ipDetails.city || '';
+      payload.region = ipDetails.region || '';
+      payload.country = ipDetails.country || '';
+      payload.latitude = ipDetails.latitude || '';
+      payload.longitude = ipDetails.longitude || '';
+      payload.isp = ipDetails.isp || '';
+    }
+
+    await axiosInstance.post(`${baseUrl}/job-posting/interview-link/candidate-interview-status`, payload);
   } catch (error) {
     console.error("Error updating status for candidate");
   }
