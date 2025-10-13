@@ -16,7 +16,7 @@ import beepSoundMp3 from "../../../resources/audios/beep-sound.mp3";
 import { useDispatch, useSelector } from "react-redux";
 import { saveCandidate } from "../../../redux/actions/sign-up-actions";
 import { setUserId, setUserState } from "../../../redux/slices/signin-slice";
-import { saveCandidateResponse } from "../api";
+import useApiWithDiagnostics from "../../../customHooks/use-api-with-diagnostics";
 import { TerminationQuestion } from "../../../components/interview/termination-question";
 import { baseUrl } from "../../../config/config";
 import { VIEWS } from "./index";
@@ -26,6 +26,7 @@ import BrowserCompatibilityWarning from "../../../components/miscellaneous/brows
 import OTPInputComponent from "../../../components/interview/OTPInputComponent";
 import InputSubmitComponent from "../../../components/interview/InputSubmitComponent";
 import StarRating from "../../../components/interview/StarRating";
+import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
 
 
 const initialTime = 2 * 60;
@@ -72,8 +73,10 @@ const L1RoundInterviewSection = ({
   isStreaming = false,
   videoRef = null,
 }) => {
+  // useInterviewDiagnostics();
   // console.log('l1 round interview section dynamicErrorMessage ::: 121212', dynamicErrorMessage);
   const { privateUserId } = useGlobalContext();
+  const { saveCandidateResponse } = useApiWithDiagnostics();
   const interviewId = useSelector((state) => state.interviewSlice.interviewId);
   const tenantId = useSelector((state) => state.interviewSlice.tenantId);
   const userId = useSelector((state) => state.signinSliceReducer.userId);
@@ -1009,7 +1012,6 @@ const L1RoundInterviewSection = ({
 };
 
 export default L1RoundInterviewSection;
-
 
 
 
