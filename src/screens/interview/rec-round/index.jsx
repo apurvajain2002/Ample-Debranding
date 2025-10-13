@@ -292,7 +292,9 @@ const OtherRecRound = () => {
   // on device check finish
   const onFinishDeviceCheck = () => {
     console.log("Device check done");
-    aviSmilingImageRef.style.visibility = "visible";
+    if (aviSmilingImageRef) {
+      aviSmilingImageRef.style.visibility = "visible";
+    }
     setShowComponent(null);
 
     // if interview is resumed, move to the next script after practice
@@ -701,7 +703,9 @@ const OtherRecRound = () => {
         setShowComponent("OTPInput");
         break;
       case QTYPES.HYGIENE_CHECK:
-        aviSmilingImageRef.style.visibility = "hidden";
+        if (aviSmilingImageRef) {
+          aviSmilingImageRef.style.visibility = "hidden";
+        }
         stopAllVideos();
         setShowComponent("deviceCheck");
         break;
@@ -866,10 +870,14 @@ const OtherRecRound = () => {
     Object.keys(videoElementsDOM).forEach((key) => {
       videoElementsDOM[key].pause();
       if (currentScriptType === "skillBased") {
-        aviSmilingImageRef.classList.add("recruiter-videos-skillBased");
+        if (aviSmilingImageRef) {
+          aviSmilingImageRef.classList.add("recruiter-videos-skillBased");
+        }
         videoElementsDOM[key].classList.add("recruiter-videos-skillBased");
       } else {
-        aviSmilingImageRef.classList.remove("recruiter-videos-skillBased");
+        if (aviSmilingImageRef) {
+          aviSmilingImageRef.classList.remove("recruiter-videos-skillBased");
+        }
         videoElementsDOM[key].classList.remove("recruiter-videos-skillBased");
       }
     });

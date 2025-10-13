@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Tooltip from "../../../miscellaneous/tooltip";
 
 const DoneButton = ({ type, stopAudioRecording, stopVideoRecording }) => {
   const [recording, setRecording] = useState(true);
+  const [btnVisible,setBtnVisible] = useState(false);
+
+  useEffect(()=>{
+    setTimeout(()=>{
+      setBtnVisible(true);
+    },10000)  
+  },[])
 
   if (type === "audio") {
     return (
@@ -23,9 +30,11 @@ const DoneButton = ({ type, stopAudioRecording, stopVideoRecording }) => {
               <br />
             </div>
           </div>
-          <div className="btn-wr user-btnside">
+          <div className="btn-wr user-btnside" style={{
+            display:"flex",justifyContent:"center"
+          }}>
             <a
-              className="waves-effect waves-light btn-large left btn-mcw-robo right"
+              className="waves-effect waves-light btn-large center btn-mcw-robo "
               href="#"
               onClick={() => {
                 stopAudioRecording();
@@ -33,8 +42,8 @@ const DoneButton = ({ type, stopAudioRecording, stopVideoRecording }) => {
               }}
               style={
                 recording
-                  ? { backgroundColor: "red", color: "white" }
-                  : { backgroundColor: "#00bf7e", color: "white" }
+                  ? { backgroundColor: "red", color: "white" , width:"auto",position:"relative", top:"80px",left:"-120px",zIndex:10,alignItems:"center", display:btnVisible ? "flex" : "none"}
+                  : { backgroundColor: "#00bf7e", color: "white", width:"auto",position:"relative", top: "80px",left:"-120px",zIndex:10,display:"flex",alignItems:"center"}
               }
             >
               Stop Recording

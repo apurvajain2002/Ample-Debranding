@@ -239,6 +239,9 @@ const QuestionSection = ({
   useEffect(() => {
     setShowNextButton(false);
     setShowSkipButton(true); // Start with skip button visible
+    setDoneRec(false); // Reset doneRec for new question
+    setRecordingStopped(false); // Reset recording stopped state
+    setAnswer(undefined); // Reset answer
   }, [question]);
 
   useEffect(() => {
@@ -258,7 +261,8 @@ const QuestionSection = ({
       (isMediaQuestion && doneRec && (answer === "Recorded" || answer === "Recorded."));
     setShowNextButton(shouldShowNext);
   }, [answer, doneRec, isMediaQuestion, respType]);
-
+  console.log("showDoneButton && isMediaQuestion :::------>", showDoneButton, isMediaQuestion);
+  
   return (
     <div className="chatt-box">
       <QuestionNumber

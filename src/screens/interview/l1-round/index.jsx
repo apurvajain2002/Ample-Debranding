@@ -294,7 +294,9 @@ const L1Round = () => {
       await joinRoom();
     }
     playCurrentVideo("aviSmiling");
-    aviSmilingImageRef.style.visibility = "visible";
+    if (aviSmilingImageRef) {
+      aviSmilingImageRef.style.visibility = "visible";
+    }
     setShowComponent(null);
     // Added so that we have enough time after create room call to actually be able to join the room
     setTimeout(() => {
@@ -753,7 +755,9 @@ const L1Round = () => {
         setShowComponent("Rating");
         break;
       case QTYPES.HYGIENE_CHECK:
-        aviSmilingImageRef.style.visibility = "hidden";
+        if (aviSmilingImageRef) {
+          aviSmilingImageRef.style.visibility = "hidden";
+        }
         stopAllVideos();
         setShowComponent("deviceCheck");
         break;
@@ -933,18 +937,22 @@ const L1Round = () => {
           videoElementsDOM[currentVideoId].style.width = "50%";
           videoElementsDOM[currentVideoId].style.left = "0";
           videoElementsDOM[currentVideoId].style.top = "70px";
-          aviSmilingImageRef.style.width = "50%";
-          aviSmilingImageRef.style.left = "0";
-          aviSmilingImageRef.style.top = "70px";
+          if (aviSmilingImageRef) {
+            aviSmilingImageRef.style.width = "50%";
+            aviSmilingImageRef.style.left = "0";
+            aviSmilingImageRef.style.top = "70px";
+          }
           break;
 
         case VIEWS.INTER:
           videoElementsDOM[currentVideoId].style.width = "100%";
           videoElementsDOM[currentVideoId].style.left = "0";
           videoElementsDOM[currentVideoId].style.top = "70px";
-          aviSmilingImageRef.style.width = "100%";
-          aviSmilingImageRef.style.left = "0";
-          aviSmilingImageRef.style.top = "70px";
+          if (aviSmilingImageRef) {
+            aviSmilingImageRef.style.width = "100%";
+            aviSmilingImageRef.style.left = "0";
+            aviSmilingImageRef.style.top = "70px";
+          }
           break;
 
         case VIEWS.CANDIDATE:
