@@ -20,6 +20,7 @@ import EvuemeTextLoader from "../../../components/loaders/evueme-text-loader";
 import { useGlobalContext } from "../../../context";
 import useForceFullscreen from "../../../customHooks/use-force-fullscreen";
 import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
+import { logClientDiagnostics } from "../../../utils/browserCompatibility";
 
 const SMILING_TIMEOUT = 1000 * 5;
 const FILLER_TIMEOUT = 1000 * 2;
@@ -74,10 +75,10 @@ const LIVE_RECORDING_CONFIG = {
 };
 
 const OtherRecRound = () => {
-  useInterviewDiagnostics();
+  // useInterviewDiagnostics();
   const location = useLocation();
   const link_access_type = location?.state?.link_access_type;
-  const { privateUserId, interviewSource } = useGlobalContext();
+  const { privateUserId, interviewSource, setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport } = useGlobalContext();
   const jobId = useSelector((state) => state.interviewSlice.jobId);
   const roundName = useSelector((state) => state.interviewSlice.roundName);
   const interviewId = useSelector((state) => state.interviewSlice.interviewId);
@@ -969,7 +970,7 @@ const OtherRecRound = () => {
           // Continue with original data if filtering fails
         }
         console.log("after", filteredSkillBased);
-
+        await logClientDiagnostics({ setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport });
         await loadVideosFromArray(data.openingScript, "openingScript");
         await loadVideosFromArray(data.practice, "practice");
         await loadVideosFromArray(data.start, "start");

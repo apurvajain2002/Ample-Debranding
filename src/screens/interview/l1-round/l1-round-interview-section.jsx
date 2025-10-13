@@ -73,7 +73,7 @@ const L1RoundInterviewSection = ({
   isStreaming = false,
   videoRef = null,
 }) => {
-  useInterviewDiagnostics();
+  // useInterviewDiagnostics();
   // console.log('l1 round interview section dynamicErrorMessage ::: 121212', dynamicErrorMessage);
   const { privateUserId } = useGlobalContext();
   const { saveCandidateResponse } = useApiWithDiagnostics();

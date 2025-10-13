@@ -21,28 +21,7 @@ const useApiWithDiagnostics = () => {
       setFeatureSupport(featureSupportData);
 
       // Fetch fresh IP details
-      try {
-        const response = await fetch(GEO_IP_ENDPOINT, { cache: 'no-store' });
-        if (response.ok) {
-          const payload = await response.json();
-          if (payload?.success !== false) {
-            const { ip, city, region, country, latitude, longitude, connection } = payload;
-            const ipDetailsData = {
-              ip,
-              city,
-              region,
-              country,
-              latitude,
-              longitude,
-              isp: connection?.isp || connection?.asn || 'Unknown'
-            };
-            setIpDetails(ipDetailsData);
-            console.log('Diagnostics refreshed:', ipDetailsData);
-          }
-        }
-      } catch (error) {
-        console.warn('Unable to fetch fresh IP details:', error);
-      }
+      
     } catch (error) {
       console.error('Error refreshing diagnostics:', error);
     }
