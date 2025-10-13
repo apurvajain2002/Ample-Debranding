@@ -14,7 +14,7 @@ import Cookies from "js-cookie";
 import {
   setAccessToken,
   setCurrentUser,
-  setUserState
+  setUserState,
 } from "../../../redux/slices/signin-slice";
 import { useDispatch } from "react-redux";
 import ErrorToast from "../../../components/toasts/error-toast";
@@ -32,8 +32,8 @@ import { APP_AUTH_URL, baseUrl } from "../../../config/config";
 
 const INITIAL_ERROR_STATE = {
   emailId: false,
-  password: false
-}
+  password: false,
+};
 
 const SigninWithEmailPasswordOTP = ({ mobileNumber, setMobileNumber }) => {
   const [email, setEmail] = useState("");
@@ -42,20 +42,20 @@ const SigninWithEmailPasswordOTP = ({ mobileNumber, setMobileNumber }) => {
   const [loading, setLoading] = useState(false);
   // const [actualOTP, setActualOtp] = useState("");
   // const [openEnterOTp, setOpenEnterOtp] = useState(false);
-  const [error, setError] = useState(INITIAL_ERROR_STATE)
+  const [error, setError] = useState(INITIAL_ERROR_STATE);
   const [mobileNumberEnabled, setMobileNumberEnabled] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { hostname } = useGlobalContext();
 
-  console.log('hostname sign in with email password otp page ::: ', hostname);
+  console.log("hostname sign in with email password otp page ::: ", hostname);
 
   //Handle Login with email password
   const handleLogin = async (e) => {
     e.preventDefault();
     console.log("xxxxxx---------->");
-    
+
     try {
       setLoading(true);
       setError(INITIAL_ERROR_STATE);
@@ -63,7 +63,7 @@ const SigninWithEmailPasswordOTP = ({ mobileNumber, setMobileNumber }) => {
         let update = {};
         if (!email) update["emailId"] = true;
         if (!password) update["password"] = true;
-        setError(prev => ({ ...prev, ...update }));
+        setError((prev) => ({ ...prev, ...update }));
         return WarningToast("Please Enter required fields");
       }
 
@@ -75,7 +75,7 @@ const SigninWithEmailPasswordOTP = ({ mobileNumber, setMobileNumber }) => {
         formData.append("username", email);
         formData.append("password", password);
         const response = await axios.post(
-          `https://${hostname}-auth.evueme.dev/oauth2/token`,
+          `https://${hostname}-auth.evueme.live/oauth2/token`,
           // `${APP_AUTH_URL}/oauth2/token`,
           formData,
           {
@@ -91,7 +91,9 @@ const SigninWithEmailPasswordOTP = ({ mobileNumber, setMobileNumber }) => {
         const userId = response.data.pk;
         const token = response.data.access_token;
 
-        dispatch(setUserState({ userName, userType, tncStatus, userId, token }));
+        dispatch(
+          setUserState({ userName, userType, tncStatus, userId, token })
+        );
         Cookies.set("e_access_token", token, {
           expires: 1,
         });
@@ -175,8 +177,7 @@ const SigninWithEmailPasswordOTP = ({ mobileNumber, setMobileNumber }) => {
         response.statusText === "OK"
       ) {
         SuccessToast(data.message || "Reset password link sent !");
-      }
-      else {
+      } else {
         ErrorToast(data.message || "Error sending the password reset link!");
       }
     } catch (error) {

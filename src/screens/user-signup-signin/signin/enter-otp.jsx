@@ -7,16 +7,14 @@ import ErrorToast from "../../../components/toasts/error-toast";
 import axios from "axios";
 import EvuemeLoader from "../../../components/loaders/evueme-loader";
 import M from "materialize-css";
-import {
-  setUserState,
-} from "../../../redux/slices/signin-slice";
+import { setUserState } from "../../../redux/slices/signin-slice";
 import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
 import {
   getCountryCode,
   getPhoneNumber,
 } from "../../../utils/phoneNumberUtils";
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 import axiosInstance from "../../../interceptors";
 import SuccessToast from "../../../components/toasts/success-toast";
 import { useGlobalContext } from "../../../context";
@@ -26,13 +24,13 @@ const initialTime = 1 * 60;
 
 const LoginWithOTP = ({
   resendOtp = false,
-  setResendSent = () => { },
+  setResendSent = () => {},
   mobileNumber,
   prevNav = "/",
-  callBackFn = () => { },
+  callBackFn = () => {},
   isModal = false,
   otpSent = true,
-  setOtpSent = () => { },
+  setOtpSent = () => {},
   actualOTP = "",
   otpInitialTime = initialTime,
 }) => {
@@ -45,9 +43,9 @@ const LoginWithOTP = ({
   const dispatch = useDispatch();
   const location = useLocation();
   const { hostname } = useGlobalContext();
-  console.log('hostname enter otp page ::: ', hostname);
+  console.log("hostname enter otp page ::: ", hostname);
   const { ActualOTP } = location?.state ? location.state : "";
-  actualOTP = ActualOTP ? ActualOTP : actualOTP
+  actualOTP = ActualOTP ? ActualOTP : actualOTP;
 
   // Handling OTP input
   const handleSetOtpChange = (value, index) => {
@@ -107,7 +105,7 @@ const LoginWithOTP = ({
         response.statusText === "OK"
       ) {
         SuccessToast(data.message || "verification code sent successfully!");
-         navigate("/signin/enter-otp", { state: { ActualOTP: data.otp } });
+        navigate("/signin/enter-otp", { state: { ActualOTP: data.otp } });
       }
     } catch (error) {
       ErrorToast(error.message || "Error sending the OTP!");
@@ -142,7 +140,7 @@ const LoginWithOTP = ({
       formData.append("username", nationalNumber);
       formData.append("password", stringOtp);
       const response = await axios.post(
-        `https://${hostname}-auth.evueme.dev/oauth2/token`,
+        `https://${hostname}-auth.evueme.live/oauth2/token`,
         // `${APP_AUTH_URL}/oauth2/token`,
         // { phoneCode: countryCode, mobileNo: nationalNumber, otp: stringOtp }
         formData
@@ -162,20 +160,22 @@ const LoginWithOTP = ({
         const userId = response.data.pk;
         const token = response.data.access_token;
 
-        dispatch(setUserState({ 
-          userName: user, 
-          userType, 
-          tncStatus, 
-          userId, 
-          token 
-        }));
-        
+        dispatch(
+          setUserState({
+            userName: user,
+            userType,
+            tncStatus,
+            userId,
+            token,
+          })
+        );
+
         Cookies.set("e_access_token", token, {
           expires: 1,
         });
         if (userType === "Others") {
-          navigate("/user/")
-          return
+          navigate("/user/");
+          return;
         }
         if (firstTimeSignIn) {
           navigate("/terms-of-use");
@@ -210,9 +210,6 @@ const LoginWithOTP = ({
     setAllowContinue(otp.every((s) => s !== ""));
   }, [otp]);
 
-  
-
-
   return (
     <>
       {loading && <EvuemeLoader />}
@@ -221,7 +218,9 @@ const LoginWithOTP = ({
       >
         <div className="login-wrap-box">
           <h3>Verify your mobile number</h3>
-          <p>We have just sent a 6 digit verification code to your phone number</p>
+          <p>
+            We have just sent a 6 digit verification code to your phone number
+          </p>
           <div
             className="loginform otp-form"
             onSubmit={handleSubmitOtp}
@@ -243,25 +242,31 @@ const LoginWithOTP = ({
               ))}
             </div>
             <span className="otp-recived">
-              <div style={{display: 'inline-block'}}>
-            <i className="show-details infermation-ico-black"
-                                  style={{ padding: '0', marginRight: '5px', marginBottom: '5px'}}>
-
-                i
-                <Tooltip divTagCssClasses={"infbox-click"}>
-                  <p>
-                  When the verification code timer reaches 0, click on 'Resend verification code' to receive a new verification code and verify your number.
-                  </p>
-                </Tooltip>
-              </i>
+              <div style={{ display: "inline-block" }}>
+                <i
+                  className="show-details infermation-ico-black"
+                  style={{
+                    padding: "0",
+                    marginRight: "5px",
+                    marginBottom: "5px",
+                  }}
+                >
+                  i
+                  <Tooltip divTagCssClasses={"infbox-click"}>
+                    <p>
+                      When the verification code timer reaches 0, click on
+                      'Resend verification code' to receive a new verification
+                      code and verify your number.
+                    </p>
+                  </Tooltip>
+                </i>
               </div>
               {/* <p style={{marginRight: '5px'}}> */}
               Didn't receive verification code?
               {/* </p> */}
-              <font style={{marginLeft: '10px'}}>
+              <font style={{ marginLeft: "10px" }}>
                 {otpSent && (
                   <CountdownTimer
-                   
                     otpTime={otpTime}
                     setOtpTime={setOtpTime}
                     prevNav={prevNav}
@@ -271,25 +276,24 @@ const LoginWithOTP = ({
                     startTimer={otpSent}
                     // style={{marginLeft:'5px'}}
                   />
-
                 )}
                 {otpTime === 0 ? (
-  <span 
-    style={{ color: 'red', cursor: 'pointer' }} 
-    onClick={handleEnterOTP}
-  >
-    Resend verification code
-  </span>
-) : null}
+                  <span
+                    style={{ color: "red", cursor: "pointer" }}
+                    onClick={handleEnterOTP}
+                  >
+                    Resend verification code
+                  </span>
+                ) : null}
               </font>
-
             </span>
             <button
-              className={`waves-effect waves-light btn btn-large fullwidth-btn graybtn modal-close ${allowContinue ? "" : "disabled"
-                }`}
-                onClick={handleSubmitOtp}
+              className={`waves-effect waves-light btn btn-large fullwidth-btn graybtn modal-close ${
+                allowContinue ? "" : "disabled"
+              }`}
+              onClick={handleSubmitOtp}
             >
-             Continue
+              Continue
             </button>
           </div>
         </div>
