@@ -19,6 +19,8 @@ import { saveCandidateResponse, updateCandidateInterviewStatus } from "../api";
 import EvuemeTextLoader from "../../../components/loaders/evueme-text-loader";
 import { useGlobalContext } from "../../../context";
 import useForceFullscreen from "../../../customHooks/use-force-fullscreen";
+import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
+import { logClientDiagnostics } from "../../../utils/browserCompatibility";
 
 const SMILING_TIMEOUT = 1000 * 5;
 const FILLER_TIMEOUT = 1000 * 2;
@@ -73,9 +75,10 @@ const LIVE_RECORDING_CONFIG = {
 };
 
 const OtherRecRound = () => {
+  // useInterviewDiagnostics();
   const location = useLocation();
   const link_access_type = location?.state?.link_access_type;
-  const { privateUserId, interviewSource } = useGlobalContext();
+  const { privateUserId, interviewSource, setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport } = useGlobalContext();
   const jobId = useSelector((state) => state.interviewSlice.jobId);
   const roundName = useSelector((state) => state.interviewSlice.roundName);
   const interviewId = useSelector((state) => state.interviewSlice.interviewId);
@@ -292,7 +295,9 @@ const OtherRecRound = () => {
   // on device check finish
   const onFinishDeviceCheck = () => {
     console.log("Device check done");
-    aviSmilingImageRef.style.visibility = "visible";
+    if (aviSmilingImageRef) {
+      aviSmilingImageRef.style.visibility = "visible";
+    }
     setShowComponent(null);
 
     // if interview is resumed, move to the next script after practice
@@ -701,7 +706,9 @@ const OtherRecRound = () => {
         setShowComponent("OTPInput");
         break;
       case QTYPES.HYGIENE_CHECK:
-        aviSmilingImageRef.style.visibility = "hidden";
+        if (aviSmilingImageRef) {
+          aviSmilingImageRef.style.visibility = "hidden";
+        }
         stopAllVideos();
         setShowComponent("deviceCheck");
         break;
@@ -866,10 +873,14 @@ const OtherRecRound = () => {
     Object.keys(videoElementsDOM).forEach((key) => {
       videoElementsDOM[key].pause();
       if (currentScriptType === "skillBased") {
-        aviSmilingImageRef.classList.add("recruiter-videos-skillBased");
+        if (aviSmilingImageRef) {
+          aviSmilingImageRef.classList.add("recruiter-videos-skillBased");
+        }
         videoElementsDOM[key].classList.add("recruiter-videos-skillBased");
       } else {
-        aviSmilingImageRef.classList.remove("recruiter-videos-skillBased");
+        if (aviSmilingImageRef) {
+          aviSmilingImageRef.classList.remove("recruiter-videos-skillBased");
+        }
         videoElementsDOM[key].classList.remove("recruiter-videos-skillBased");
       }
     });
@@ -967,7 +978,7 @@ const OtherRecRound = () => {
           // Continue with original data if filtering fails
         }
         console.log("after", filteredSkillBased);
-
+        await logClientDiagnostics({ setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport });
         await loadVideosFromArray(data.openingScript, "openingScript");
         await loadVideosFromArray(data.practice, "practice");
         await loadVideosFromArray(data.start, "start");

@@ -23,7 +23,6 @@ import { fetchFilterRejectCandidates } from "../../redux/actions/interview-respo
 import { useGlobalContext } from "../../context";
 import { icon } from "../../components/assets/assets.jsx";
 import NormalInputField from "../../components/input-fields/normal-input-field";
-
 // Constants for score thresholds and colors
 const SCORE_THRESHOLDS = {
   HIGH: 60,
@@ -989,14 +988,11 @@ const ReportPage1 = () => {
           </button>
           <NormalInputField
                           // divTagCssClasses={form.divTagCssClasses}
-                          value="test"
-                          placeholder="Shortlisted"
                           type="text"
                           inputTagIdAndName="Shortlisted"
                           onChange={()=>{}}
                           required= "false"
                           labelText="Shortlisted"
-                          // missing={form.missing}
                       />
 
         </div>

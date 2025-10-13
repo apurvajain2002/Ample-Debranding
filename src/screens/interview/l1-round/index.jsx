@@ -10,7 +10,7 @@ import DeviceChecking from "../../device-checking";
 import aviSmiling from "../../../resources/videos/aviSmiling.mp4";
 import aviListening from "../../../resources/videos/aviListening.mp4";
 import { useLocation, useNavigate } from "react-router-dom";
-import { saveCandidateResponse, updateCandidateInterviewStatus } from "../api";
+import { updateCandidateInterviewStatus } from "../api";
 import { QTYPES } from "../../../resources/constant-data/question-types";
 import Popup from "../../../components/errors";
 import aviSmilingImage from "../../../resources/images/aviSmiling.png";
@@ -18,6 +18,8 @@ import EvuemeTextLoader from "../../../components/loaders/evueme-text-loader";
 import { useGlobalContext } from "../../../context";
 import useForceFullscreen from "../../../customHooks/use-force-fullscreen";
 import useStreamCamera from "../../../customHooks/use-stream-camera";
+import { logClientDiagnostics } from "../../../utils/browserCompatibility";
+import useApiWithDiagnostics from "../../../customHooks/use-api-with-diagnostics";
 const SMILING_TIMEOUT = 1000 * 5;
 const FILLER_TIMEOUT = 1000 * 2;
 const subscribedStreams = new Map();
@@ -79,7 +81,8 @@ export const VIEWS = {
 const L1Round = () => {
   const location = useLocation();
   const link_access_type = location?.state?.link_access_type;
-  const { privateUserId, interviewSource } = useGlobalContext();
+  const { privateUserId, interviewSource, setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport } = useGlobalContext();
+  const { saveCandidateResponse } = useApiWithDiagnostics();
   const jobId = useSelector((state) => state.interviewSlice.jobId);
   const interviewId = useSelector((state) => state.interviewSlice.interviewId);
   const tenantId = useSelector((state) => state.interviewSlice.tenantId);
@@ -294,7 +297,9 @@ const L1Round = () => {
       await joinRoom();
     }
     playCurrentVideo("aviSmiling");
-    aviSmilingImageRef.style.visibility = "visible";
+    if (aviSmilingImageRef) {
+      aviSmilingImageRef.style.visibility = "visible";
+    }
     setShowComponent(null);
     // Added so that we have enough time after create room call to actually be able to join the room
     setTimeout(() => {
@@ -753,7 +758,9 @@ const L1Round = () => {
         setShowComponent("Rating");
         break;
       case QTYPES.HYGIENE_CHECK:
-        aviSmilingImageRef.style.visibility = "hidden";
+        if (aviSmilingImageRef) {
+          aviSmilingImageRef.style.visibility = "hidden";
+        }
         stopAllVideos();
         setShowComponent("deviceCheck");
         break;
@@ -933,18 +940,22 @@ const L1Round = () => {
           videoElementsDOM[currentVideoId].style.width = "50%";
           videoElementsDOM[currentVideoId].style.left = "0";
           videoElementsDOM[currentVideoId].style.top = "70px";
-          aviSmilingImageRef.style.width = "50%";
-          aviSmilingImageRef.style.left = "0";
-          aviSmilingImageRef.style.top = "70px";
+          if (aviSmilingImageRef) {
+            aviSmilingImageRef.style.width = "50%";
+            aviSmilingImageRef.style.left = "0";
+            aviSmilingImageRef.style.top = "70px";
+          }
           break;
 
         case VIEWS.INTER:
           videoElementsDOM[currentVideoId].style.width = "100%";
           videoElementsDOM[currentVideoId].style.left = "0";
           videoElementsDOM[currentVideoId].style.top = "70px";
-          aviSmilingImageRef.style.width = "100%";
-          aviSmilingImageRef.style.left = "0";
-          aviSmilingImageRef.style.top = "70px";
+          if (aviSmilingImageRef) {
+            aviSmilingImageRef.style.width = "100%";
+            aviSmilingImageRef.style.left = "0";
+            aviSmilingImageRef.style.top = "70px";
+          }
           break;
 
         case VIEWS.CANDIDATE:
@@ -1047,7 +1058,7 @@ const L1Round = () => {
           // Continue with original data if filtering fails
         }
         console.log("after", filteredSkillBased);
-
+        await logClientDiagnostics({ setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport });
         await loadVideosFromArray(data.openingScript, "openingScript");
         await loadVideosFromArray(data.practice, "practice");
         await loadVideosFromArray(data.start, "start");

@@ -7,7 +7,7 @@ import WarningToast from "../../toasts/warning-toast";
 // import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { TerminationQuestion } from "../termination-question";
-import { saveCandidateResponse } from "../../../screens/interview/api";
+import useApiWithDiagnostics from "../../../customHooks/use-api-with-diagnostics";
 import useCaptureImage from "../../../customHooks/use-capture-image";
 import ErrorToast from "../../toasts/error-toast";
 
@@ -33,6 +33,7 @@ const QuestionSection = ({
   setDoneRec,
 }) => {
   const userId = useSelector((state) => state.signinSliceReducer.userId);
+  const { saveCandidateResponse } = useApiWithDiagnostics();
   const interviewId = useSelector((state) => state.interviewSlice.interviewId);
   const tenantId = useSelector((state) => state.interviewSlice.tenantId);
   const submitAudioThroughDoneRef = useRef(false);
@@ -239,6 +240,9 @@ const QuestionSection = ({
   useEffect(() => {
     setShowNextButton(false);
     setShowSkipButton(true); // Start with skip button visible
+    setDoneRec(false); // Reset doneRec for new question
+    setRecordingStopped(false); // Reset recording stopped state
+    setAnswer(undefined); // Reset answer
   }, [question]);
 
   useEffect(() => {
@@ -258,7 +262,8 @@ const QuestionSection = ({
       (isMediaQuestion && doneRec && (answer === "Recorded" || answer === "Recorded."));
     setShowNextButton(shouldShowNext);
   }, [answer, doneRec, isMediaQuestion, respType]);
-
+  console.log("showDoneButton && isMediaQuestion :::------>", showDoneButton, isMediaQuestion);
+  
   return (
     <div className="chatt-box">
       <QuestionNumber

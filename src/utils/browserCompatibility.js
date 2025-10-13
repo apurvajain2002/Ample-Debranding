@@ -2,7 +2,6 @@
  * Browser Compatibility Utility
  * Provides cross-browser support for interview features
  */
-
 // Browser detection with fallbacks
 export const getBrowserInfo = () => {
   const userAgent = navigator.userAgent;
@@ -306,6 +305,73 @@ export const gracefulDegradation = {
   }
 };
 
+// Constants
+const GEO_IP_ENDPOINT = 'https://ipwho.is/?fields=ip,city,region,country,latitude,longitude,connection';
+
+const logClientDiagnostics = async (contextFunctions = {}) => {
+  const { setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport } = contextFunctions;
+  const browserInfoData = getBrowserInfo();
+  const deviceInfoData = getDeviceInfo();
+  const featureSupportData = featureDetection.getSupportedFeatures();
+  let ipPayload = null;
+  let cancelled = false;
+
+  // Store in global context if functions are provided
+  if (setBrowserInfo) setBrowserInfo(browserInfoData);
+  if (setDeviceInfo) setDeviceInfo(deviceInfoData);
+  if (setFeatureSupport) setFeatureSupport(featureSupportData);
+
+  try {
+    const response = await fetch(GEO_IP_ENDPOINT, { cache: 'no-store' });
+    if (response.ok) {
+      const payload = await response.json();
+      if (!cancelled && payload?.success !== false) {
+        ipPayload = payload;
+      }
+    }
+  } catch (error) {
+    if (!cancelled) {
+      console.warn('Unable to fetch IP/location details:', error);
+    }
+  }
+
+  if (cancelled) {
+    return;
+  }
+
+  console.group('Interview client diagnostics');
+  console.info('Browser info:', browserInfoData);
+  console.info('Device info:', deviceInfoData);
+  console.info('Feature support:', featureSupportData);
+  console.info('ipPayload:------------>', ipPayload);
+
+  if (ipPayload) {
+    const { ip, city, region, country, latitude, longitude, connection } = ipPayload;
+    const ipDetailsData = {
+      browserName: browserInfoData.name,
+      isAndroid: deviceInfoData.isAndroid,
+      isDesktop: deviceInfoData.isDesktop,
+      isIOS: deviceInfoData.isIOS,
+      isMobile: deviceInfoData.isMobile,
+      city,
+      region,
+      country,
+      ip,
+      isp: connection?.isp || connection?.asn || 'Unknown'
+    };
+    
+    // Store IP details in global context if function is provided
+    if (setIpDetails) setIpDetails(ipDetailsData);
+    
+    console.info('IP details:', ipDetailsData);
+  } else {
+    console.warn('IP/location details not available.');
+    if (setIpDetails) setIpDetails(null);
+  }
+
+  console.groupEnd();
+};
+
 // Create the default export object
 const browserCompatibility = {
   getBrowserInfo,
@@ -316,7 +382,9 @@ const browserCompatibility = {
   browserCapabilities,
   featureDetection,
   getCompatibilityWarnings,
-  gracefulDegradation
+  gracefulDegradation,
+  logClientDiagnostics
 };
 
+export { logClientDiagnostics };
 export default browserCompatibility;
