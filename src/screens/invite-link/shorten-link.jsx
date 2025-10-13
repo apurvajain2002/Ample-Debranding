@@ -14,7 +14,6 @@ const ShortenLink = ({
   createLinkHandler,
   isCustomLinkGenerated,
 }) => {
-
   const handleCopy = () => {
     if (!customLink.customEditLink) {
       ErrorToast("No link available. Please generate a link first!");
@@ -27,8 +26,8 @@ const ShortenLink = ({
   const iconArray = [
     {
       iconSrc: "publicCopyIcon",
-      tooltip: 'Copy Link',
-      onclick: () => handleCopy()
+      tooltip: "Copy Link",
+      onclick: () => handleCopy(),
     },
     /* {
       iconSrc: "publicShareIcon",
@@ -53,10 +52,8 @@ const ShortenLink = ({
     }, */
     {
       iconSrc: "publicQRCodeIcon",
-      tooltip: 'QR Code Link',
-      onclick: () => {
-
-      }
+      tooltip: "QR Code Link",
+      onclick: () => {},
     },
   ];
 
@@ -67,7 +64,7 @@ const ShortenLink = ({
         labelText="Interview link"
         value={inviteInfo.linkValue}
         disabled={true}
-        style={{ backgroundColor: '#fff' }}
+        style={{ backgroundColor: "#fff" }}
       />
 
       <NormalInputField
@@ -75,7 +72,7 @@ const ShortenLink = ({
         labelText="Shorten Link"
         value={inviteInfo.shortenLink}
         disabled={true}
-        style={{ backgroundColor: '#fff' }}
+        style={{ backgroundColor: "#fff" }}
       />
 
       <NormalInputField
@@ -84,10 +81,10 @@ const ShortenLink = ({
         placeholder="Custom Edit Here"
         value={customLink.customEditLink}
         onChange={(e) => {
-          const fixedPrefix = "https://ev.evueme.dev/";
+          const fixedPrefix = "https://app.evueme.live/";
           let newValue = e.target.value;
           if (!newValue.startsWith(fixedPrefix)) {
-            WarningToast("The link must start with 'https://ev.evueme.dev/'");
+            WarningToast("The link must start with 'https://app.evueme.live/'");
           } else {
             const customPart = newValue.slice(fixedPrefix.length);
             setCustomLink({
@@ -138,7 +135,8 @@ const ShortenLink = ({
                   onClick={(e) => {
                     e.preventDefault();
                     onclick();
-                  }}>
+                  }}
+                >
                   <i>
                     <EvuemeImageTag src={icon[iconSrc]} alt="" />
                   </i>
