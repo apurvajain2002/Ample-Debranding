@@ -3,11 +3,19 @@ import { useLocation, useNavigate } from "react-router-dom";
 import EvuemeLoader from "../../components/loaders/evueme-loader";
 import axiosInstance from "../../interceptors";
 import { useDispatch } from "react-redux";
-import { setUserState, setLogout, setUserId } from "../../redux/slices/signin-slice";
+import {
+  setUserState,
+  setLogout,
+  setUserId,
+} from "../../redux/slices/signin-slice";
 import ErrorToast from "../../components/toasts/error-toast";
 import Popup from "../../components/errors";
 import { dataFromLink } from "../../redux/slices/interview-slice";
-import { setSelectedJobId, setSelectedRoundId, setReportLink } from "../../redux/slices/interview-responses-l1-dashboard-slice";
+import {
+  setSelectedJobId,
+  setSelectedRoundId,
+  setReportLink,
+} from "../../redux/slices/interview-responses-l1-dashboard-slice";
 import { useGlobalContext } from "../../context";
 import { baseUrl } from "../../config/config";
 
@@ -16,7 +24,8 @@ const NoRouteFound = ({ navigateToPath }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const { pathname } = useLocation();
-  const { setInterviewJobName, setPrivateUserId, setInterviewSource } = useGlobalContext();
+  const { setInterviewJobName, setPrivateUserId, setInterviewSource } =
+    useGlobalContext();
 
   const validateInterviewLink = async (url) => {
     try {
@@ -24,23 +33,23 @@ const NoRouteFound = ({ navigateToPath }) => {
         `${baseUrl}/job-posting/interview-link/interview-link-validation`,
         {
           interviewLink: url
-          // interviewLink: "https://ev.evueme.dev/5f6QLNjUBjdYkdPrJXuj49kt+kib6ryJg1GyELXO34Q9xzXjyzDsVw=="
+          // interviewLink: "https://ev.evueme.dev/ImWWH8ThvODdzQ9Df8zDQC94TM1W1urF9YZsXL3JkaIb9A3wSRKApS9vLNQjiQeR",
         }
       );
       // console.log("validateInterviewLink respone is ::", data);
       // debugger;
       if (data.success || data.status) {
-        setInterviewJobName(data?.jobName || '');
+        setInterviewJobName(data?.jobName || "");
         // propagate source (e.g., 'login') to context so interview screens can adjust flow
         setInterviewSource((data?.source || "").toLowerCase());
         const user = data.user;
         if (user) {
-          localStorage.setItem("link_access_type", 'privateLink');
+          localStorage.setItem("link_access_type", "privateLink");
           localStorage.setItem("myUserId", user.id);
           dispatch(setUserId(user.id));
           setPrivateUserId(user.id);
         } else {
-          localStorage.setItem("link_access_type", 'publicLink');
+          localStorage.setItem("link_access_type", "publicLink");
         }
         if (data.valid) {
           if (!data.public && user) {
@@ -67,10 +76,10 @@ const NoRouteFound = ({ navigateToPath }) => {
           );
           navigate("/interview/language-selection", {
             state: {
-              link_access_type: data?.user ? 'privateLink' : 'publicLink'
-            }
+              link_access_type: data?.user ? "privateLink" : "publicLink",
+            },
           });
-          // navigate("/interview/language-selection"); //  Rishi Singh   4 months ago (January 21st, 2025 3:40 PM) 
+          // navigate("/interview/language-selection"); //  Rishi Singh   4 months ago (January 21st, 2025 3:40 PM)
           return true;
         } else {
           ErrorToast("The link has expired or is invalid.");
@@ -88,7 +97,6 @@ const NoRouteFound = ({ navigateToPath }) => {
 
   const validateReportLink = async (url) => {
     try {
-
       const response = await axiosInstance.post(
         `${baseUrl}/job-posting/interview-link/report-link-validation`,
         {
@@ -98,9 +106,9 @@ const NoRouteFound = ({ navigateToPath }) => {
       console.log("resmponse from there is :", response);
       if (response.data?.success || response.data?.status) {
         // if (response.data?.valid) {
-        dispatch(setSelectedJobId(response?.data?.['jobId']));
-        dispatch(setSelectedRoundId(response?.data?.['interviewRound']));
-        dispatch(setReportLink(response?.data?.['reportLink']));
+        dispatch(setSelectedJobId(response?.data?.["jobId"]));
+        dispatch(setSelectedRoundId(response?.data?.["interviewRound"]));
+        dispatch(setReportLink(response?.data?.["reportLink"]));
         navigate("/interview/report");
         return true;
         // }
