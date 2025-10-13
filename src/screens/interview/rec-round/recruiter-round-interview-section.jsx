@@ -23,7 +23,7 @@ import InputSubmitComponent from "../../../components/interview/InputSubmitCompo
 import StarRating from "../../../components/interview/StarRating";
 import OTPInputComponent from "../../../components/interview/OTPInputComponent";
 import { baseUrl } from "../../../config/config";
-import { saveCandidateResponse } from "../api";
+import useApiWithDiagnostics from "../../../customHooks/use-api-with-diagnostics";
 import { useGlobalContext } from "../../../context";
 import { wait200ms } from "../../../utils/functions";
 import useCaptureImage from "../../../customHooks/use-capture-image";
@@ -72,6 +72,7 @@ const RecruiterRoundInterviewSection = ({
   startInterviewMonitoring = () => { },
 }) => {
   const { privateUserId, setPrivateUserId } = useGlobalContext();
+  const { saveCandidateResponse } = useApiWithDiagnostics();
 
   const interviewId = useSelector((state) => state.interviewSlice.interviewId);
   const tenantId = useSelector((state) => state.interviewSlice.tenantId);

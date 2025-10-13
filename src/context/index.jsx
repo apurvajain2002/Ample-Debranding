@@ -33,7 +33,10 @@ export const GlobalContextProvider = ({ children }) => {
     });
     const [candidatesToInvite, setCandidatesToInvite] = useState("");
     const [userEditProfilePageYN, setUserEditProfilePageYN] = useState(false);
-
+    const [ipDetails, setIpDetails] = useState(null);
+    const [browserInfo, setBrowserInfo] = useState(null);
+    const [deviceInfo, setDeviceInfo] = useState(null);
+    const [featureSupport, setFeatureSupport] = useState(null);
 
     const { ...userProfile } = useUserProfileContext();
 
@@ -50,6 +53,10 @@ export const GlobalContextProvider = ({ children }) => {
             dynamicColorPage,
             hostname: hostname === 'localhost' ? 'ev' : hostname,
             userEditProfilePageYN, setUserEditProfilePageYN,
+            ipDetails, setIpDetails,
+            browserInfo, setBrowserInfo,
+            deviceInfo, setDeviceInfo,
+            featureSupport, setFeatureSupport,
             ...userProfile
         }}>
             {children}
