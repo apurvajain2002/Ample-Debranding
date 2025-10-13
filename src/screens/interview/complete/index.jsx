@@ -45,7 +45,7 @@ const InterviewComplete = () => {
           <h2>
             Please click this link{" "}
             <Link to="/signin" replace>
-              https://ev.evueme.dev
+              https://app.evueme.live
             </Link>
           </h2>
           <p>and log in with your credentials</p>
