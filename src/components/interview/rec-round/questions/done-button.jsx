@@ -61,14 +61,14 @@ const DoneButton = ({ type, stopAudioRecording, stopVideoRecording }) => {
         href="#"
         className="waves-effect waves-light btn btn-clear btn-submit btn-small"
         onClick={stopVideoRecording}
-        style={{ marginRight: '10px',width:"50%",position:"relative", top:"80px",left:"-120px",zIndex:10, display:btnVisible ? "flex" : "none" }}
+        style={{ marginRight: '10px',width:"30%",position:"relative", top:"70px",left:"-80px",zIndex:10, display:btnVisible ? "flex" : "none", justifyContent:"center" }}
       >
         DONE
       </a>
 
       <i
         className="show-details infermation-ico-black"
-        style={{ padding: "0" }}
+        style={{ padding: "0",display:btnVisible ? "flex" : "none" }}
       >
         i
         <Tooltip divTagCssClasses={"infbox-click-done information-box-done"}>
