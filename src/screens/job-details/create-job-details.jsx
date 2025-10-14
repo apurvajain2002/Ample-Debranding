@@ -36,9 +36,11 @@ import WarningToast from "../../components/toasts/warning-toast";
 // import { icon } from "../../components/assets/assets";
 import { FileUploadInput } from "../../components/input-fields/file-upload";
 import { FOCUSABLE_SELECTOR } from "@testing-library/user-event/dist/utils";
+import { baseUrl } from "../../config/config";
+import axiosInstance from "../../interceptors";
+import ErrorToast from "../../components/toasts/error-toast";
 
 const DEFAULT_HIRING_TYPE = "Lateral Hiring";
-
 const INITIAL_ERROR_STATE = {
   positionName: false,
   recruiters: false,
@@ -51,6 +53,7 @@ const INITIAL_ERROR_STATE = {
   interviewRoundsSelect: false,
   interviewersSelect: false,
   orgId: false,
+  campus: false,
 };
 
 const multiselectArray = [
@@ -62,6 +65,7 @@ const multiselectArray = [
   "interviewers",
   "placementAgencies",
   "orgId",
+  "campus",
 ];
 
 const getDDMMYYYY = (dateString) => {
@@ -96,6 +100,7 @@ const CreatejobPosition = ({ currentJobDetails }) => {
     orgId: [],
     placementAgencies: [],
     recruiters: [],
+    campus: [],
     hiringType: "Lateral Hiring",
     positionCounts: 0,
     vacancyStartDate: "",
@@ -118,6 +123,7 @@ const CreatejobPosition = ({ currentJobDetails }) => {
     campuses,
     tableData,
     interviewrs,
+    currentJobDetails : positionRes,
   } = useSelector((state) => state.createNewJobSliceReducer);
 
   const { tableData: entities, currentEntity } = useSelector(
@@ -145,6 +151,12 @@ const CreatejobPosition = ({ currentJobDetails }) => {
   // Pagination state for soft skills
   const [softSkillsPage, setSoftSkillsPage] = useState(1);
   const SOFT_SKILLS_PER_PAGE = 99;
+  
+  // State for campus data
+  const [campusData, setCampusData] = useState([]);
+  
+  // State for placement agencies data
+  const [placementAgenciesData, setPlacementAgenciesData] = useState([]);
   
 
   const handleClick = (ref) => {
@@ -308,7 +320,7 @@ const CreatejobPosition = ({ currentJobDetails }) => {
       placementAgencies: updatedPlacementAgencies,
     });
   };
-  const availableOptionsPlacement = (placementAgencies || []).filter(
+  const availableOptionsPlacement = (placementAgenciesData || []).filter(
     (skill) => !jobPosition.placementAgencies?.includes(skill.name)
   );
 
@@ -568,10 +580,11 @@ const CreatejobPosition = ({ currentJobDetails }) => {
     setPositionsSelected({ ...positionSelected });
   };
 
-  const handleJobChange = (e) => {
+  const handleJobChange = async(e) => {
     setError(INITIAL_ERROR_STATE);
     dispatch(getJob({ jobId: e.target.value }));
     dispatch(selectJobId(e.target.value));
+    
   };
 
   const handleSubmit = async () => {
@@ -694,7 +707,42 @@ const CreatejobPosition = ({ currentJobDetails }) => {
     // Send showRows as string with one space
     // so that we don't page, and get all jobs
     dispatch(getAllJob({ showRows: " " }));
+    
+    const fetchCampuses = async () => {
+      try{
+        const { data } = await axiosInstance.get(`${baseUrl}/common/campus/get-campuses`)
+        console.log("data",data);
+        if(data && data.list) {
+          setCampusData(data.list);
+        }
+      }catch(error){
+        ErrorToast(error.message);
+      }
+    };
+    
+    
+    
+    fetchCampuses();
+    
   }, []);
+console.log("positionRes----------->",positionRes);
+
+  useEffect(()=>{
+    const fetchPlacementAgencies = async () => {
+      if(positionRes?.orgId) {
+        try{
+          const { data } = await axiosInstance.get(`${baseUrl}/common/placementAgency/get-placement-agency?orgId=${positionRes.orgId}`)
+          console.log("placement agencies data",data);
+          if(data && data.list) {
+            setPlacementAgenciesData(data.list);
+          }
+        }catch(error){
+          ErrorToast(error.message);
+        }
+      }
+    };
+    fetchPlacementAgencies();
+  },[positionRes])
 
   useEffect(() => {
     setJobPosition({
@@ -1243,7 +1291,38 @@ const CreatejobPosition = ({ currentJobDetails }) => {
                   />
                 </EvuemeLabelTag>
               </aside>
-              {jobPosition.hiringType !== "Campus Hiring" ? (
+              {jobPosition.hiringType === "Campus Hiring" ? (
+                <aside className="input-field col xl3 l3 m6 s12">
+                  <div className="col xl12 l12 m16 s12">
+                    <NewTypeaheadInputField
+                      divTagCssClasses="input-field"
+                      selectTagIdAndName="campus"
+                      labelText="Select Campus"
+                      placeholder="Select Campus..."
+                      options={optionMapper(
+                        campusData,
+                        "name",
+                        "id",
+                        "Select Campus"
+                      )}
+                      value={jobPosition.campus || []}
+                      onChange={(selected) => setJobPosition({ ...jobPosition, campus: selected })}
+                      handleRemoveMultiValue={(key, value) => {
+                        const updatedCampus = jobPosition.campus?.filter(
+                          (campus) => campus !== value
+                        );
+                        setJobPosition({
+                          ...jobPosition,
+                          campus: updatedCampus && updatedCampus.length > 0 ? updatedCampus : null,
+                        });
+                      }}
+                      multiple={true}
+                      required={true}
+                      missing={error.campus}
+                    />
+                  </div>
+                </aside>
+              ) : jobPosition.hiringType !== "Campus Hiring" ? (
                 <aside className="input-field col xl3 l3 m6 s12">
                   <div className="col xl12 l12 m16 s12">
                     <NewTypeaheadInputField
