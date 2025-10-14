@@ -56,7 +56,7 @@ const DoneButton = ({ type, stopAudioRecording, stopVideoRecording }) => {
 
   // Video JSX
   return (
-    <div className="btn-wr" style={{ textAlign: 'center',backgroundColor:"#fff", marginTop: '20px',display:"flex",justifyContent:"center",gap:"10px",position:"relative", top:"60px",zIndex:10 }}>
+    <div className="btn-wr" style={{ textAlign: 'center',backgroundColor:"#fff", marginTop: '20px',display:btnVisible ? "flex" : "none",justifyContent:"center",gap:"10px",position:"relative", top:"60px",zIndex:10 }}>
       <a
         href="#"
         className="waves-effect waves-light btn btn-clear btn-submit btn-small"

@@ -237,9 +237,6 @@ const CreatejobPosition = ({ currentJobDetails }) => {
   // Get paginated options for display
   const paginatedOptionsDomainSkills = allAvailableDomainSkills.slice(startIndex, endIndex);
   
-  // Use all available options for search (not paginated)
-  const availableOptionsDomainSkills = allAvailableDomainSkills;
-  
   // Check if there are more pages to show
   const hasMorePages = domainSkillsPage < totalPages;
   
@@ -273,9 +270,6 @@ const CreatejobPosition = ({ currentJobDetails }) => {
   
   // Get paginated options for display
   const paginatedOptionsSoftSkills = allAvailableSoftSkills.slice(softSkillsStartIndex, softSkillsEndIndex);
-  
-  // Use all available options for search (not paginated)
-  const availableOptionsSoftSkills = allAvailableSoftSkills;
   
   // Check if there are more pages to show for soft skills
   const hasMorePagesSoftSkills = softSkillsPage < softSkillsTotalPages;
@@ -1094,7 +1088,13 @@ console.log("positionRes----------->",positionRes);
                   labelText="Domain Skills"
                   placeholder="Select Domain Skills..."
                   options={optionMapper(
-                    availableOptionsDomainSkills,
+                    paginatedOptionsDomainSkills,
+                    "name",
+                    "name",
+                    "Select Domain Skills"
+                  )}
+                  allOptions={optionMapper(
+                    allAvailableDomainSkills,
                     "name",
                     "name",
                     "Select Domain Skills"
@@ -1114,7 +1114,13 @@ console.log("positionRes----------->",positionRes);
                   labelText="Soft Skills"
                   placeholder="Select Soft Skills..."
                   options={optionMapper(
-                    availableOptionsSoftSkills,
+                    paginatedOptionsSoftSkills,
+                    "name",
+                    "name",
+                    "Select Soft Skills"
+                  )}
+                  allOptions={optionMapper(
+                    allAvailableSoftSkills,
                     "name",
                     "name",
                     "Select Soft Skills"
