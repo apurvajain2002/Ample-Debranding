@@ -56,19 +56,19 @@ const DoneButton = ({ type, stopAudioRecording, stopVideoRecording }) => {
 
   // Video JSX
   return (
-    <div className="btn-wr" style={{ textAlign: 'center', marginTop: '20px',display:"flex",justifyContent:"center",gap:"10px" }}>
+    <div className="btn-wr" style={{ textAlign: 'center', marginTop: '20px',display:"flex",justifyContent:"center",gap:"10px",position:"relative", top:"60px",zIndex:10 }}>
       <a
         href="#"
         className="waves-effect waves-light btn btn-clear btn-submit btn-small"
         onClick={stopVideoRecording}
-        style={{ marginRight: '10px',width:"30%",position:"relative", top:"70px",left:"-80px",zIndex:10, display:btnVisible ? "flex" : "none", justifyContent:"center" }}
+        style={{ marginRight: '10px',width:"30%", display:btnVisible ? "flex" : "none", justifyContent:"center" }}
       >
         DONE
       </a>
 
       <i
         className="show-details infermation-ico-black"
-        style={{ padding: "0",display:btnVisible ? "flex" : "none" }}
+        style={{ padding: "0",display:btnVisible ? "block" : "none" }}
       >
         i
         <Tooltip divTagCssClasses={"infbox-click-done information-box-done"}>
