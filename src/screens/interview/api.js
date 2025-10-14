@@ -86,7 +86,7 @@ export async function saveCandidateResponse(
     body.append("browserName", ipDetails.browserName);
     body.append("isAndroid", ipDetails.isAndroid);
     body.append("isDesktop", ipDetails.isDesktop);
-    body.append("isIOS", ipDetails.isIOS);
+    body.append("isIos", ipDetails.isIos);
     body.append("isMobile", ipDetails.isMobile);
     body.append("city", ipDetails.city);
     body.append("region", ipDetails.region);
