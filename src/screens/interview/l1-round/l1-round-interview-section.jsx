@@ -39,6 +39,8 @@ const RATINGS = [
   { key: "100% Without Doubt", value: "100% Without Doubt" },
 ];
 
+const COUNTED_QUESTION_TYPES = new Set(["filtration", "skillBased"]);
+
 const L1RoundInterviewSection = ({
   setView = () => { },
   view = VIEWS.SPLIT,
@@ -100,6 +102,10 @@ const L1RoundInterviewSection = ({
   const [showRotateOverlay, setShowRotateOverlay] = useState(false);
 
   const payloadUserId = link_access_type === "privateLink" ? privateUserId : userId ?? '';
+
+  const shouldShowQuestionNumber =
+    currentScriptType === "skillBased" &&
+    COUNTED_QUESTION_TYPES.has(currentQuestion?.questionType);
 
   /* console.log('l1 round interview section payloadUserId ::: ', payloadUserId);
   console.log('l1 round interview section privateUserId ::: ', privateUserId);
@@ -634,9 +640,11 @@ const L1RoundInterviewSection = ({
                               <aside className={`col xl8 l8 m8 s8`}>
                                 <div className="discuss-box" style={{ textAlign: "justify" }}>
                                   <p style={{ textAlign: "justify", padding: 0 }}>
-                                    <span style={{ color: "black", fontWeight: "bold", padding: 0 }}>{currentScriptType === "skillBased"
-                                      ? `Q${currentIndex}/${totalQuestions}.`
-                                      : null}{" "}</span>
+                                    <span style={{ color: "black", fontWeight: "bold", padding: 0 }}>
+                                      {shouldShowQuestionNumber
+                                        ? `Q${currentIndex}/${totalQuestions}.`
+                                        : null}{" "}
+                                    </span>
                                     {currentQuestion.questionText}
                                   </p>
                                 </div>
@@ -1012,7 +1020,4 @@ const L1RoundInterviewSection = ({
 };
 
 export default L1RoundInterviewSection;
-
-
-
 

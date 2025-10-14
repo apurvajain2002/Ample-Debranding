@@ -32,8 +32,9 @@ const NoRouteFound = ({ navigateToPath }) => {
       const { data } = await axiosInstance.post(
         `${baseUrl}/job-posting/interview-link/interview-link-validation`,
         {
-          interviewLink: url
-          // interviewLink: "https://ev.evueme.dev/ImWWH8ThvODdzQ9Df8zDQC94TM1W1urF9YZsXL3JkaIb9A3wSRKApS9vLNQjiQeR",
+          // interviewLink: url
+          interviewLink:
+            "https://ev.evueme.dev/tJcwwhG7spPE65lR0BKsiJOoP7sz00FcNU9viVFI1rGmX3Am8Zgwky7kWg_WXdJ6",
         }
       );
       // console.log("validateInterviewLink respone is ::", data);
