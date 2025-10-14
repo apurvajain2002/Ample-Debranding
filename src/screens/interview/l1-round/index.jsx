@@ -13,7 +13,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { updateCandidateInterviewStatus } from "../api";
 import { QTYPES } from "../../../resources/constant-data/question-types";
 import Popup from "../../../components/errors";
-import aviSmilingImage from "../../../resources/images/aviSmiling.png";
+import aviSmilingImage from "../../../resources/images/aviSmiling.jpg";
 import EvuemeTextLoader from "../../../components/loaders/evueme-text-loader";
 import { useGlobalContext } from "../../../context";
 import useForceFullscreen from "../../../customHooks/use-force-fullscreen";
