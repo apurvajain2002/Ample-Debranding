@@ -61,7 +61,7 @@ const DoneButton = ({ type, stopAudioRecording, stopVideoRecording }) => {
         href="#"
         className="waves-effect waves-light btn btn-clear btn-submit btn-small"
         onClick={stopVideoRecording}
-        style={{ marginRight: '10px' }}
+        style={{ marginRight: '10px', display:btnVisible ? "flex" : "none" }}
       >
         DONE
       </a>
