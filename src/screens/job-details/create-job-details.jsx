@@ -142,6 +142,10 @@ const CreatejobPosition = ({ currentJobDetails }) => {
   const [domainSkillsPage, setDomainSkillsPage] = useState(1);
   const DOMAIN_SKILLS_PER_PAGE = 99;
   
+  // Pagination state for soft skills
+  const [softSkillsPage, setSoftSkillsPage] = useState(1);
+  const SOFT_SKILLS_PER_PAGE = 99;
+  
 
   const handleClick = (ref) => {
     ref.current.click();
@@ -203,6 +207,11 @@ const CreatejobPosition = ({ currentJobDetails }) => {
   const handleViewMoreDomainSkills = () => {
     setDomainSkillsPage(prevPage => prevPage + 1);
   };
+  
+  // Handle "View More" for soft skills pagination
+  const handleViewMoreSoftSkills = () => {
+    setSoftSkillsPage(prevPage => prevPage + 1);
+  };
   // Get all available domain skills (excluding already selected ones)
   const allAvailableDomainSkills = (domainSkillsData || []).filter(
     (skill) => !jobPosition.domainSkills?.includes(skill.name)
@@ -213,8 +222,11 @@ const CreatejobPosition = ({ currentJobDetails }) => {
   const startIndex = (domainSkillsPage - 1) * DOMAIN_SKILLS_PER_PAGE;
   const endIndex = startIndex + DOMAIN_SKILLS_PER_PAGE;
   
-  // Get paginated options
-  const availableOptionsDomainSkills = allAvailableDomainSkills.slice(startIndex, endIndex);
+  // Get paginated options for display
+  const paginatedOptionsDomainSkills = allAvailableDomainSkills.slice(startIndex, endIndex);
+  
+  // Use all available options for search (not paginated)
+  const availableOptionsDomainSkills = allAvailableDomainSkills;
   
   // Check if there are more pages to show
   const hasMorePages = domainSkillsPage < totalPages;
@@ -237,9 +249,24 @@ const CreatejobPosition = ({ currentJobDetails }) => {
       softSkills: updatedSoftSkills && updatedSoftSkills.length > 0 ? updatedSoftSkills : null,
     });
   };
-  const availableOptionsSoftSkills = (softkillsData || []).filter(
+  // Get all available soft skills (excluding already selected ones)
+  const allAvailableSoftSkills = (softkillsData || []).filter(
     (skill) => !jobPosition.softSkills?.includes(skill.name)
   );
+  
+  // Calculate pagination for soft skills
+  const softSkillsTotalPages = Math.ceil(allAvailableSoftSkills.length / SOFT_SKILLS_PER_PAGE);
+  const softSkillsStartIndex = (softSkillsPage - 1) * SOFT_SKILLS_PER_PAGE;
+  const softSkillsEndIndex = softSkillsStartIndex + SOFT_SKILLS_PER_PAGE;
+  
+  // Get paginated options for display
+  const paginatedOptionsSoftSkills = allAvailableSoftSkills.slice(softSkillsStartIndex, softSkillsEndIndex);
+  
+  // Use all available options for search (not paginated)
+  const availableOptionsSoftSkills = allAvailableSoftSkills;
+  
+  // Check if there are more pages to show for soft skills
+  const hasMorePagesSoftSkills = softSkillsPage < softSkillsTotalPages;
 
   // TODO: Test the new Typeahead comp for interview
   const handleOnChangeInterviewRound = (selected) => {
@@ -1050,6 +1077,8 @@ const CreatejobPosition = ({ currentJobDetails }) => {
                   multiple={true}
                   required={false}
                   missing={error.softSkills}
+                  viewMore={hasMorePagesSoftSkills}
+                  handleViewMore={handleViewMoreSoftSkills}
                 />
                 <NewTypeaheadInputField
                   divTagCssClasses="input-field col xl3 l3 m4 s12"
