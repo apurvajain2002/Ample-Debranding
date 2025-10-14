@@ -11,6 +11,8 @@ import useApiWithDiagnostics from "../../../customHooks/use-api-with-diagnostics
 import useCaptureImage from "../../../customHooks/use-capture-image";
 import ErrorToast from "../../toasts/error-toast";
 
+const COUNTED_QUESTION_TYPES = new Set(["filtration", "skillBased"]);
+
 const QuestionSection = ({
   question,
   currentQuestion,
@@ -266,10 +268,12 @@ const QuestionSection = ({
   
   return (
     <div className="chatt-box">
-      <QuestionNumber
-        currentQuestionIndex={mcqQuestionCounter}
-        totalQuestions={totalQuestions}
-      />
+      {COUNTED_QUESTION_TYPES.has(question.questionType) ? (
+        <QuestionNumber
+          currentQuestionIndex={mcqQuestionCounter}
+          totalQuestions={totalQuestions}
+        />
+      ) : null}
       <Question
         question={question}
         setAnswer={setAnswer}

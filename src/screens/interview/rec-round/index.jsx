@@ -15,12 +15,12 @@ import Popup from "../../../components/errors";
 import useStreamCamera from "../../../customHooks/use-stream-camera";
 import { QTYPES } from "../../../resources/constant-data/question-types";
 import aviSmilingImage from "../../../resources/images/aviSmiling.png";
-import { saveCandidateResponse, updateCandidateInterviewStatus } from "../api";
 import EvuemeTextLoader from "../../../components/loaders/evueme-text-loader";
 import { useGlobalContext } from "../../../context";
 import useForceFullscreen from "../../../customHooks/use-force-fullscreen";
 import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
 import { logClientDiagnostics } from "../../../utils/browserCompatibility";
+import useApiWithDiagnostics from "../../../customHooks/use-api-with-diagnostics";
 
 const SMILING_TIMEOUT = 1000 * 5;
 const FILLER_TIMEOUT = 1000 * 2;
@@ -68,6 +68,8 @@ const SCRIPT_FLOW = [
   "closingScript",
 ];
 
+const COUNTED_QUESTION_TYPES = new Set(["filtration", "skillBased"]);
+
 const LIVE_RECORDING_CONFIG = {
   urlDetails: {
     url: "https://livestream.yourvideo.live/?header=false&grid_username=no&grid_line_icon=no&max_video=yes&rtmp_mode=yes&toolbar=false&grid_view=gallery&chat_overlay=1&token=",
@@ -79,6 +81,7 @@ const OtherRecRound = () => {
   const location = useLocation();
   const link_access_type = location?.state?.link_access_type;
   const { privateUserId, interviewSource, setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport } = useGlobalContext();
+  const { saveCandidateResponse, updateCandidateInterviewStatus } = useApiWithDiagnostics();
   const jobId = useSelector((state) => state.interviewSlice.jobId);
   const roundName = useSelector((state) => state.interviewSlice.roundName);
   const interviewId = useSelector((state) => state.interviewSlice.interviewId);
@@ -127,6 +130,7 @@ const OtherRecRound = () => {
   const repeatingTimeoutRef = useRef(null);
   const candidateVideoFeedbackRef = useRef(false);
   const questionDoneRef = useRef(false);
+  const answeredSkillQuestionsRef = useRef(0);
 
   const [localStream, setLocalStream] = useState(null);
   const [room, setRoom] = useState(null);
@@ -141,6 +145,8 @@ const OtherRecRound = () => {
   console.log('rec round userId ::: ', userId);*/
   console.log('currentQuestionIndex ::: 01', currentQuestionIndex); 
   console.log('mcqQuestionCounter ::: 01', mcqQuestionCounter); 
+  const displayQuestionNumber =
+    answeredSkillQuestionsRef.current + mcqQuestionCounter;
 
   useEffect(() => {
     if (currentScriptType === "skillBased" && forceCameraOn) {
@@ -302,7 +308,6 @@ const OtherRecRound = () => {
 
     // if interview is resumed, move to the next script after practice
     // if (isResumed) return handleNextScriptType("practice");
-    if (isResumed) setMcqQuestionCounter((prev) => prev - 1);
     moveToNextQuestion(currentQuestion.nextQuestionIfYes, currentScriptType);
   };
 
@@ -569,12 +574,9 @@ const OtherRecRound = () => {
               createRoom().then(() => joinRoom());
             }
           }
-          if (
-            nextQuestion.responseType !== QTYPES.VIDEO_FIRST &&
-            nextQuestion.responseType !== QTYPES.AUDIO_FIRST &&
-            nextQuestion.responseType !== QTYPES.HYGIENE_CHECK
-          )
+          if (COUNTED_QUESTION_TYPES.has(nextQuestion.questionType)) {
             setMcqQuestionCounter((prev) => prev + 1);
+          }
         }, SMILING_TIMEOUT);
       } else {
         questionDoneRef.current = false;
@@ -586,12 +588,9 @@ const OtherRecRound = () => {
             createRoom().then(() => joinRoom());
           }
         }
-        if (
-          nextQuestion.responseType !== QTYPES.VIDEO_FIRST &&
-          nextQuestion.responseType !== QTYPES.AUDIO_FIRST &&
-          nextQuestion.responseType !== QTYPES.HYGIENE_CHECK
-        )
+        if (COUNTED_QUESTION_TYPES.has(nextQuestion.questionType)) {
           setMcqQuestionCounter((prev) => prev + 1);
+        }
       }
     }
   };
@@ -843,11 +842,17 @@ const OtherRecRound = () => {
     setCurrentQuestionIndex(0);
     setMcqQuestionCounter(0);
     if (questionData.status && currentScriptType) {
-      const currentScriptQuestions = questionData[currentScriptType];
-      const currentScriptQuestionsCount =
-        currentScriptType === "skillBased"
-          ? questionData.questionsCount
-          : questionData[currentScriptType]?.length;
+      const currentScriptQuestions = questionData[currentScriptType] || [];
+      let currentScriptQuestionsCount =
+        questionData[currentScriptType]?.length || 0;
+
+      if (currentScriptType === "skillBased") {
+        const remainingCount = currentScriptQuestions.filter(
+          ({ questionType }) => COUNTED_QUESTION_TYPES.has(questionType)
+        ).length;
+        currentScriptQuestionsCount =
+          remainingCount + answeredSkillQuestionsRef.current;
+      }
 
       // set total questions count
       setTotalQuestions(currentScriptQuestionsCount);
@@ -987,12 +992,22 @@ const OtherRecRound = () => {
         await loadVideosFromArray(data.closingScript, "closingScript");
         addAvisImage();
         setQuestionData({ ...data, skillBased: filteredSkillBased });
-        setMcqQuestionCounter(
-          data.skillBased.length - filteredSkillBased.length + 1
+
+        const originalCountedQuestions = data.skillBased.filter(
+          (question) => COUNTED_QUESTION_TYPES.has(question.questionType)
+        ).length;
+        const filteredCountedQuestions = filteredSkillBased.filter((question) =>
+          COUNTED_QUESTION_TYPES.has(question.questionType)
+        ).length;
+        const answeredCount = Math.max(
+          originalCountedQuestions - filteredCountedQuestions,
+          0
         );
-        setCurrentQuestionIndex(
-          data.skillBased.length - filteredSkillBased.length + 1
-        );
+        answeredSkillQuestionsRef.current = answeredCount;
+        const resumedOffset = answeredCount + 1;
+
+        setMcqQuestionCounter(0);
+        setCurrentQuestionIndex(resumedOffset);
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -1070,7 +1085,7 @@ const OtherRecRound = () => {
                 currentScriptType={currentScriptType}
                 playCurrentVideo={playCurrentVideo}
                 setShowComponent={setShowComponent}
-                mcqQuestionCounter={mcqQuestionCounter}
+                mcqQuestionCounter={displayQuestionNumber}
                 totalQuestions={totalQuestions}
                 isVideoEnded={isVideoEnded}
                 repeatingTimeoutRef={repeatingTimeoutRef}
