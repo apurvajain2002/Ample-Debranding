@@ -13,7 +13,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { updateCandidateInterviewStatus } from "../api";
 import { QTYPES } from "../../../resources/constant-data/question-types";
 import Popup from "../../../components/errors";
-import aviSmilingImage from "../../../resources/images/aviSmiling.jpg";
+import aviSmilingImage from "../../../resources/images/aviSmiling.png";
 import EvuemeTextLoader from "../../../components/loaders/evueme-text-loader";
 import { useGlobalContext } from "../../../context";
 import useForceFullscreen from "../../../customHooks/use-force-fullscreen";
@@ -38,6 +38,8 @@ const SCRIPT_FLOW = [
   "feedBack",
   "closingScript",
 ];
+
+const COUNTED_QUESTION_TYPES = new Set(["filtration", "skillBased"]);
 
 // Dynamic first script based on interview source
 const getFirstScript = (source) => {
@@ -116,6 +118,7 @@ const L1Round = () => {
   const [isVideoEnded, setIsVideoEnded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [skillQuestionCounter, setSkillQuestionCounter] = useState(0);
   const [isResumed, setIsResumed] = useState(false);
 
   // Enablex state
@@ -130,6 +133,7 @@ const L1Round = () => {
   const candidateVideoFeedbackRef = useRef(false);
   const savedIdRef = useRef([]);
   const firstQuestionSetRef = useRef(false);
+  const answeredSkillQuestionsRef = useRef(0);
 
   const [localStream, setLocalStream] = useState(null);
   const [room, setRoom] = useState(null);
@@ -535,6 +539,14 @@ const L1Round = () => {
     });
     
     let nextQuestion;
+    const incrementSkillCounter = (questionToCount) => {
+      if (
+        scriptType === "skillBased" &&
+        COUNTED_QUESTION_TYPES.has(questionToCount?.questionType)
+      ) {
+        setSkillQuestionCounter((prev) => prev + 1);
+      }
+    };
 
     // different handler for skill based
     if (currentScriptType === "skillBased") {
@@ -592,10 +604,12 @@ const L1Round = () => {
           questionDoneRef.current = false;
           candidateVideoFeedbackRef.current = false;
           setCurrentQuestion(nextQuestion);
+          incrementSkillCounter(nextQuestion);
         }, SMILING_TIMEOUT);
       } else {
         questionDoneRef.current = false;
         setCurrentQuestion(nextQuestion);
+        incrementSkillCounter(nextQuestion);
       }
     } else {
       console.error('Next question not found!', { 
@@ -617,6 +631,7 @@ const L1Round = () => {
         
         if (nextQuestion) {
           setCurrentQuestion(nextQuestion);
+          incrementSkillCounter(nextQuestion);
         }
       }
     }
@@ -903,17 +918,25 @@ const L1Round = () => {
     // Reset the first question flag when script type changes
     firstQuestionSetRef.current = false;
     if (questionData.status && currentScriptType) {
-      // const currentScriptQuestions = questionData[currentScriptType];
-      const currentScriptQuestionsCount =
-        currentScriptType === "skillBased"
-          ? questionData.questionsCount
-          : questionData[currentScriptType]?.length;
+      const currentScriptQuestions = questionData[currentScriptType] || [];
+      let currentScriptQuestionsCount =
+        questionData[currentScriptType]?.length || 0;
+
+      if (currentScriptType === "skillBased") {
+        const remainingCount = currentScriptQuestions.filter(
+          ({ questionType }) => COUNTED_QUESTION_TYPES.has(questionType)
+        ).length;
+        currentScriptQuestionsCount =
+          remainingCount + answeredSkillQuestionsRef.current;
+        setSkillQuestionCounter(answeredSkillQuestionsRef.current);
+      } else {
+        setSkillQuestionCounter(0);
+      }
       setTotalQuestions(currentScriptQuestionsCount);
-      const nextQuestionId = questionData[currentScriptType][0]?.questionId;
+      const nextQuestionId = currentScriptQuestions[0]?.questionId;
       // Set the first question for this script type
       moveToNextQuestion(nextQuestionId || 1, currentScriptType);
       firstQuestionSetRef.current = true;
-    } else {
     }
   }, [currentScriptType]);
 
@@ -1072,9 +1095,20 @@ const L1Round = () => {
           ...data,
           skillBased: filteredSkillBased,
         });
-        setCurrentQuestionIndex(
-          data.skillBased.length - filteredSkillBased.length + 1
+        const originalCountedQuestions = data.skillBased.filter(
+          (question) => COUNTED_QUESTION_TYPES.has(question.questionType)
+        ).length;
+        const filteredCountedQuestions = filteredSkillBased.filter((question) =>
+          COUNTED_QUESTION_TYPES.has(question.questionType)
+        ).length;
+        const answeredCount = Math.max(
+          originalCountedQuestions - filteredCountedQuestions,
+          0
         );
+        answeredSkillQuestionsRef.current = answeredCount;
+        const resumedOffset = answeredCount + 1;
+        setCurrentQuestionIndex(resumedOffset);
+        setSkillQuestionCounter(answeredCount);
         setView(VIEWS.SPLIT);
       } catch (error) {
         console.error(error);
@@ -1165,7 +1199,7 @@ const L1Round = () => {
                 questionDoneRef={questionDoneRef}
                 candidateVideoFeedbackRef={candidateVideoFeedbackRef}
                 practiceLink={practiceLink}
-                currentIndex={currentQuestionIndex}
+                currentIndex={skillQuestionCounter}
                 savedIdRef={savedIdRef}
                 setQuestionData={setQuestionData}
                 setIsResumed={setIsResumed}

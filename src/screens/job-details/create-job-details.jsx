@@ -234,8 +234,11 @@ const CreatejobPosition = ({ currentJobDetails }) => {
   const startIndex = (domainSkillsPage - 1) * DOMAIN_SKILLS_PER_PAGE;
   const endIndex = startIndex + DOMAIN_SKILLS_PER_PAGE;
   
-  // Get paginated options
-  const availableOptionsDomainSkills = allAvailableDomainSkills.slice(startIndex, endIndex);
+  // Get paginated options for display
+  const paginatedOptionsDomainSkills = allAvailableDomainSkills.slice(startIndex, endIndex);
+  
+  // Use all available options for search (not paginated)
+  const availableOptionsDomainSkills = allAvailableDomainSkills;
   
   // Check if there are more pages to show
   const hasMorePages = domainSkillsPage < totalPages;
