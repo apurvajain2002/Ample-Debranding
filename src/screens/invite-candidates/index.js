@@ -447,8 +447,23 @@ const InviteCandidates = () => {
 
   // Auto-call API when conditions are met (only once)
   useEffect(() => {
-    const shouldCallAPI = (candidatesToInvite && jobId && roundName) || 
-                         (isNotPublishedJobsApiCalled && isGetJobsApiCalled);
+    const currentUrl = window.location.href;
+  const currentPathname = location.pathname;
+  const currentSearch = location.search;
+
+  // Extract only the part after /admin
+  const pathAfterAdmin = currentPathname.replace('/admin', '');
+  // Alternative: Split by '/' and get the last part
+  const pathSegments = currentPathname.split('/');
+  const lastSegment = pathSegments[pathSegments.length - 1];
+  // Combine pathname and search to get full path with query parameters
+  const fullPath = currentPathname + currentSearch;
+  // Another alternative: Use substring to get everything after '/admin/'
+  const pathAfterAdminSubstring = fullPath.substring(fullPath.indexOf('/admin/') + 6);
+
+  console.log("Full path:", fullPath);
+  console.log("Path after /admin (substring):", pathAfterAdminSubstring);
+    const shouldCallAPI = pathAfterAdminSubstring === '/invite-candidates?type=invited-candidates';
     
     if (shouldCallAPI && !apiCallMade.current) {
       console.log('Auto-calling interviewLinkInviteDetails (first time only)');
@@ -469,7 +484,7 @@ const InviteCandidates = () => {
         dispatch(setIsNotPublishedJobsApiCalled(false));
       }
     }
-  }, [candidatesToInvite, jobId, roundName, selectedPlacementAgency, selectedLocation, isNotPublishedJobsApiCalled, isGetJobsApiCalled]);
+  }, []);
 
   // Reset API call flag when location changes (new page load)
   useEffect(() => {
@@ -863,8 +878,12 @@ const InviteCandidates = () => {
 
   const handleInterviewLinkInviteDetails = () => {
     console.log("inviteCandidate", inviteCandidate);
-    // API call is now handled automatically by useEffect
-    // No need to call it manually here
+    dispatch(interviewLinkInviteDetails({
+      "jobId": jobId,
+      "interviewRoundName": roundName,
+      "agencyName": selectedPlacementAgency,
+      "vacancyLocations": selectedLocation
+    }));
   }
 
   const generateTemplateOption = () => {
