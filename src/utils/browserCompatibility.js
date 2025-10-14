@@ -33,12 +33,12 @@ const getVersion = (userAgent, browserName) => {
 export const getDeviceInfo = () => {
   const userAgent = navigator.userAgent;
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-  const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+  const isIos = /iPad|iPhone|iPod/.test(userAgent);
   const isAndroid = /Android/.test(userAgent);
   
   return {
     isMobile,
-    isIOS,
+    isIos,
     isAndroid,
     isDesktop: !isMobile
   };
@@ -351,7 +351,7 @@ const logClientDiagnostics = async (contextFunctions = {}) => {
       browserName: browserInfoData.name,
       isAndroid: deviceInfoData.isAndroid,
       isDesktop: deviceInfoData.isDesktop,
-      isIOS: deviceInfoData.isIOS,
+      isIos: deviceInfoData.isIos,
       isMobile: deviceInfoData.isMobile,
       city,
       region,

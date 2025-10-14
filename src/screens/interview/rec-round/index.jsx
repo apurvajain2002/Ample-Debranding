@@ -15,12 +15,12 @@ import Popup from "../../../components/errors";
 import useStreamCamera from "../../../customHooks/use-stream-camera";
 import { QTYPES } from "../../../resources/constant-data/question-types";
 import aviSmilingImage from "../../../resources/images/aviSmiling.png";
-import { saveCandidateResponse, updateCandidateInterviewStatus } from "../api";
 import EvuemeTextLoader from "../../../components/loaders/evueme-text-loader";
 import { useGlobalContext } from "../../../context";
 import useForceFullscreen from "../../../customHooks/use-force-fullscreen";
 import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
 import { logClientDiagnostics } from "../../../utils/browserCompatibility";
+import useApiWithDiagnostics from "../../../customHooks/use-api-with-diagnostics";
 
 const SMILING_TIMEOUT = 1000 * 5;
 const FILLER_TIMEOUT = 1000 * 2;
@@ -79,6 +79,7 @@ const OtherRecRound = () => {
   const location = useLocation();
   const link_access_type = location?.state?.link_access_type;
   const { privateUserId, interviewSource, setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport } = useGlobalContext();
+  const { saveCandidateResponse, updateCandidateInterviewStatus } = useApiWithDiagnostics();
   const jobId = useSelector((state) => state.interviewSlice.jobId);
   const roundName = useSelector((state) => state.interviewSlice.roundName);
   const interviewId = useSelector((state) => state.interviewSlice.interviewId);
