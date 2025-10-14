@@ -51,7 +51,7 @@ const useInterviewDiagnostics = () => {
           browserName: browserInfoData.name,
           isAndroid: deviceInfoData.isAndroid,
           isDesktop: deviceInfoData.isDesktop,
-          isIOS: deviceInfoData.isIOS,
+          isIos: deviceInfoData.isIos,
           isMobile: deviceInfoData.isMobile,
           city,
           region,

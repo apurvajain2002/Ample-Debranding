@@ -112,7 +112,7 @@ const L1RoundInterviewSection = ({
   useEffect(() => {
     const deviceInfo = getDeviceInfo();
     const handleOrientation = () => {
-      if (deviceInfo.isIOS && window.innerHeight > window.innerWidth) {
+      if (deviceInfo.isIos && window.innerHeight > window.innerWidth) {
         setShowRotateOverlay(true);
       } else {
         setShowRotateOverlay(false);
@@ -1012,7 +1012,6 @@ const L1RoundInterviewSection = ({
 };
 
 export default L1RoundInterviewSection;
-
 
 
 
