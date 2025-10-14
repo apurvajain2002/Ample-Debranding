@@ -14,7 +14,7 @@ import InterviewFooter from "../../../components/interview/interview-footer";
 import Popup from "../../../components/errors";
 import useStreamCamera from "../../../customHooks/use-stream-camera";
 import { QTYPES } from "../../../resources/constant-data/question-types";
-import aviSmilingImage from "../../../resources/images/aviSmiling.png";
+import aviSmilingImage from "../../../resources/images/aviSmiling.jpg";
 import { saveCandidateResponse, updateCandidateInterviewStatus } from "../api";
 import EvuemeTextLoader from "../../../components/loaders/evueme-text-loader";
 import { useGlobalContext } from "../../../context";
