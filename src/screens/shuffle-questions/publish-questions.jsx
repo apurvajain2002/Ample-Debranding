@@ -258,9 +258,9 @@ const PublishQuestions = () => {
         </i>
       </div>
       <div className="publish-colaspe center-align">
-        <PublishingLoader 
+        {/* <PublishingLoader 
         uploadedPercentage={publishInfo.isRoundPublished?100:70}
-        />
+        /> */}
         
         {/* <a className="waves-effect waves-light btn btn-clear btn-submit btn-small">
           Interview Published
@@ -361,7 +361,7 @@ const PublishQuestions = () => {
               fontWeight: 'bold',
               color: '#333'
             }}>
-              Preparing your Publish...
+              Your interview is getting ready for rollout
             </h3>
             
             {/* Progress bar */}
@@ -389,7 +389,7 @@ const PublishQuestions = () => {
               fontSize: '14px',
               color: '#666'
             }}>
-              It might take 0-5 secs
+              It might take 10 to 20 minutes.
             </p>
             
             {/* Info message */}
@@ -399,11 +399,7 @@ const PublishQuestions = () => {
               color: '#666',
               lineHeight: '1.4'
             }}>
-              Don't worry, You can also get this under{" "}
-              <span style={{ color: '#007bff', cursor: 'pointer' }}>
-                "Recently Published Interviews"
-              </span>{" "}
-              for the next 48 hours.
+              Don't Worry. Once the process is completed, you will see a message saying 'Your interview is published successfully'
             </p>
           </div>
         </div>
