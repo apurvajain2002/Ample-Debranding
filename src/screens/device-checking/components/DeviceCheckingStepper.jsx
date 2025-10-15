@@ -431,8 +431,8 @@ const DeviceCheckingStepper = ({
                </i>
                <span style={{ fontWeight: 'bold' }}>Internet Connectivity</span>
                <span>-</span>
-               <span>
-                 {checkStatus.bandwidth === null ? "Checking ...":checkStatus.bandwidth}
+               <span style={{ color: checkStatus.bandwidth ? "#00bf7e" : "#ff0000" }}>
+                 {checkStatus.bandwidth === null ? "Checking ..." : checkStatus.bandwidth.charAt(0).toUpperCase() + checkStatus.bandwidth.slice(1)}
                </span>
              </div>
             {checkStatus.bandwidth && (
