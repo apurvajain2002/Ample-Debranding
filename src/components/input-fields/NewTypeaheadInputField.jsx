@@ -2,7 +2,7 @@ import { Menu, MenuItem, Typeahead } from "react-bootstrap-typeahead";
 import "react-bootstrap-typeahead/css/Typeahead.css";
 import getUniqueId from "../../utils/getUniqueId";
 import EvuemeLabelTag from "../evueme-html-tags/evueme-label-tag";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 const NewTypeaheadInputField = ({
   divTagCssClasses = "",
@@ -13,6 +13,7 @@ const NewTypeaheadInputField = ({
   selectTagIdAndName = "",
   placeholder = "",
   options = [],
+  allOptions = [], // All available options for filtering
   value = [],
   onChange = () => { },
   handleRemoveMultiValue = () => { },
@@ -30,9 +31,24 @@ const NewTypeaheadInputField = ({
   placementAgencyLabel = false,
 }) => {
   const selectedCount = value?.length || 0;
+  const [searchText, setSearchText] = useState("");
 
+  // Use allOptions for filtering if provided, otherwise fall back to options
+  const searchOptions = allOptions.length > 0 ? allOptions : options;
+
+  // Filter options based on search text
+  const filteredOptions = useMemo(() => {
+    if (!searchText) return options; // Show paginated options when no search
+    
+    return searchOptions.filter(option => 
+      option.optionKey.toLowerCase().includes(searchText.toLowerCase())
+    );
+  }, [searchText, options, searchOptions]);
 
   const renderMenu = (results, menuProps) => {
+    // Use filtered options instead of results for better control
+    const displayOptions = searchText ? filteredOptions : results;
+    
     return (
       <Menu {...menuProps} style={{top: "40px",position: "absolute", width:"100%"}}>
         {value?.length > 0 && (
@@ -52,7 +68,7 @@ const NewTypeaheadInputField = ({
             ))}
           </div>
         )}
-        {results.map((result, index) => {
+        {displayOptions.map((result, index) => {
         const isDisabled = result.optionKey.toLowerCase().includes("select");
         return (
           <MenuItem
@@ -72,7 +88,7 @@ const NewTypeaheadInputField = ({
           </MenuItem>
         );
        })}
-        {viewMore && (
+        {viewMore && !searchText && (
           <div className="view-more-container">
             <button className="view-more" onClick={handleViewMore}>
               View More
@@ -92,6 +108,7 @@ const NewTypeaheadInputField = ({
         placeholder={placeholder || "Choose an option..."}
         selected={value ?? []}
         onChange={onChange}
+        onInputChange={(text) => setSearchText(text)}
         // minLength={value?.length ? 0 : 1}
         multiple={multiple}
         disabled={disabled}
@@ -101,7 +118,7 @@ const NewTypeaheadInputField = ({
             <input
               {...inputProps}
               ref={inputRef}
-              placeholder={`${selectedCount} selected`} // Show the counter in the placeholder
+              placeholder={searchText ? "Search..." : `${selectedCount} selected`} // Show search placeholder when typing
             />
           </div>
         )}
