@@ -432,9 +432,7 @@ const DeviceCheckingStepper = ({
                <span style={{ fontWeight: 'bold' }}>Internet Connectivity</span>
                <span>-</span>
                <span>
-                 {checkStatus.connection === null && "Checking ..."}
-                 {checkStatus.connection === true && "Connected"}
-                 {checkStatus.connection === false && "Connection Failed"}
+                 {checkStatus.bandwidth === null ? "Checking ...":checkStatus.bandwidth}
                </span>
              </div>
             {checkStatus.bandwidth && (
