@@ -26,7 +26,7 @@ import BrowserCompatibilityWarning from "../../../components/miscellaneous/brows
 import OTPInputComponent from "../../../components/interview/OTPInputComponent";
 import InputSubmitComponent from "../../../components/interview/InputSubmitComponent";
 import StarRating from "../../../components/interview/StarRating";
-import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
+// import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
 
 
 const initialTime = 2 * 60;

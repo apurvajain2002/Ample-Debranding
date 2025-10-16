@@ -1097,7 +1097,14 @@ const L1Round = () => {
           // Continue with original data if filtering fails
         }
         console.log("after", filteredSkillBased);
-        await logClientDiagnostics({ setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport });
+        
+        // Log client diagnostics (optional - don't block main functionality if it fails)
+        try {
+          await logClientDiagnostics({ setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport });
+        } catch (diagnosticsError) {
+          console.warn("Client diagnostics failed, continuing with interview:", diagnosticsError);
+        }
+        
         await loadVideosFromArray(data.openingScript, "openingScript");
         await loadVideosFromArray(data.practice, "practice");
         await loadVideosFromArray(data.start, "start");

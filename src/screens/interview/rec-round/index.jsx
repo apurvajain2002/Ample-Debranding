@@ -18,7 +18,7 @@ import aviSmilingImage from "../../../resources/images/aviSmiling.png";
 import EvuemeTextLoader from "../../../components/loaders/evueme-text-loader";
 import { useGlobalContext } from "../../../context";
 import useForceFullscreen from "../../../customHooks/use-force-fullscreen";
-import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
+// import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
 import { logClientDiagnostics } from "../../../utils/browserCompatibility";
 import useApiWithDiagnostics from "../../../customHooks/use-api-with-diagnostics";
 
@@ -994,7 +994,14 @@ const OtherRecRound = () => {
           // Continue with original data if filtering fails
         }
         console.log("after", filteredSkillBased);
-        await logClientDiagnostics({ setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport });
+        
+        // Log client diagnostics (optional - don't block main functionality if it fails)
+        try {
+          await logClientDiagnostics({ setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport });
+        } catch (diagnosticsError) {
+          console.warn("Client diagnostics failed, continuing with interview:", diagnosticsError);
+        }
+        
         await loadVideosFromArray(data.openingScript, "openingScript");
         await loadVideosFromArray(data.practice, "practice");
         await loadVideosFromArray(data.start, "start");
