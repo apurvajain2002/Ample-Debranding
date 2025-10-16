@@ -299,6 +299,7 @@ const InviteLink = () => {
   };
 
   const handleGenerateLink = () => {
+    
     if (!jobId || !roundName) {
       return WarningToast("'Position Name' or 'Round Name' not selected");
     }
@@ -362,6 +363,7 @@ const InviteLink = () => {
 
     const startDateTime = new Date(startDateUTC);
     const endDateTime = new Date(endDateUTC);
+    console.log("xxxxxxxxxxxxx---------->>");
 
     dispatch(
       generateLink({
@@ -493,15 +495,6 @@ const InviteLink = () => {
     dispatch(generateShortenLink(payloadWithValidity));
     setIsCreateLinkButtonClicked(true);
   };
-
-  useEffect(() => {
-    if (state.successMessage) {
-      SuccessToast(state.successMessage);
-    } else if (state.failMessage) {
-      ErrorToast(state.failMessage);
-    }
-    dispatch(setMessagesEmpty());
-  }, [state.successMessage, state.failMessage]);
 
   useEffect(() => {
     if (jobId) {
