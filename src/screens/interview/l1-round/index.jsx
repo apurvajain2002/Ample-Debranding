@@ -386,6 +386,21 @@ const L1Round = () => {
   ) => {
     try {
       const currentVideo = videoElementsDOM[videoId];
+      
+      // Check if video element exists
+      if (!currentVideo) {
+        console.warn(`Video element ${videoId} not found in videoElementsDOM`);
+        if (loading) setLoading(false);
+        return;
+      }
+      
+      // Check if video has valid source before playing
+      if (!currentVideo.src || currentVideo.src === '' || currentVideo.src === window.location.href) {
+        console.warn(`Video ${videoId} has no valid source, skipping play`);
+        if (loading) setLoading(false);
+        return;
+      }
+      
       currentVideo.style.display = "initial";
       if (aviSmilingImageRef) {
         aviSmilingImageRef.style.width = currentVideo.style.width;
@@ -401,14 +416,12 @@ const L1Round = () => {
 
       setIsVideoEnded(false);
       
-      // Check if video has valid source before playing
-      if (!currentVideo.src || currentVideo.src === '' || currentVideo.src === window.location.href) {
-        console.warn(`Video ${videoId} has no valid source, skipping play`);
+      // Try to play video with error handling
+      currentVideo.play().catch((playError) => {
+        console.warn(`Failed to play video ${videoId}:`, playError);
         if (loading) setLoading(false);
-        return;
-      }
-
-      currentVideo.play();
+      });
+      
       if (loading) setLoading(false);
 
       // only for videos not looping
