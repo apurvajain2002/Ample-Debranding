@@ -29,19 +29,9 @@ const videoParent = document.getElementById("root");
 let aviSmilingImageRef = null;
 const videoElementsDOM = {};
 
-// Sources that skip opening script and start from practice
-const SKIP_OPENING_SCRIPT_SOURCES = ["login"];
-
-// Dynamic first script based on interview source
-const getFirstScript = (source) => {
-  return SKIP_OPENING_SCRIPT_SOURCES.includes(source)
-    ? "practice"
-    : "openingScript";
-};
-
 // Function to find the first available script with data
-const findFirstAvailableScript = (questionData, interviewSource) => {
-  const scriptFlow = SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource)
+const findFirstAvailableScript = (questionData, shouldSkipOpeningScript = false) => {
+  const scriptFlow = shouldSkipOpeningScript
     ? SCRIPT_FLOW.filter((script) => script !== "openingScript")
     : SCRIPT_FLOW;
 
@@ -117,6 +107,7 @@ const OtherRecRound = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [mcqQuestionCounter, setMcqQuestionCounter] = useState(0);
   const [totalQuestions, setTotalQuestions] = useState(0);
+  const [shouldSkipOpeningScript, setShouldSkipOpeningScript] = useState(false);
   const [videoLoadError, setVideoLoadError] = useState(false);
   const [isResumed, setIsResumed] = useState(false);
 
@@ -607,7 +598,7 @@ const OtherRecRound = () => {
 
   // move to next script type
   const handleNextScriptType = async (prevScriptType = currentScriptType) => {
-    const scriptFlow = SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource)
+    const scriptFlow = shouldSkipOpeningScript
       ? SCRIPT_FLOW.filter((script) => script !== "openingScript")
       : SCRIPT_FLOW;
     let nextScriptType = "";
@@ -641,7 +632,7 @@ const OtherRecRound = () => {
 
     // If no next script found, try to find any available script with data
     if (!nextScriptType) {
-      nextScriptType = findFirstAvailableScript(questionData, interviewSource);
+      nextScriptType = findFirstAvailableScript(questionData, shouldSkipOpeningScript);
     }
 
     // Only update if a valid next script type was found
@@ -665,8 +656,8 @@ const OtherRecRound = () => {
       currentScriptType === "openingScript" &&
       qText.includes("help you with a practice question so")
     ) {
-      // Skip to practice for sources that skip opening script, otherwise use normal logic
-      if (SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource)) {
+      // Skip to practice if resume status indicates opening script should be skipped, otherwise use normal logic
+      if (shouldSkipOpeningScript) {
         moveToNextQuestion(12, "practice");
       } else {
         moveToNextQuestion(
@@ -818,10 +809,8 @@ const OtherRecRound = () => {
       const videoLink =
         currentQuestion.questionVideoLink || currentQuestion.lipSyncVideoLink;
       if (!videoLink) {
-        // Use practice script as fallback for sources that skip opening script, otherwise use opening script
-        const fallbackScript = SKIP_OPENING_SCRIPT_SOURCES.includes(
-          interviewSource
-        )
+        // Use practice script as fallback if opening script should be skipped, otherwise use opening script
+        const fallbackScript = shouldSkipOpeningScript
           ? "practice"
           : "openingScript";
         const fallbackQuestion = questionData[fallbackScript]?.[0];
@@ -867,11 +856,11 @@ const OtherRecRound = () => {
       // Find the first available script with data, skipping empty ones
       const initialScript = findFirstAvailableScript(
         questionData,
-        interviewSource
+        shouldSkipOpeningScript
       );
       setCurrentScriptType(initialScript);
     }
-  }, [questionData, interviewSource]);
+  }, [questionData, shouldSkipOpeningScript]);
 
   // when splitview updates
   useEffect(() => {
@@ -951,6 +940,10 @@ const OtherRecRound = () => {
                 userId: myUserId,
             }
           );
+          
+          // Set the resume status to determine if opening script should be skipped
+          setShouldSkipOpeningScript(checkResumeStatusData.resume || false);
+          
           if (checkResumeStatusData.resume) {
             const { data: apiFilterIds } = await axiosInstance.get(
               `${baseUrl}/job-posting/api/enablex/interview-questions`,
