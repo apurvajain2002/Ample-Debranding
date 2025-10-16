@@ -137,9 +137,13 @@ const cinPattern = /^[LUlu]{1}[0-9]{5}[A-Za-z]{2}[0-9]{4}[A-Za-z]{3}[0-9]{6}$/;
 
 // Validate CIN function
 export const isValidCin = (input) => {
+  // console.log("input.length",input.length);
+  
   if (input.length !== 21) {
     return false;
   }
+  // console.log(cinPattern.test(input));
+  
   return cinPattern.test(input);
 };
 
