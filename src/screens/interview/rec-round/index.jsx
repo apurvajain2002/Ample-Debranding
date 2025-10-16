@@ -380,6 +380,13 @@ const OtherRecRound = () => {
       if (videoId !== "aviSmiling" && videoId !== "aviListening")
         setIsVideoEnded(false);
 
+      // Check if video has valid source before playing
+      if (!currentVideo.src || currentVideo.src === '' || currentVideo.src === window.location.href) {
+        console.warn(`Video ${videoId} has no valid source, skipping play`);
+        if (loading) setLoading(false);
+        return;
+      }
+
       currentVideo.play();
       if (loading) setLoading(false);
 
@@ -444,7 +451,10 @@ const OtherRecRound = () => {
         const videoLink =
           question.questionVideoLink || question.lipSyncVideoLink;
         // If video doesn't exist for this question, skip
-        if (!videoLink) return;
+        if (!videoLink || videoLink.trim() === '' || videoLink === window.location.href) {
+          console.warn(`Skipping video with invalid source: ${videoLink}`);
+          return;
+        }
 
         const video = document.createElement("video");
         video.classList.add("preloaded-videos");
@@ -454,6 +464,7 @@ const OtherRecRound = () => {
         if (scriptType === "aviSmiling" || scriptType === "aviListening") {
           video.loop = true;
         }
+
 
         // Styles
         video.style.display = "none";
@@ -467,8 +478,9 @@ const OtherRecRound = () => {
         }
 
         // Create a promise for video loading
-        const videoLoadPromise = new Promise((resolve) => {
+        const videoLoadPromise = new Promise((resolve, reject) => {
           video.addEventListener("error", (e) => {
+            console.warn(`Video loading error for ${scriptType}_${question.questionId}:`, e);
             reject(`${scriptType}_${question.questionId}`);
           });
           video.addEventListener("canplaythrough", () => {
@@ -482,13 +494,19 @@ const OtherRecRound = () => {
         videoLoadPromises.push(videoLoadPromise);
       });
 
-      // Wait for all videos to load
-      Promise.all(videoLoadPromises)
-        .then(() => {
+      // Wait for all videos to load (use allSettled to handle individual failures gracefully)
+      Promise.allSettled(videoLoadPromises)
+        .then((results) => {
+          const failedVideos = results
+            .filter(result => result.status === 'rejected')
+            .map(result => result.reason);
+          
+          if (failedVideos.length > 0) {
+            console.warn('Some videos failed to load:', failedVideos);
+          }
+          
+          // Resolve even if some videos failed to load
           resolve();
-        })
-        .catch((error) => {
-          reject(error);
         });
     });
   };
