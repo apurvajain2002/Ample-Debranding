@@ -27,14 +27,14 @@ const USER_TYPE_MAP = {
   12: "Campus Student Coordinator",
   13: "Campus TPO",
   14: "IT Compliance Officer",
-}
+};
 
 const AuthCallback = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const { hostname } = useGlobalContext();
-  console.log('hostname auth callback page ::: ', hostname);
+  console.log("hostname auth callback page ::: ", hostname);
 
   useEffect(() => {
     const auth = async () => {
@@ -58,7 +58,8 @@ const AuthCallback = () => {
 
       try {
         let res = await axios.post(
-          `https://${'app'}-auth.evueme.live/oauth2/token`,
+          // `https://${'app'}-auth.evueme.live/oauth2/token`,
+          `https://${hostname}-auth.evueme.live/oauth2/token`,
           data.toString(),
           {
             headers: {
@@ -78,17 +79,19 @@ const AuthCallback = () => {
 
         dispatch(
           setUserState({
-            userName: `${userinfo?.firstName}${userinfo?.lastName ? ' ' + userinfo.lastName : ''}`,
+            userName: `${userinfo?.firstName}${
+              userinfo?.lastName ? " " + userinfo.lastName : ""
+            }`,
             tncStatus: userinfo?.tncStatus,
             userId: userinfo?.id,
             userType: USER_TYPE_MAP[userinfo?.evUserType ?? -1] ?? "",
             token: accessToken,
           })
         );
-        
+
         // Reset logout flag on successful authentication
         dispatch(resetLogoutFlag());
-        
+
         Cookies.set("e_access_token", accessToken, {
           expires: 1,
         });
