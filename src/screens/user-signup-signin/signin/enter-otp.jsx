@@ -135,7 +135,7 @@ const LoginWithOTP = ({
       setLoading(true);
       const formData = new FormData();
       formData.append("grant_type", "password");
-      formData.append("client_id", "ev-client");
+      formData.append("client_id", "ev-client-1");
       formData.append("client_secret", "egov");
       formData.append("username", nationalNumber);
       formData.append("password", stringOtp);
