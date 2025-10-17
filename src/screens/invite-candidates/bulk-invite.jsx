@@ -95,6 +95,7 @@ const section =
     document.title = "Invite Candidates";
     dispatch(getEntity());
     dispatch(getAllEntities({ url: hostname }));
+    const inviteType = currentJobDetails?.hiringType == "Lateral Hiring" ? "invite round 1" : "process invite";
 
     if (roundName) {
       dispatch(
@@ -102,7 +103,7 @@ const section =
           type: "email",
           hiringType: currentJobDetails?.hiringType,
           interviewRounds: roundName,
-          inviteType: section,
+          inviteType
         })
       );
       dispatch(
@@ -110,7 +111,7 @@ const section =
           type: "whatsapp",
           hiringType: currentJobDetails?.hiringType,
           interviewRounds: roundName,
-          inviteType: section,
+          inviteType
         })
       );
     }
@@ -273,22 +274,22 @@ const section =
                       // Clear the template flags
                       dispatch(clearIsTemplate());
                       dispatch(clearIsTemplateWA());
-                      dispatch(
-                        fetchTemplateNames({
-                          type: "email",
-                          hiringType: currentJobDetails?.hiringType,
-                          interviewRounds: selectedRound,
-                          inviteType: section,
-                        })
-                      );
-                      dispatch(
-                        fetchWATemplateNames({
-                          type: "whatsapp",
-                          hiringType: currentJobDetails?.hiringType,
-                          interviewRounds: selectedRound,
-                          inviteType: section,
-                        })
-                      );
+                      // dispatch(
+                      //   fetchTemplateNames({
+                      //     type: "email",
+                      //     hiringType: currentJobDetails?.hiringType,
+                      //     interviewRounds: selectedRound,
+                      //     inviteType: section,
+                      //   })
+                      // );
+                      // dispatch(
+                      //   fetchWATemplateNames({
+                      //     type: "whatsapp",
+                      //     hiringType: currentJobDetails?.hiringType,
+                      //     interviewRounds: selectedRound,
+                      //     inviteType: section,
+                      //   })
+                      // );
                     }}
                   />
                   <SelectInputField
