@@ -109,7 +109,12 @@ const InviteCandidates = () => {
     allCombinedTemplates, setAllCombinedTemplates,
     candidatesToInvite, setCandidatesToInvite, hostname
   } = useGlobalContext();
+  
+  // State to store all templates in merged format (previous behavior)
+  const [allTemplatesMerged, setAllTemplatesMerged] = useState([]);
+  
   console.log("allCombinedTemplates", allCombinedTemplates);
+  console.log("allTemplatesMerged", allTemplatesMerged);
 
   const { selectedCandidateEmailWpInfo } = useSelector(
     (state) => state.interviewResponsesRecruiterDashboardSliceReducer
@@ -616,7 +621,12 @@ const InviteCandidates = () => {
   useEffect(() => {
     if (interviewRoundTemplate && templateNames?.length > 0) {
       const results = formatFileNamesForTemplates(templateNames);
+      // Store only new templates (replacement behavior)
       setAllCombinedTemplates(results);
+      // Store all templates in merged format (previous behavior)
+      setAllTemplatesMerged((prev) =>
+        mergeAndRemoveDuplicates(prev, results)
+      );
       dispatch(clearIsInterviewRoundTemplate());
     }
   }, [interviewRoundTemplate, templateNames, dispatch]);
@@ -624,7 +634,12 @@ const InviteCandidates = () => {
   useEffect(() => {
     if (interviewRoundTemplateWA && templateWANames?.length > 0) {
       const results = formatFileNamesForTemplates(templateWANames);
+      // Store only new templates (replacement behavior)
       setAllCombinedTemplates(results);
+      // Store all templates in merged format (previous behavior)
+      setAllTemplatesMerged((prev) =>
+        mergeAndRemoveDuplicates(prev, results)
+      );
       dispatch(clearIsInterviewRoundTemplateWA());
     }
   }, [interviewRoundTemplateWA, templateWANames, dispatch]);
@@ -760,8 +775,9 @@ const InviteCandidates = () => {
     }
 
     // Find matching templates by name
-    const matchingTemplates = allCombinedTemplates?.filter(template => template.name === value);
-    console.log('Matching templates:', matchingTemplates);
+    const matchingTemplates = allTemplatesMerged?.filter(template => template.name === value);
+    console.log('allCombined Templates', allTemplatesMerged,value);
+    console.log('Matching templates:', matchingTemplates,);
 
     if (matchingTemplates?.length > 0) {
       // Clear existing templates first
@@ -779,6 +795,8 @@ const InviteCandidates = () => {
       // Fetch templates with a small delay to ensure proper state updates
       setTimeout(() => {
         matchingTemplates.forEach(template => {
+          console.log("xxx------------->",template);
+          
           if (template.value.includes("whatsapp")) {
             console.log('Fetching WhatsApp template:', template.value);
             dispatch(fetchWATemplate(template.value));
