@@ -3,7 +3,6 @@ import { useGlobalContext } from '../context';
 import { saveCandidateResponse as saveCandidateResponseBase, updateCandidateInterviewStatus as updateCandidateInterviewStatusBase } from '../screens/interview/api';
 import { featureDetection, getBrowserInfo, getDeviceInfo } from '../utils/browserCompatibility';
 
-const GEO_IP_ENDPOINT = 'https://ipwho.is/?fields=ip,city,region,country,latitude,longitude,connection';
 
 const useApiWithDiagnostics = () => {
   const { setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport, ipDetails } = useGlobalContext();

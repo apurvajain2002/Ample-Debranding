@@ -39,7 +39,8 @@ const EntitySignupStep1 = ({
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  // console.log("newEntity----------->",newEntity);
+  
   // const [candidateDetails, setCandidateDetails] = useState({
   //   firstName: "",
   //   lastName: "",
@@ -190,14 +191,22 @@ const EntitySignupStep1 = ({
     if (!businessName || !webSite || !isContactPersonDetailsValid) {
       return WarningToast("Fill all the required fields!");
     } else {
+      // Filter payload to match desired format
+      const filteredPayload = {
+        entityType: newEntity.entityType,
+        businessName: newEntity.businessName,
+        businessShortName: newEntity.businessShortName,
+        hqstate: newEntity.hqstate,
+        hqcity: newEntity.hqcity,
+        pincode: newEntity.pincode,
+        country: newEntity.country,
+        webSite: newEntity.webSite,
+        noOfEmployees: newEntity.noOfEmployees,
+        contactPersonDetails: newEntity.contactPersonDetails
+      };
+
       const res = await dispatch(
-        saveEntity({
-          ...newEntity,
-          id: localStorage?.getItem("entityId"),
-          billingAddress:
-            JSON.parse(localStorage.getItem("organizationDTO"))
-              ?.billingAddress || null,
-        })
+        saveEntity(filteredPayload)
       );
       if (
         res.type === "saveEntity/fulfilled" &&

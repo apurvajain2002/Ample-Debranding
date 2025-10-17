@@ -238,7 +238,7 @@ const UserInterviewTableRow = ({ userData, index }) => {
                             // Add status as URL parameter to ensure it's available immediately
                             const url = new URL(userData.interviewLink);
                             // url.searchParams.set('status', userInterviewStatus);
-                            window.location.href = url.toString();
+                            window.open(url.toString(), '_blank');
                         }}
                         disabled={(userInterviewStatus).toLowerCase() === 'completed'}
                     />

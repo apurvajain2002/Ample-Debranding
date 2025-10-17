@@ -18,6 +18,8 @@ import {
 import CheckboxInputField from "../../components/input-fields/checkbox-input-field";
 import { AnnotationEditorParamsType } from "pdfjs-dist";
 import SuccessToast from "../../components/toasts/success-toast";
+import axiosInstance from "../../interceptors";
+import { baseUrl } from "../../config/config";
 
 const billingAddressTemplate = {
   addressLine1: "",
@@ -35,7 +37,8 @@ const billingAddressTemplate = {
   gstinMedia: "",
   isDefault: false,
 };
-
+  console.log("baseUrl",baseUrl);
+  
 const INITIAL_ERROR_STATE = {
   name: false,
   addressLine1: false,
@@ -290,7 +293,8 @@ const EntitySignupStep2 = ({ newEntity, setNewEntity }) => {
   const dispatch = useDispatch();
   const fileInputRef = useRef([null]);
   const fileInputRef2 = useRef([null]);
-
+  console.log("newEntity----->",newEntity);
+  
   const { states } = useSelector((state) => state.manageLocationsSliceReducer);
 
   // const handleOnClickNextButton = async () => {
@@ -400,18 +404,57 @@ const EntitySignupStep2 = ({ newEntity, setNewEntity }) => {
       return WarningToast(`Invalid entries: ${invalidFields.join(", ")}`);
     }
 
-    const res = await dispatch(
-      saveEntity({ ...newEntity, id: localStorage.getItem("entityId") })
-    );
+    try {
+      // Create FormData for the API call
+      const formData = new FormData();
+      
+      // Get the first billing address (assuming single address for now)
+      const billingAddress = newEntity.billingAddress[0];
+      
+      // Add text fields to FormData
+      formData.append('addressLine1', billingAddress.addressLine1 || '');
+      formData.append('name', billingAddress.name || '');
+      formData.append('organizationId', billingAddress.orgId || '');
+      formData.append('addressLine2', billingAddress.addressLine2 || '');
+      formData.append('stateId', billingAddress.stateId || '');
+      formData.append('pincode', billingAddress.pincode || '');
+      formData.append('cinNumber', billingAddress.cinNumber || '');
+      formData.append('panNumber', billingAddress.panNumber || '');
+      formData.append('gstinNumber', billingAddress.gstinNumber || '');
+      formData.append('gstState', billingAddress.gstState || '');
+      formData.append('isDefault', billingAddress.isDefault || false);
+      
+      // Add file uploads to FormData - use actual file objects from state
+      if (panFile[0] && panFile[0] !== '') {
+        formData.append('panFile', panFile[0]);
+      }
+      if (gstFile[0] && gstFile[0] !== '') {
+        formData.append('gstinFile', gstFile[0]);
+      }
 
-    if (
-      res.type === "saveEntity/fulfilled" &&
-      res?.payload?.message === "Request processed successfully!"
-    ) {
-      // Earlier It is not showing success Toast!
-      SuccessToast("Request Processed Successfully")
-      navigate("/entity-signup/step-3");
+      console.log('FormData being sent:', formData);
+
+      const response = await axiosInstance.post(
+        `${baseUrl}/common/base/newEntityRegistration/save-billing-address`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (response.status === 200 && response.data) {
+        SuccessToast("Billing address saved successfully!");
+        navigate("/entity-signup/step-3");
+      } else {
+        WarningToast("Failed to save billing address. Please try again.");
+      }
+    } catch (err) {
+      console.error('Error saving billing address:', err);
+      WarningToast("Failed to save billing address. Please try again.");
     }
+    
   };
 
   const handleRemoveFile = (name, index) => {

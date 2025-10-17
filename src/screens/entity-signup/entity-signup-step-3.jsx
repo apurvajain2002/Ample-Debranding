@@ -15,6 +15,9 @@ import CheckboxInputField from "../../components/input-fields/checkbox-input-fie
 import { useNavigate } from "react-router-dom";
 import WarningToast from "../../components/toasts/warning-toast";
 import CustomClockLoader from "../../components/loaders/clock-loader";
+import axiosInstance from "../../interceptors";
+import { baseUrl } from "../../config/config";
+import SuccessToast from "../../components/toasts/success-toast";
 
 import { isValidHexCode, validateCompanyLinkedinUrlInput, isValidLinkedinUrl, isValidURL, isValidYoutubeUrl } from "../../utils/valdationRegex";
 
@@ -25,11 +28,13 @@ const EntitySignupStep3 = ({
 }) => {
   const dispatch = useDispatch();
   const { captcha } = useSelector((state) => state.signUpReducer);
-
+  console.log("newEntity--------------->",newEntity);
+  
   const [captchaImageDataUrl, setCaptchaImageDataUrl] = useState("");
   const [userAnswer, setUserAnswer] = useState("");
   const [tfStatus, setTfStatus] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state
+  const [logoFile, setLogoFile] = useState(null); // Store actual file object
 
   const navigate = useNavigate();
 
@@ -133,22 +138,46 @@ const EntitySignupStep3 = ({
       return WarningToast("Invalid Captcha");
     }
 
-    const res = await dispatch(
-      saveEntity({
-        ...newEntity,
-        id: localStorage.getItem("entityId"),
-        tfStatus: tfStatus,
-        captchaVerified: true,
-      })
-    );
+    try {
+      // Create FormData for the API call
+      const formData = new FormData();
+      const billingAddress = newEntity.billingAddress[0];
+      // Add text fields to FormData
+      formData.append('organizationId', newEntity.billingAddress[0].orgId || '');
+      formData.append('linkedinUrl', newEntity.linkedInURL || '');
+      formData.append('youTubeURL', newEntity.youTubeURL || '');
+      formData.append('primaryColor', newEntity.primaryColor || '');
+      formData.append('secondaryColor', newEntity.secondaryColor || '');
+      formData.append('about', newEntity.about || '');
+      formData.append('tfaStatus', newEntity.tfStatus || false);
+      
+      // Add logo file to FormData if it exists
+      if (logoFile) {
+        formData.append('logoFile', logoFile);
+      }
 
+      console.log('Company branding FormData being sent:', formData);
 
-    if (
-      res.type === "saveEntity/fulfilled" &&
-      res?.payload?.message === "Request processed successfully!"
-    ) {
-      localStorage.clear();
-      navigate("/entity-signup/success");
+      const response = await axiosInstance.post(
+        `${baseUrl}/common/base/newEntityRegistration/save-company-branding`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (response.status === 200 && response.data) {
+        SuccessToast("Company branding saved successfully!");
+        localStorage.clear();
+        navigate("/entity-signup/success");
+      } else {
+        WarningToast("Failed to save company branding. Please try again.");
+      }
+    } catch (error) {
+      console.error('Error saving company branding:', error);
+      WarningToast("Failed to save company branding. Please try again.");
     }
   };
 
@@ -218,6 +247,8 @@ const EntitySignupStep3 = ({
 
 
             setLoading(true);
+            // Store the actual file object
+            setLogoFile(file);
             setNewEntity((prevEntity) => {
               prevEntity["logoMedia"] = reader.result?.split(",")[1];
               return { ...prevEntity };
