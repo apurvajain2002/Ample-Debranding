@@ -43,6 +43,9 @@ export const useLogout = () => {
       console.error("Logout API call failed:", error);
     } finally {
       clearClientSession();
+      setTimeout(() => {
+        navigate("/signin", { replace: true });
+      }, 2000);
       navigate("/signin", { replace: true });
     }
   };
