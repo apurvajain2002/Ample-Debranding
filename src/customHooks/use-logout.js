@@ -30,7 +30,7 @@ export const useLogout = () => {
 
   const handleLogout = () => {
     clearClientSession();
-    //navigate("/signin", { replace: true });
+    navigate("/signin", { replace: true });
     window.location.replace("/signin");
   };
 
