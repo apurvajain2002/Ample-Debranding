@@ -9,9 +9,9 @@ export const useLogout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { API_BASE_URL } = getHostConfig();
+  const { AUTH_API_BASE_URL } = getHostConfig();
 
-  const LOGOUT_URL = `${API_BASE_URL}/exit`;
+  const LOGOUT_URL = `${AUTH_API_BASE_URL}/exit`;
 
   const clearClientSession = () => {
     Object.keys(Cookies.get()).forEach((cookieName) => {
