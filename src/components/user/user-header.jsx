@@ -1,4 +1,4 @@
-import { icon,image } from "../assets/assets";
+import { icon, image } from "../assets/assets";
 import EvuemeImageTag from "../evueme-html-tags/Evueme-image-tag";
 import { useDispatch, useSelector } from "react-redux";
 import NormalButton from "../buttons/normal-button";
@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 // import getUniqueId from "../../../utils/getUniqueId";
 import { capitalize } from "lodash";
 import { useGlobalContext } from "../../context";
+import { useLogout } from "../../customHooks/use-logout";
 
 const headerDropdownList = [
   {
@@ -37,21 +38,22 @@ const UserHeader = () => {
   );
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { handleLogout } = useLogout();
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/exit', {
-        method: 'GET',
-        credentials: 'include'
-      });
-      dispatch(setLogout());
-      navigate('/signin');
-    } catch (error) {
-      console.error('Logout failed:', error);
-      dispatch(setLogout());
-      navigate('/signin');
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     await fetch('/exit', {
+  //       method: 'GET',
+  //       credentials: 'include'
+  //     });
+  //     dispatch(setLogout());
+  //     navigate('/signin');
+  //   } catch (error) {
+  //     console.error('Logout failed:', error);
+  //     dispatch(setLogout());
+  //     navigate('/signin');
+  //   }
+  // };
 
   return (
     <div className="top-bar">

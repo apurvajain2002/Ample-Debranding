@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import getUniqueId from "../../../utils/getUniqueId";
 import { capitalize } from "lodash";
 import { useGlobalContext } from "../../../context";
+import { useLogout } from "../../../customHooks/use-logout";
 
 const headerDropdownList = [
   {
@@ -37,29 +38,34 @@ const AdminHeader = ({ onToggleSidebar }) => {
   );
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { handleLogout } = useLogout();
 
-  const handleLogout = async () => {
-    try {
-      // Call the logout API endpoint
-      await fetch('/exit', {
-        method: 'GET',
-        credentials: 'include'
-      });
-    } catch (error) {
-      console.error('Logout API call failed:', error);
-    } finally {
-      Object.keys(Cookies.get()).forEach(cookieName => {
-        Cookies.remove(cookieName);
-      });
-      localStorage.clear();
-      dispatch(setLogout());
-      navigate('/signin', { replace: true });
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     // Call the logout API endpoint
+  //     await fetch('/exit', {
+  //       method: 'GET',
+  //       credentials: 'include'
+  //     });
+  //   } catch (error) {
+  //     console.error('Logout API call failed:', error);
+  //   } finally {
+  //     Object.keys(Cookies.get()).forEach(cookieName => {
+  //       Cookies.remove(cookieName);
+  //     });
+  //     localStorage.clear();
+  //     dispatch(setLogout());
+  //     navigate('/signin', { replace: true });
+  //   }
+  // };
 
   return (
     <div className="top-bar">
-      <a href="javascript:void(0);" className="dashboard-setting" onClick={onToggleSidebar}>
+      <a
+        href="javascript:void(0);"
+        className="dashboard-setting"
+        onClick={onToggleSidebar}
+      >
         <i>
           <EvuemeImageTag imgSrc={icon.categoryIcon} altText={"categoryIcon"} />
         </i>
@@ -122,9 +128,7 @@ const AdminHeader = ({ onToggleSidebar }) => {
                     <li className="logout-btn-li">
                       <NormalButton
                         leftIconSrc={icon.logoutButtonIcon}
-                        buttonTagCssClasses={
-                          "btn btn-clear btn-submit"
-                        }
+                        buttonTagCssClasses={"btn btn-clear btn-submit"}
                         buttonText={"Logout"}
                         onClick={handleLogout}
                       />

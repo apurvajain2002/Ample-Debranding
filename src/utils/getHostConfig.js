@@ -23,7 +23,13 @@ export const getHostConfig = () => {
 
   const baseDomain = `evueme.${env}`;
   const authHost = `${subdomain}-auth.${baseDomain}`;
-  const apiHost = `${subdomain}-api.${baseDomain}`;
+
+  const apiSubdomainMap = {
+    dev: "ev",
+    live: "app",
+  }; // will add here for environments
+  const apiBaseSubdomain = apiSubdomainMap[env] || "ev";
+  const apiHost = `${apiBaseSubdomain}-api.${baseDomain}`;
 
   const AUTH_API_BASE_URL = `https://${authHost}`;
   const API_BASE_URL = `https://${apiHost}`;
