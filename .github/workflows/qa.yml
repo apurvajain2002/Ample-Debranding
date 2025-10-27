@@ -2,9 +2,9 @@ name: Staging Deploy
 
 on:
   push:
-    branches: [ staging,vltz_authcallback_restructure_v1 ]
+    branches: [ staging ]
   pull_request:
-    branches: [ staging,vltz_authcallback_restructure_v1 ]
+    branches: [ staging ]
 
 jobs:
   build-and-deploy:
