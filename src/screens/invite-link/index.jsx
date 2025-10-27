@@ -314,9 +314,9 @@ const InviteLink = () => {
       inviteOnly: !inviteInfo.inviteOnly,
     });
 
-    if (!inviteInfo.inviteOnly) {
+   /*  if (!inviteInfo.inviteOnly) {
       navigate("/admin/invite-candidates");
-    }
+    } */
   };
 
   const handleLinkChange = (e) => {
@@ -402,6 +402,11 @@ const InviteLink = () => {
         timeZone: timezone || new Date().toTimeString().substring(9),
       })
     );
+
+    //redirect
+    if (inviteInfo.inviteOnly) {
+      navigate("/admin/invite-candidates");
+    }
   };
 
   useEffect(() => {
@@ -649,7 +654,7 @@ const InviteLink = () => {
                     </EvuemeModalTrigger>
                     <NormalButton
                       className="btn btn-clear btn-submit"
-                      buttonText={"Generate Link"}
+                      buttonText={inviteInfo.inviteOnly ? "Invite Now" : "Generate Link"}
                       onClick={handleGenerateLink}
                     />
                     {/* {generatedLink && <QRCodeGenerator value={generatedLink} />} */}
