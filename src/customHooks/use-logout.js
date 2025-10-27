@@ -30,31 +30,9 @@ export const useLogout = () => {
 
   const handleLogout = () => {
     clearClientSession();
-    navigate("/signin", { replace: true });
-    window.location.reload();
+    //navigate("/signin", { replace: true });
+    window.location.replace("/signin");
   };
-
-  //   const handleLogout = async () => {
-  //     try {
-  //       const response = await fetch(LOGOUT_URL, {
-  //         method: "GET",
-  //         credentials: "include",
-  //         headers: { "Cache-Control": "no-cache" },
-  //       });
-  //       console.log(response, "......api response");
-  //       setTimeout(() => {
-  //         navigate("/signin", { replace: true });
-  //       }, 2000);
-  //       if (!response.ok) {
-  //         console.warn("Logout API failed:", response.status);
-  //       }
-  //     } catch (error) {
-  //       console.error("Logout API call failed:", error);
-  //     } finally {
-  //       clearClientSession();
-  //       navigate("/signin", { replace: true });
-  //     }
-  //   };
 
   return { handleLogout };
 };

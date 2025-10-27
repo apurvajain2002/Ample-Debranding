@@ -33,26 +33,48 @@ import { useDispatch } from "react-redux";
 import { getBranding } from "./redux/actions/root-actions";
 
 function App() {
-
   const dispatch = useDispatch();
   const { setRootColor, dynamicColorPage } = useGlobalContext();
   const hostname = window.location.hostname?.split(".")[0];
 
-
   useEffect(() => {
     const getBrandingApiCall = async () => {
       const response = await dispatch(getBranding({ hostname }));
-      const { primaryColor, secondaryColor, logoURL } = response?.payload?.organizationBrandingDTO || {};
+      const { primaryColor, secondaryColor, logoURL } =
+        response?.payload?.organizationBrandingDTO || {};
       const root = document.documentElement;
-      root.style.setProperty('--primary-color', primaryColor || dynamicColorPage.primary);
-      root.style.setProperty('--secondary-color', secondaryColor || dynamicColorPage.secondary);
+      root.style.setProperty(
+        "--primary-color",
+        primaryColor || dynamicColorPage.primary
+      );
+      root.style.setProperty(
+        "--secondary-color",
+        secondaryColor || dynamicColorPage.secondary
+      );
       setRootColor({
         primary: primaryColor || dynamicColorPage.primary,
         secondary: secondaryColor || dynamicColorPage.secondary,
-        logoUrl: logoURL || dynamicColorPage.logoUrl
+        logoUrl: logoURL || dynamicColorPage.logoUrl,
       });
-    }
+    };
     getBrandingApiCall();
+
+    //clean up while going back
+    const handlePageShow = (event) => {
+      if (event.persisted) {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          // If user navigated back to a cached page after logout, force reload to signin
+          window.location.replace("/signin");
+        }
+      }
+    };
+
+    window.addEventListener("pageshow", handlePageShow);
+
+    return () => {
+      window.removeEventListener("pageshow", handlePageShow);
+    };
   }, []);
 
   return (
@@ -91,8 +113,12 @@ function App() {
         />
         <Route path="/interview/*" element={<Interview />} />
         <Route path="/oauth2/callback" element={<AuthCallback />} />
-        {/* <Route path="/no-route" element={<NoRouteFound navigateToPath={"/signin"} />} /> */}  {/* manas added for testing */}
-        <Route path="/*" element={<NoRouteFound navigateToPath={"/signin"} />} />
+        {/* <Route path="/no-route" element={<NoRouteFound navigateToPath={"/signin"} />} /> */}{" "}
+        {/* manas added for testing */}
+        <Route
+          path="/*"
+          element={<NoRouteFound navigateToPath={"/signin"} />}
+        />
       </Routes>
     </BrowserErrorBoundary>
   );
