@@ -136,8 +136,11 @@ const L1Round = () => {
   const payloadUserId =
     link_access_type === "privateLink" ? privateUserId : userId ?? "";
   // console.log("Current interview status:", link_access_type);
-  console.log('currentQuestionIndex ::: ', currentQuestionIndex); 
+  // console.log('currentQuestionIndex ::: ', currentQuestionIndex); 
   // Camera activation logic - only turn on camera for skillBased script type
+
+  console.log("currentUser :: ", currentUser);
+  console.log("userId :: ", userId);
   useEffect(() => {
     if (currentScriptType === "skillBased" && forceCameraOn) {
       startStreaming();
@@ -1065,13 +1068,13 @@ const L1Round = () => {
         console.log("before l1 round", userInterviewStatus);
         try {
           // Call your API to get the array of IDs
-          const myUserId = localStorage.getItem("myUserId");
-          console.log("local storage data", myUserId);
+          // const myUserId = localStorage.getItem("myUserId");
+          // console.log("local storage data", myUserId);
           const { data: checkResumeStatusData } = await axiosInstance.post(
             `${baseUrl}/job-posting/candidate-interviews/get-resume-status`,
             {
                 interviewId: interviewId,
-                userId: myUserId,
+                userId,
             }
           );
           
@@ -1084,7 +1087,7 @@ const L1Round = () => {
               {
                 params: {
                   interviewId: interviewId,
-                  userId: myUserId,
+                  userId,
                 },
               }
             );

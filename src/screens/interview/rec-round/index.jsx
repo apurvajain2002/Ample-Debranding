@@ -21,7 +21,6 @@ import useForceFullscreen from "../../../customHooks/use-force-fullscreen";
 // import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
 import { logClientDiagnostics } from "../../../utils/browserCompatibility";
 import useApiWithDiagnostics from "../../../customHooks/use-api-with-diagnostics";
-
 const SMILING_TIMEOUT = 1000 * 5;
 const FILLER_TIMEOUT = 1000 * 2;
 const subscribedStreams = new Map();
@@ -70,12 +69,14 @@ const OtherRecRound = () => {
   // useInterviewDiagnostics();
   const location = useLocation();
   const link_access_type = location?.state?.link_access_type;
-  const { privateUserId, interviewSource, setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport } = useGlobalContext();
+  const { privateUserId, interviewSource, setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport,userProfile } = useGlobalContext();
   const { saveCandidateResponse, updateCandidateInterviewStatus } = useApiWithDiagnostics();
   const jobId = useSelector((state) => state.interviewSlice.jobId);
   const roundName = useSelector((state) => state.interviewSlice.roundName);
   const interviewId = useSelector((state) => state.interviewSlice.interviewId);
   const tenantId = useSelector((state) => state.interviewSlice.tenantId);
+const { userId } = useSelector((state) => state.signinSliceReducer);
+
   const currentUser = useSelector(
     (state) => state.signinSliceReducer.currentUser
   );
@@ -88,12 +89,14 @@ const OtherRecRound = () => {
   const { preferredLanguage, userInterviewStatus: reduxUserInterviewStatus } = useSelector(
     (state) => state.interviewSlice
   );
+  console.log("currentUser :: ", currentUser);
+  console.log("userId :: ", userId);
   
   // Get status from URL parameter as fallback if Redux state is not updated yet
   const urlParams = new URLSearchParams(location.search);
   const urlStatus = urlParams.get('status');
   const userInterviewStatus = urlStatus || reduxUserInterviewStatus || 'notstarted';
-  const userId = useSelector((state) => state.signinSliceReducer.userId);
+  // const userId = useSelector((state) => state.signinSliceReducer.userId);
   const navigate = useNavigate();
   const { dynamicErrorMessage, containerRef, startInterviewMonitoring } =
     useForceFullscreen();
@@ -968,7 +971,7 @@ const OtherRecRound = () => {
             `${baseUrl}/job-posting/candidate-interviews/get-resume-status`,
             {
                 interviewId: interviewId,
-                userId: myUserId,
+                userId,
             }
           );
           
@@ -981,7 +984,7 @@ const OtherRecRound = () => {
               {
                 params: {
                   interviewId: interviewId,
-                  userId: myUserId,
+                  userId,
                 },
               }
             );
