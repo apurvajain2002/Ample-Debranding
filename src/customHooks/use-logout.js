@@ -31,6 +31,7 @@ export const useLogout = () => {
   const handleLogout = () => {
     clearClientSession();
     navigate("/signin", { replace: true });
+    window.location.reload();
   };
 
   //   const handleLogout = async () => {
