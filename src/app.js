@@ -58,26 +58,6 @@ function App() {
       });
     };
     getBrandingApiCall();
-
-    //clean up while going back
-    const handlePageShow = (event) => {
-      if (event.persisted) {
-        const token =
-          localStorage.getItem("e_access_token") ||
-          sessionStorage.getItem("e_access_token") ||
-          document.cookie.includes("e_access_token");
-        if (!token) {
-          // If user navigated back to a cached page after logout, force reload to signin
-          window.location.replace("/signin");
-        }
-      }
-    };
-
-    window.addEventListener("pageshow", handlePageShow);
-
-    return () => {
-      window.removeEventListener("pageshow", handlePageShow);
-    };
   }, []);
 
   return (
