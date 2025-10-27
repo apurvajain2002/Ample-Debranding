@@ -62,7 +62,10 @@ function App() {
     //clean up while going back
     const handlePageShow = (event) => {
       if (event.persisted) {
-        const token = localStorage.getItem("accessToken");
+        const token =
+          localStorage.getItem("e_access_token") ||
+          sessionStorage.getItem("e_access_token") ||
+          document.cookie.includes("e_access_token");
         if (!token) {
           // If user navigated back to a cached page after logout, force reload to signin
           window.location.replace("/signin");
