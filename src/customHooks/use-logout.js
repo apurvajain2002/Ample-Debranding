@@ -36,6 +36,9 @@ export const useLogout = () => {
         headers: { "Cache-Control": "no-cache" },
       });
       console.log(response, "......api response");
+      setTimeout(() => {
+        navigate("/signin", { replace: true });
+      }, 2000);
       if (!response.ok) {
         console.warn("Logout API failed:", response.status);
       }
@@ -43,9 +46,6 @@ export const useLogout = () => {
       console.error("Logout API call failed:", error);
     } finally {
       clearClientSession();
-      setTimeout(() => {
-        navigate("/signin", { replace: true });
-      }, 2000);
       navigate("/signin", { replace: true });
     }
   };
