@@ -293,6 +293,27 @@ export const OrganizationAdminMenu = [
 export const PlacementAgencyAdminMenu = [
   // TODO add Job listing option later
   {
+    path: "/admin/invite-link",
+    dataTooltipContent: "Invite Candidates",
+    svgIcon: icon.inviteCandidates,
+    svgIconAltText: "Invite Candidates",
+  },
+  {
+    path: "/admin/invited-candidates",
+    dataTooltipContent: "Invited Candidates",
+    svgIcon: icon.checkInviteCandidates,
+    svgIconAltText: "Check Invited candidates",
+  },
+  {
+    path: "/admin/search-candidates",
+    dataTooltipContent: "Search Candidates",
+    svgIcon: icon.interviewReports,
+    svgIconAltText: "Search Candidates",
+  },
+]
+
+export const PlacementAgencyRecruiterMenu = [
+  {
     path: "/admin/invited-candidates",
     dataTooltipContent: "Invited Candidates",
     svgIcon: icon.checkInviteCandidates,

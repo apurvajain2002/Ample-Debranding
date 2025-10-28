@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import getUniqueId from "../../../utils/getUniqueId";
-import { CampusStudentCoordinatorMenu, EvuemeSupportMenu, JobPositionIconData, JobPositionIconDataCampus, JobPositionIconDataManpower, L1InterViewerMenu, L3InterViewerMenu, OrganizationAdminMenu, OrganizationRecruiterMenu, PlacementAgencyAdminMenu } from "./admin-navigation-routes";
+import { CampusStudentCoordinatorMenu, EvuemeSupportMenu, JobPositionIconData, JobPositionIconDataCampus, JobPositionIconDataManpower, L1InterViewerMenu, L3InterViewerMenu, OrganizationAdminMenu, OrganizationRecruiterMenu, PlacementAgencyAdminMenu, PlacementAgencyRecruiterMenu } from "./admin-navigation-routes";
 import JobPositionIcon from "./job-position-icon";
 
 const AdminLeftNavigationMenu = ({
@@ -24,9 +24,8 @@ const AdminLeftNavigationMenu = ({
         return L1InterViewerMenu
       case 'l3 interviewer': return L3InterViewerMenu
       case 'organization admin': return OrganizationAdminMenu
-      case 'placement agency admin':
-      case 'placement_agency_recruiter':
-        return PlacementAgencyAdminMenu
+      case 'placement agency admin': return PlacementAgencyAdminMenu
+      case 'placement_agency_recruiter': return PlacementAgencyRecruiterMenu
       case 'evueMe support': return EvuemeSupportMenu
       case 'campus student coordinator':
       case 'campus tpo':
