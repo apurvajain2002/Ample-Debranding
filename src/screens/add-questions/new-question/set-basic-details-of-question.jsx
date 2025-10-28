@@ -28,11 +28,12 @@ const SetBasicDetailsOfQuestion = ({
   clearQuestion = () => {},
 }) => {
   const dispatch = useDispatch();
-
   const { jobId, roundName } = useSelector(
     (state) => state.createNewJobSliceReducer
   );
-
+  const {currentJob } = useSelector(
+    (state) => state.defineInterviewSliceReducer
+  );
   const { recruiterRound, l1Round } = useSelector(
     (state) => state.defineInterviewSliceReducer
   );
@@ -40,7 +41,7 @@ const SetBasicDetailsOfQuestion = ({
   // Memoize filtered question types
   const questionTypesFiltered = useMemo(() => {
     let questionTypesNew = [...questionTypes];
-
+    
     // Add select option at the beginning for admin users
     if (userType === "admin") {
       questionTypesNew = [
@@ -48,6 +49,13 @@ const SetBasicDetailsOfQuestion = ({
         { optionKey: "Practice Question", optionValue: "practiceQuestion" },
       ];
     }
+
+    if(currentJob?.hiringType === "Campus Hiring" && roundName === "L1 Hiring Manager Round"){
+      questionTypesNew = questionTypesNew.filter(
+        (qt) => !(qt.optionValue === "openingScript")
+      );
+    }
+    // console.log("questionTypesNew------>",questionTypesNew);
 
     // Apply the existing recruiter filter
     return questionTypesNew.filter(
