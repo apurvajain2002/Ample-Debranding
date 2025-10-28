@@ -240,7 +240,7 @@ const EntitySignupStep3 = ({
             const { width, height } = img;
             console.log("width and height------>",width,height);
             
-            if (width != 144 || height != 48) {
+            if ((width < 140 || width > 148) || (height < 44 || height > 52)) {
               WarningToast("Please upload logo in size Width: 144px and Height: 48px");
               e.target.value = "";
               return;
