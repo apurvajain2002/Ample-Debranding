@@ -56,14 +56,12 @@ const Admin = () => {
     // Only navigate if we're not already there
     if (location.pathname !== targetPath) {
       navigate(targetPath, { replace: true });
-    } else {
-      // Only update state when navigation is complete
-      setLeftNavigationPathname(targetPath);
-      setRedirecting(false);
     }
-  }, [location.pathname, navigate, setLeftNavigationPathname]);
+    setLeftNavigationPathname(targetPath);
+    setRedirecting(false);
+  }, []);
 
-  
+
   const getRolesBasedSideMenusPath = (userType) => {
     switch (userType) {
       case 'manpower': return "/admin/dashboard"
