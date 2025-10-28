@@ -35,20 +35,12 @@ export const useLogout = () => {
       `https://${currentHost}/signin?loggedout=true`
     );
     const logOutURL = `${AUTH_API_BASE_URL}/logout?redirect=${redirectAfterLogout}`;
-    console.log("Redirecting to:", logOutURL);
-
+    // const { authHost } = getHostConfig();
+    localStorage.setItem("isLoggingOut", "true");
+    // const logOutURL = `https://${authHost}/login?loggedout=true`;
+    console.log(logOutURL);
     window.location.replace(logOutURL);
   };
-
-  // const handleLogout = () => {
-  //   clearClientSession();
-  //   // navigate("/signin", { replace: true });
-  //   // window.location.replace("/signin");
-  //   // //window.location.href = "/signin";
-  //   const { AUTH_API_BASE_URL } = getHostConfig();
-  //   const logOutURL = `${AUTH_API_BASE_URL}/login?loggedout=true`;
-  //   window.location.href = logOutURL;
-  // };
 
   return { handleLogout };
 };

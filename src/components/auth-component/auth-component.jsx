@@ -25,9 +25,21 @@ const AuthComponent = ({ children }) => {
         Cookies.get("e_access_token") ||
         accessToken;
 
+      const isLoggingOut = localStorage.getItem("isLoggingOut") === "true";
+
       if (!token) {
-        //navigate("/signin", { replace: true });
-        window.location.replace("/signin");
+        // //navigate("/signin", { replace: true });
+        // window.location.replace("/signin");
+        // return;
+        // if (!window.location.search.includes("loggedout=true")) {
+        //   window.location.replace("/signin");
+        // }
+        // return;
+        if (!isLoggingOut) {
+          window.location.replace("/signin");
+        } else {
+          localStorage.removeItem("isLoggingOut");
+        }
         return;
       }
 
