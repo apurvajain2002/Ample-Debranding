@@ -9,6 +9,7 @@ import getUniqueId from "../../../utils/getUniqueId";
 import { capitalize } from "lodash";
 import { useGlobalContext } from "../../../context";
 import { capitalizeEachWord } from "../../../utils/functions";
+import { useLogout } from "../../../customHooks/use-logout";
 
 const headerDropdownList = [
   {
