@@ -51,7 +51,13 @@ const tableHeadValues = [
 ];
 
 const UserInterview = () => {
-  const userId = localStorage.getItem('userId');
+  // const userId2 = localStorage.getItem('userId');
+  const userId = useSelector((state) => state.signinSliceReducer.userId);
+  // const currentUser = useSelector(
+  //   (state) => state.signinSliceReducer.currentUser
+  // );
+  // console.log("userId :: ", userId);
+  
   const modalTriggerRef = useRef(null);
   const [messageBodyContent, setMessageBodyContent] = useState(null);
   const dispatch = useDispatch();

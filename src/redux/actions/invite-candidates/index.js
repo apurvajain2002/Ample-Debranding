@@ -35,7 +35,7 @@ const generateLink = createAsyncThunk(
         return rejectWithValue(data);
       }
     } catch (error) {
-      ErrorToast(error.message);
+      // ErrorToast(error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -56,7 +56,6 @@ const generateShortenLink = createAsyncThunk(
         return rejectWithValue(data);
       }
     } catch (error) {
-      ErrorToast(error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -79,7 +78,6 @@ const fetchTemplate = createAsyncThunk(
         return rejectWithValue(data);
       }
     } catch (error) {
-      ErrorToast(error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -101,7 +99,6 @@ const fetchWATemplate = createAsyncThunk(
         return rejectWithValue(data);
       }
     } catch (error) {
-      ErrorToast(error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -127,7 +124,6 @@ const fetchTemplateNames = createAsyncThunk(
         return rejectWithValue(data);
       }
     } catch (error) {
-      ErrorToast(error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -152,7 +148,6 @@ const fetchWATemplateNames = createAsyncThunk(
         return rejectWithValue(data);
       }
     } catch (error) {
-      ErrorToast(error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -170,7 +165,6 @@ const interviewLinkInviteDetails = createAsyncThunk(
         return rejectWithValue(data);
       }
     } catch (error) {
-      ErrorToast(error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -210,7 +204,6 @@ const sendInvite = createAsyncThunk(
         return rejectWithValue(data);
       }
     } catch (error) {
-      ErrorToast(error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -234,7 +227,6 @@ const mapIndex = createAsyncThunk(
         return rejectWithValue(data);
       }
     } catch (error) {
-      ErrorToast(error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -254,7 +246,6 @@ const revalidateBulkInvite = createAsyncThunk(
         return rejectWithValue(data);
       }
     } catch (error) {
-      ErrorToast(error.message);
       return rejectWithValue(error.message);
     }
   }

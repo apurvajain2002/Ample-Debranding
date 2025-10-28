@@ -1,5 +1,6 @@
 import NormalButton from "../../../components/buttons/normal-button";
 import { icon } from "../../../components/assets/assets";
+import { convertToIST, getAvailableTimezones } from "../../../utils/dateFormatter";
 
 const deliveryMap = {
   sent: {
@@ -30,7 +31,7 @@ const deliveryMap = {
 
 const defaultBtnClassName = "btn-success btn-textleft btn-linkopening mb2 soft-round-btn";
 
-const NotificationRow = ({ userData, index, onclick }) => {
+const NotificationRow = ({ userData, index, onclick, sourceTimezone = 'UTC' }) => {
   // Helper function to get button styling
   const getButtonClassName = (status = "") => {
     status = status?.replace(/\s+/g, "").toLowerCase();
@@ -56,14 +57,21 @@ const NotificationRow = ({ userData, index, onclick }) => {
   };
 
   const status = getStatus();
-
+  
   return (
     <tr>
       <td>
         {userData.inviteSentTime ? (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span>{userData.inviteSentTime.split(' ')[0]}</span>
-            <span>{userData.inviteSentTime.substring(userData.inviteSentTime.indexOf(' ') + 1)}</span>
+            {(() => {
+              const istTime = convertToIST(userData.inviteSentTime, sourceTimezone);
+              return (
+                <>
+                  <span>{istTime.split(' ')[0]}</span>
+                  <span>{istTime.substring(istTime.indexOf(' ') + 1)}</span>
+                </>
+              );
+            })()}
           </div>
         ) : (
           userData.inviteSentTime

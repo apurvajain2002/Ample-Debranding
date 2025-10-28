@@ -27,9 +27,6 @@ const videoParent = document.getElementById("root");
 const videoElementsDOM = {};
 let aviSmilingImageRef = null;
 
-// Sources that skip opening script and start from practice
-const SKIP_OPENING_SCRIPT_SOURCES = ["login"];
-
 const SCRIPT_FLOW = [
   "openingScript",
   "practice",
@@ -41,16 +38,9 @@ const SCRIPT_FLOW = [
 
 const COUNTED_QUESTION_TYPES = new Set(["filtration", "skillBased"]);
 
-// Dynamic first script based on interview source
-const getFirstScript = (source) => {
-  return SKIP_OPENING_SCRIPT_SOURCES.includes(source)
-    ? "practice"
-    : "openingScript";
-};
-
 // Function to find the first available script with data
-const findFirstAvailableScript = (questionData, interviewSource) => {
-  const scriptFlow = SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource)
+const findFirstAvailableScript = (questionData, shouldSkipOpeningScript = false) => {
+  const scriptFlow = shouldSkipOpeningScript
     ? SCRIPT_FLOW.filter((script) => script !== "openingScript")
     : SCRIPT_FLOW;
 
@@ -117,6 +107,7 @@ const L1Round = () => {
   const [candidateVerified, setCandidateVerified] = useState(Boolean(userId));
   const [isVideoEnded, setIsVideoEnded] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [shouldSkipOpeningScript, setShouldSkipOpeningScript] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [skillQuestionCounter, setSkillQuestionCounter] = useState(0);
   const [isResumed, setIsResumed] = useState(false);
@@ -145,8 +136,11 @@ const L1Round = () => {
   const payloadUserId =
     link_access_type === "privateLink" ? privateUserId : userId ?? "";
   // console.log("Current interview status:", link_access_type);
-  console.log('currentQuestionIndex ::: ', currentQuestionIndex); 
+  // console.log('currentQuestionIndex ::: ', currentQuestionIndex); 
   // Camera activation logic - only turn on camera for skillBased script type
+
+  console.log("currentUser :: ", currentUser);
+  console.log("userId :: ", userId);
   useEffect(() => {
     if (currentScriptType === "skillBased" && forceCameraOn) {
       startStreaming();
@@ -395,6 +389,21 @@ const L1Round = () => {
   ) => {
     try {
       const currentVideo = videoElementsDOM[videoId];
+      
+      // Check if video element exists
+      if (!currentVideo) {
+        console.warn(`Video element ${videoId} not found in videoElementsDOM`);
+        if (loading) setLoading(false);
+        return;
+      }
+      
+      // Check if video has valid source before playing
+      if (!currentVideo.src || currentVideo.src === '' || currentVideo.src === window.location.href) {
+        console.warn(`Video ${videoId} has no valid source, skipping play`);
+        if (loading) setLoading(false);
+        return;
+      }
+      
       currentVideo.style.display = "initial";
       if (aviSmilingImageRef) {
         aviSmilingImageRef.style.width = currentVideo.style.width;
@@ -409,7 +418,13 @@ const L1Round = () => {
       });
 
       setIsVideoEnded(false);
-      currentVideo.play();
+      
+      // Try to play video with error handling
+      currentVideo.play().catch((playError) => {
+        console.warn(`Failed to play video ${videoId}:`, playError);
+        if (loading) setLoading(false);
+      });
+      
       if (loading) setLoading(false);
 
       // only for videos not looping
@@ -477,15 +492,23 @@ const L1Round = () => {
           scriptType === "skillBased" && !!question.lipSyncVideoLink;
         if (!hasVideoLink && !hasLipSyncLink) return;
 
+        const videoSource = scriptType === "skillBased" ? question.lipSyncVideoLink : question.questionVideoLink;
+        
+        // Validate video source before creating video element
+        if (!videoSource || videoSource.trim() === '' || videoSource === window.location.href) {
+          console.warn(`Skipping video with invalid source: ${videoSource}`);
+          return;
+        }
+
         const video = document.createElement("video");
         video.classList.add("preloaded-videos");
-        if (scriptType === "skillBased") video.src = question.lipSyncVideoLink;
-        else video.src = question.questionVideoLink;
+        video.src = videoSource;
 
         // Add looping for specific video scriptTypes
         if (scriptType === "aviSmiling" || scriptType === "aviListening") {
           video.loop = true;
         }
+
 
         // Styles
         video.style.display = "none";
@@ -499,8 +522,9 @@ const L1Round = () => {
         }
 
         // Create a promise for video loading
-        const videoLoadPromise = new Promise((resolve) => {
+        const videoLoadPromise = new Promise((resolve, reject) => {
           video.addEventListener("error", (e) => {
+            console.warn(`Video loading error for ${scriptType}_${question.questionId}:`, e);
             reject(`${scriptType}_${question.questionId}`);
           });
           video.addEventListener("canplaythrough", () => {
@@ -515,13 +539,19 @@ const L1Round = () => {
         videoLoadPromises.push(videoLoadPromise);
       });
 
-      // Wait for all videos to load
-      Promise.all(videoLoadPromises)
-        .then(() => {
+      // Wait for all videos to load (use allSettled to handle individual failures gracefully)
+      Promise.allSettled(videoLoadPromises)
+        .then((results) => {
+          const failedVideos = results
+            .filter(result => result.status === 'rejected')
+            .map(result => result.reason);
+          
+          if (failedVideos.length > 0) {
+            console.warn('Some videos failed to load:', failedVideos);
+          }
+          
+          // Resolve even if some videos failed to load
           resolve();
-        })
-        .catch((error) => {
-          reject(error);
         });
     });
   };
@@ -649,7 +679,7 @@ const L1Round = () => {
 
   // move to next script type
   const handleNextScriptType = async (prevScriptType = currentScriptType) => {
-    const scriptFlow = SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource)
+    const scriptFlow = shouldSkipOpeningScript
       ? SCRIPT_FLOW.filter((script) => script !== "openingScript")
       : SCRIPT_FLOW;
     let nextScriptType = "";
@@ -681,7 +711,7 @@ const L1Round = () => {
 
     // If no next script found, try to find any available script with data
     if (!nextScriptType) {
-      nextScriptType = findFirstAvailableScript(questionData, interviewSource);
+      nextScriptType = findFirstAvailableScript(questionData, shouldSkipOpeningScript);
     }
 
     // Only update if a valid next script type was found
@@ -712,8 +742,8 @@ const L1Round = () => {
       qText.includes("help you with a practice question so")
     ) {
       console.log('Special case: practice question transition');
-      // Skip to practice for sources that skip opening script, otherwise use normal logic
-      if (SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource)) {
+      // Skip to practice if resume status indicates opening script should be skipped, otherwise use normal logic
+      if (shouldSkipOpeningScript) {
         moveToNextQuestion(12, "practice");
       } else {
         moveToNextQuestion(
@@ -888,10 +918,8 @@ const L1Round = () => {
         !!currentQuestion.lipSyncVideoLink;
 
       if (!hasVideoLink && !hasLipSyncLink) {
-        // Use practice script as fallback for sources that skip opening script, otherwise use opening script
-        const fallbackScript = SKIP_OPENING_SCRIPT_SOURCES.includes(
-          interviewSource
-        )
+        // Use practice script as fallback if opening script should be skipped, otherwise use opening script
+        const fallbackScript = shouldSkipOpeningScript
           ? "practice"
           : "openingScript";
         const fallbackQuestion = questionData[fallbackScript]?.[0];
@@ -946,11 +974,11 @@ const L1Round = () => {
       // Find the first available script with data, skipping empty ones
       const initialScript = findFirstAvailableScript(
         questionData,
-        interviewSource
+        shouldSkipOpeningScript
       );
       setCurrentScriptType(initialScript);
     }
-  }, [questionData, interviewSource]);
+  }, [questionData, shouldSkipOpeningScript]);
 
   // when splitview updates
   useEffect(() => {
@@ -1040,22 +1068,26 @@ const L1Round = () => {
         console.log("before l1 round", userInterviewStatus);
         try {
           // Call your API to get the array of IDs
-          const myUserId = localStorage.getItem("myUserId");
-          console.log("local storage data", myUserId);
+          // const myUserId = localStorage.getItem("myUserId");
+          // console.log("local storage data", myUserId);
           const { data: checkResumeStatusData } = await axiosInstance.post(
             `${baseUrl}/job-posting/candidate-interviews/get-resume-status`,
             {
                 interviewId: interviewId,
-                userId: myUserId,
+                userId,
             }
           );
+          
+          // Set the resume status to determine if opening script should be skipped
+          setShouldSkipOpeningScript(checkResumeStatusData.resume || false);
+          
           if (checkResumeStatusData.resume) {
             const { data: apiFilterIds } = await axiosInstance.get(
               `${baseUrl}/job-posting/api/enablex/interview-questions`,
               {
                 params: {
                   interviewId: interviewId,
-                  userId: myUserId,
+                  userId,
                 },
               }
             );
@@ -1081,7 +1113,14 @@ const L1Round = () => {
           // Continue with original data if filtering fails
         }
         console.log("after", filteredSkillBased);
-        await logClientDiagnostics({ setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport });
+        
+        // Log client diagnostics (optional - don't block main functionality if it fails)
+        try {
+          await logClientDiagnostics({ setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport });
+        } catch (diagnosticsError) {
+          console.warn("Client diagnostics failed, continuing with interview:", diagnosticsError);
+        }
+        
         await loadVideosFromArray(data.openingScript, "openingScript");
         await loadVideosFromArray(data.practice, "practice");
         await loadVideosFromArray(data.start, "start");
@@ -1139,16 +1178,16 @@ const L1Round = () => {
     fetchAllQuestions();
   }, []);
 
-  // Set initial script based on interview source
+  // Set initial script based on resume status
   useEffect(() => {
     if (Object.keys(questionData).length > 0) {
       const initialScript = findFirstAvailableScript(
         questionData,
-        interviewSource
+        shouldSkipOpeningScript
       );
       setCurrentScriptType(initialScript);
     }
-  }, [questionData, interviewSource]);
+  }, [questionData, shouldSkipOpeningScript]);
 
   return (
     <>

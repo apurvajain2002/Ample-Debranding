@@ -18,10 +18,9 @@ import aviSmilingImage from "../../../resources/images/aviSmiling.png";
 import EvuemeTextLoader from "../../../components/loaders/evueme-text-loader";
 import { useGlobalContext } from "../../../context";
 import useForceFullscreen from "../../../customHooks/use-force-fullscreen";
-import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
+// import useInterviewDiagnostics from "../../../customHooks/use-interview-diagnostics";
 import { logClientDiagnostics } from "../../../utils/browserCompatibility";
 import useApiWithDiagnostics from "../../../customHooks/use-api-with-diagnostics";
-
 const SMILING_TIMEOUT = 1000 * 5;
 const FILLER_TIMEOUT = 1000 * 2;
 const subscribedStreams = new Map();
@@ -29,19 +28,9 @@ const videoParent = document.getElementById("root");
 let aviSmilingImageRef = null;
 const videoElementsDOM = {};
 
-// Sources that skip opening script and start from practice
-const SKIP_OPENING_SCRIPT_SOURCES = ["login"];
-
-// Dynamic first script based on interview source
-const getFirstScript = (source) => {
-  return SKIP_OPENING_SCRIPT_SOURCES.includes(source)
-    ? "practice"
-    : "openingScript";
-};
-
 // Function to find the first available script with data
-const findFirstAvailableScript = (questionData, interviewSource) => {
-  const scriptFlow = SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource)
+const findFirstAvailableScript = (questionData, shouldSkipOpeningScript = false) => {
+  const scriptFlow = shouldSkipOpeningScript
     ? SCRIPT_FLOW.filter((script) => script !== "openingScript")
     : SCRIPT_FLOW;
 
@@ -80,12 +69,14 @@ const OtherRecRound = () => {
   // useInterviewDiagnostics();
   const location = useLocation();
   const link_access_type = location?.state?.link_access_type;
-  const { privateUserId, interviewSource, setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport } = useGlobalContext();
+  const { privateUserId, interviewSource, setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport,userProfile } = useGlobalContext();
   const { saveCandidateResponse, updateCandidateInterviewStatus } = useApiWithDiagnostics();
   const jobId = useSelector((state) => state.interviewSlice.jobId);
   const roundName = useSelector((state) => state.interviewSlice.roundName);
   const interviewId = useSelector((state) => state.interviewSlice.interviewId);
   const tenantId = useSelector((state) => state.interviewSlice.tenantId);
+const { userId } = useSelector((state) => state.signinSliceReducer);
+
   const currentUser = useSelector(
     (state) => state.signinSliceReducer.currentUser
   );
@@ -98,12 +89,14 @@ const OtherRecRound = () => {
   const { preferredLanguage, userInterviewStatus: reduxUserInterviewStatus } = useSelector(
     (state) => state.interviewSlice
   );
+  console.log("currentUser :: ", currentUser);
+  console.log("userId :: ", userId);
   
   // Get status from URL parameter as fallback if Redux state is not updated yet
   const urlParams = new URLSearchParams(location.search);
   const urlStatus = urlParams.get('status');
   const userInterviewStatus = urlStatus || reduxUserInterviewStatus || 'notstarted';
-  const userId = useSelector((state) => state.signinSliceReducer.userId);
+  // const userId = useSelector((state) => state.signinSliceReducer.userId);
   const navigate = useNavigate();
   const { dynamicErrorMessage, containerRef, startInterviewMonitoring } =
     useForceFullscreen();
@@ -117,6 +110,7 @@ const OtherRecRound = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [mcqQuestionCounter, setMcqQuestionCounter] = useState(0);
   const [totalQuestions, setTotalQuestions] = useState(0);
+  const [shouldSkipOpeningScript, setShouldSkipOpeningScript] = useState(false);
   const [videoLoadError, setVideoLoadError] = useState(false);
   const [isResumed, setIsResumed] = useState(false);
 
@@ -373,6 +367,21 @@ const OtherRecRound = () => {
   ) => {
     try {
       const currentVideo = videoElementsDOM[videoId];
+      
+      // Check if video element exists
+      if (!currentVideo) {
+        console.warn(`Video element ${videoId} not found in videoElementsDOM`);
+        if (loading) setLoading(false);
+        return;
+      }
+      
+      // Check if video has valid source before playing
+      if (!currentVideo.src || currentVideo.src === '' || currentVideo.src === window.location.href) {
+        console.warn(`Video ${videoId} has no valid source, skipping play`);
+        if (loading) setLoading(false);
+        return;
+      }
+      
       currentVideo.style.display = "initial";
       if (aviSmilingImageRef) {
         aviSmilingImageRef.style.width = currentVideo.style.width;
@@ -389,7 +398,12 @@ const OtherRecRound = () => {
       if (videoId !== "aviSmiling" && videoId !== "aviListening")
         setIsVideoEnded(false);
 
-      currentVideo.play();
+      // Try to play video with error handling
+      currentVideo.play().catch((playError) => {
+        console.warn(`Failed to play video ${videoId}:`, playError);
+        if (loading) setLoading(false);
+      });
+      
       if (loading) setLoading(false);
 
       // only for videos not looping
@@ -453,7 +467,10 @@ const OtherRecRound = () => {
         const videoLink =
           question.questionVideoLink || question.lipSyncVideoLink;
         // If video doesn't exist for this question, skip
-        if (!videoLink) return;
+        if (!videoLink || videoLink.trim() === '' || videoLink === window.location.href) {
+          console.warn(`Skipping video with invalid source: ${videoLink}`);
+          return;
+        }
 
         const video = document.createElement("video");
         video.classList.add("preloaded-videos");
@@ -463,6 +480,7 @@ const OtherRecRound = () => {
         if (scriptType === "aviSmiling" || scriptType === "aviListening") {
           video.loop = true;
         }
+
 
         // Styles
         video.style.display = "none";
@@ -476,8 +494,9 @@ const OtherRecRound = () => {
         }
 
         // Create a promise for video loading
-        const videoLoadPromise = new Promise((resolve) => {
+        const videoLoadPromise = new Promise((resolve, reject) => {
           video.addEventListener("error", (e) => {
+            console.warn(`Video loading error for ${scriptType}_${question.questionId}:`, e);
             reject(`${scriptType}_${question.questionId}`);
           });
           video.addEventListener("canplaythrough", () => {
@@ -491,13 +510,19 @@ const OtherRecRound = () => {
         videoLoadPromises.push(videoLoadPromise);
       });
 
-      // Wait for all videos to load
-      Promise.all(videoLoadPromises)
-        .then(() => {
+      // Wait for all videos to load (use allSettled to handle individual failures gracefully)
+      Promise.allSettled(videoLoadPromises)
+        .then((results) => {
+          const failedVideos = results
+            .filter(result => result.status === 'rejected')
+            .map(result => result.reason);
+          
+          if (failedVideos.length > 0) {
+            console.warn('Some videos failed to load:', failedVideos);
+          }
+          
+          // Resolve even if some videos failed to load
           resolve();
-        })
-        .catch((error) => {
-          reject(error);
         });
     });
   };
@@ -607,7 +632,7 @@ const OtherRecRound = () => {
 
   // move to next script type
   const handleNextScriptType = async (prevScriptType = currentScriptType) => {
-    const scriptFlow = SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource)
+    const scriptFlow = shouldSkipOpeningScript
       ? SCRIPT_FLOW.filter((script) => script !== "openingScript")
       : SCRIPT_FLOW;
     let nextScriptType = "";
@@ -641,7 +666,7 @@ const OtherRecRound = () => {
 
     // If no next script found, try to find any available script with data
     if (!nextScriptType) {
-      nextScriptType = findFirstAvailableScript(questionData, interviewSource);
+      nextScriptType = findFirstAvailableScript(questionData, shouldSkipOpeningScript);
     }
 
     // Only update if a valid next script type was found
@@ -665,8 +690,8 @@ const OtherRecRound = () => {
       currentScriptType === "openingScript" &&
       qText.includes("help you with a practice question so")
     ) {
-      // Skip to practice for sources that skip opening script, otherwise use normal logic
-      if (SKIP_OPENING_SCRIPT_SOURCES.includes(interviewSource)) {
+      // Skip to practice if resume status indicates opening script should be skipped, otherwise use normal logic
+      if (shouldSkipOpeningScript) {
         moveToNextQuestion(12, "practice");
       } else {
         moveToNextQuestion(
@@ -818,10 +843,8 @@ const OtherRecRound = () => {
       const videoLink =
         currentQuestion.questionVideoLink || currentQuestion.lipSyncVideoLink;
       if (!videoLink) {
-        // Use practice script as fallback for sources that skip opening script, otherwise use opening script
-        const fallbackScript = SKIP_OPENING_SCRIPT_SOURCES.includes(
-          interviewSource
-        )
+        // Use practice script as fallback if opening script should be skipped, otherwise use opening script
+        const fallbackScript = shouldSkipOpeningScript
           ? "practice"
           : "openingScript";
         const fallbackQuestion = questionData[fallbackScript]?.[0];
@@ -867,11 +890,11 @@ const OtherRecRound = () => {
       // Find the first available script with data, skipping empty ones
       const initialScript = findFirstAvailableScript(
         questionData,
-        interviewSource
+        shouldSkipOpeningScript
       );
       setCurrentScriptType(initialScript);
     }
-  }, [questionData, interviewSource]);
+  }, [questionData, shouldSkipOpeningScript]);
 
   // when splitview updates
   useEffect(() => {
@@ -948,16 +971,20 @@ const OtherRecRound = () => {
             `${baseUrl}/job-posting/candidate-interviews/get-resume-status`,
             {
                 interviewId: interviewId,
-                userId: myUserId,
+                userId,
             }
           );
+          
+          // Set the resume status to determine if opening script should be skipped
+          setShouldSkipOpeningScript(checkResumeStatusData.resume || false);
+          
           if (checkResumeStatusData.resume) {
             const { data: apiFilterIds } = await axiosInstance.get(
               `${baseUrl}/job-posting/api/enablex/interview-questions`,
               {
                 params: {
                   interviewId: interviewId,
-                  userId: myUserId,
+                  userId,
                 },
               }
             );
@@ -983,7 +1010,14 @@ const OtherRecRound = () => {
           // Continue with original data if filtering fails
         }
         console.log("after", filteredSkillBased);
-        await logClientDiagnostics({ setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport });
+        
+        // Log client diagnostics (optional - don't block main functionality if it fails)
+        try {
+          await logClientDiagnostics({ setIpDetails, setBrowserInfo, setDeviceInfo, setFeatureSupport });
+        } catch (diagnosticsError) {
+          console.warn("Client diagnostics failed, continuing with interview:", diagnosticsError);
+        }
+        
         await loadVideosFromArray(data.openingScript, "openingScript");
         await loadVideosFromArray(data.practice, "practice");
         await loadVideosFromArray(data.start, "start");

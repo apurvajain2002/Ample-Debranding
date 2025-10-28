@@ -1,12 +1,17 @@
+import { getHostConfig } from "../utils/getHostConfig";
+
 export const APP_AUTH_BASE_URL = process.env.REACT_APP_APP_API_BASE_URL;
 export const APP_AUTH_URL = process.env.REACT_APP_APP_AUTH_URL;
 
-export const baseUrl = process.env.REACT_APP_APP_API_BASE_URL; // harsh_HSC did this 20 months ago
+// export const baseUrl = process.env.REACT_APP_APP_API_BASE_URL; // harsh_HSC did this 20 months ago
 //export const baseUrl = APP_AUTH_BASE_URL; // my chnages based on 12th 09 stand up call
+
+const { API_BASE_URL } = getHostConfig();
+export const baseUrl = API_BASE_URL;
 
 export const OAUTH = {
   CLIENT_ID: "ev-client-1",
   CLIENT_SECRET: "egov",
   GRANT_TYPE: "authorization_code",
-    REDIRECT_URI: `${window.location.protocol}//${window.location.host}/oauth2/callback`,
+  REDIRECT_URI: `${window.location.protocol}//${window.location.host}/oauth2/callback`,
 };

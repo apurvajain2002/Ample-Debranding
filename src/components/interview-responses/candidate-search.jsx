@@ -39,9 +39,7 @@ const CandidateSearch = ({ l1Jobs = false }) => {
   const tableDataPublished = useSelector(
     (state) => state.createNewJobSliceReducer.tableDataPublished
   );
-  const { userType } = useSelector(
-    (state) => state.signinSliceReducer
-  );
+  const { userType } = useSelector((state) => state.signinSliceReducer);
   const jobId = useSelector((state) => state.createNewJobSliceReducer.jobId);
   const [selectedJobRounds, setSelectedJobRounds] = useState([]);
   const [selectedPlacementAgencies, setSelectedPlacementAgencies] = useState(
@@ -69,23 +67,24 @@ const CandidateSearch = ({ l1Jobs = false }) => {
     selectedRoundId,
     totalQuestionList,
     isViewByApplicant,
-    triggerScore
+    triggerScore,
   } = useSelector((state) => state.interviewResponsesL1DashboardSliceReducer);
 
   console.log("triggerScore ::: ", triggerScore);
 
   const { userId } = useSelector((state) => state.signinSliceReducer);
   const { hostname } = useGlobalContext();
-  const isAdmin = hostname === 'ev' && userType === 'recruiter';
+  const isAdmin = hostname === "app" && userType === "recruiter";
 
   useEffect(() => {
     // Only fetch published jobs if we have a valid userId and user is authenticated
     if (userId) {
-      dispatch(getAllPublishedJob({ showRows: " ", id: userId }))
-        .catch((error) => {
+      dispatch(getAllPublishedJob({ showRows: " ", id: userId })).catch(
+        (error) => {
           console.error("Failed to fetch published jobs:", error);
           // Don't show error toast for initial load failures
-        });
+        }
+      );
     }
   }, [userId]);
 
@@ -97,9 +96,14 @@ const CandidateSearch = ({ l1Jobs = false }) => {
 
       if (selectedJob) {
         if (l1Jobs) {
-          if (selectedJob.interviewRounds?.includes("L1 Hiring Manager Round")) {
+          if (
+            selectedJob.interviewRounds?.includes("L1 Hiring Manager Round")
+          ) {
             setSelectedJobRounds([
-              { label: "L1 Hiring Manager Round", value: "L1 Hiring Manager Round" },
+              {
+                label: "L1 Hiring Manager Round",
+                value: "L1 Hiring Manager Round",
+              },
             ]);
           } else {
             setSelectedJobRounds([]);
@@ -189,11 +193,14 @@ const CandidateSearch = ({ l1Jobs = false }) => {
       const reportLink = "";
 
       // Make API calls sequentially to prevent race conditions
-      await dispatch(fetchCandidateList({ selectedJobId, selectedRoundId, reportLink }));
+      await dispatch(
+        fetchCandidateList({ selectedJobId, selectedRoundId, reportLink })
+      );
 
       const responseType = "video";
-      await dispatch(fetchTotalQuestions({ selectedJobId, selectedRoundId, responseType }));
-
+      await dispatch(
+        fetchTotalQuestions({ selectedJobId, selectedRoundId, responseType })
+      );
     } catch (error) {
       console.error("Error fetching candidate data:", error);
       const errorMessage = error.message || "Failed to fetch candidate data";
@@ -213,23 +220,24 @@ const CandidateSearch = ({ l1Jobs = false }) => {
   const handleLocationChange = (e) => setSelectedLocation(e.target.value);
   const handleRoundChange = (e) => dispatch(setSelectedRoundId(e.target.value));
   const openAiScoreModal = async () => {
-
     if (!selectedJobId || !selectedRoundId) {
       ErrorToast("Please select both Job Position and Interview Round");
       return;
     }
 
-    await dispatch(triggerScoreCalculation({
-      jobId: selectedJobId,
-      interviewRound: selectedRoundId,
-      questionType: '1',
-      candidateStatus: selectedCandidateStatus,
-      placementAgency: selectedPlacementAgency,
-      recruiterName: selectedRecruiter,
-      vacancyLocation: selectedLocation,
-    }));
+    await dispatch(
+      triggerScoreCalculation({
+        jobId: selectedJobId,
+        interviewRound: selectedRoundId,
+        questionType: "1",
+        candidateStatus: selectedCandidateStatus,
+        placementAgency: selectedPlacementAgency,
+        recruiterName: selectedRecruiter,
+        vacancyLocation: selectedLocation,
+      })
+    );
 
-    setIsAiScoreModalOpen(true)
+    setIsAiScoreModalOpen(true);
   };
   const closeAiScoreModal = () => setIsAiScoreModalOpen(false);
 
@@ -240,7 +248,7 @@ const CandidateSearch = ({ l1Jobs = false }) => {
         <div className="col xl6 l6 m6 s6"></div>
         <div
           className="col xl6 l6 m6 s6 right-align search-button"
-        //  style={{paddingRight: 0,marginLeft: "50.6%"}}
+          //  style={{paddingRight: 0,marginLeft: "50.6%"}}
         >
           <a
             className="waves-effect waves-light btn btn-clear btn-submit search-dropdown"
@@ -251,8 +259,9 @@ const CandidateSearch = ({ l1Jobs = false }) => {
         </div>
       </div>
       <div
-        className={`body-box-header mb-15 candidate-body ${isSearchVisible ? "expanded" : "collapsed"
-          }`}
+        className={`body-box-header mb-15 candidate-body ${
+          isSearchVisible ? "expanded" : "collapsed"
+        }`}
         style={{ display: isSearchVisible ? "block" : "none" }}
       >
         <div
@@ -372,32 +381,36 @@ const CandidateSearch = ({ l1Jobs = false }) => {
               </div>
               <div className="input-field col xl3 l3 m3 s3">
                 <div
-                  style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                    alignItems: "flex-start",
+                  }}
                 >
-                  {!isAdmin &&
+                  {!isAdmin && (
                     <a
                       className="waves-effect waves-light btn btn-clear left"
                       onClick={handleOnClickClear}
                     >
                       Clear
                     </a>
-                  }
+                  )}
                   <a
                     className="waves-effect waves-light btn btn-clear btn-submit right"
                     onClick={handleOnClickSubmit}
-                    style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
+                    style={{ cursor: loading ? "not-allowed" : "pointer" }}
                   >
                     {loading ? "Loading..." : "Submit"}
                   </a>
-                  {isAdmin &&
+                  {isAdmin && (
                     <a
                       className="waves-effect waves-light btn btn-clear btn-submit right btnsmall-tr"
                       onClick={openAiScoreModal}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                     >
                       AI Score Prediction
                     </a>
-                  }
+                  )}
                 </div>
               </div>
             </div>
@@ -407,9 +420,12 @@ const CandidateSearch = ({ l1Jobs = false }) => {
       <CustomModal isOpen={isAiScoreModalOpen} onClose={closeAiScoreModal}>
         <div style={{ padding: 16 }}>
           <h5 style={{ marginTop: 0, marginBottom: 12 }}>Getting AI Scores</h5>
-          <p style={{ marginTop: 0, marginBottom: 8 }}>It might take a few minutes</p>
+          <p style={{ marginTop: 0, marginBottom: 8 }}>
+            It might take a few minutes
+          </p>
           <p style={{ marginTop: 0 }}>
-            Don’t worry. You can see the scores once heavy lifting is completed. You can close this window now
+            Don’t worry. You can see the scores once heavy lifting is completed.
+            You can close this window now
           </p>
         </div>
       </CustomModal>

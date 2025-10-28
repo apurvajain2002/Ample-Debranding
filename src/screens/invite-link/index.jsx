@@ -14,9 +14,16 @@ import {
   generateLink,
   generateShortenLink,
 } from "../../redux/actions/invite-candidates";
-import { setCustomLinkGenerated, setMessagesEmpty } from "../../redux/slices/invite-candidates-slice";
+import {
+  setCustomLinkGenerated,
+  setMessagesEmpty,
+} from "../../redux/slices/invite-candidates-slice";
 import { useNavigate } from "react-router-dom";
-import { getAllNotPublishedLateralJobs, getAllNotPublishedJobs, getAllNotPublishedCampusJobs } from "../../redux/actions/define-interview-actions/define-interview-actions";
+import {
+  getAllNotPublishedLateralJobs,
+  getAllNotPublishedJobs,
+  getAllNotPublishedCampusJobs,
+} from "../../redux/actions/define-interview-actions/define-interview-actions";
 import {
   selectJobId,
   setRoundName,
@@ -70,103 +77,117 @@ const InviteLink = () => {
   // Add title and metadata when component mounts
   useEffect(() => {
     // Set page title
-    document.title = 'Your Job Interview Invitation';
+    document.title = "Your Job Interview Invitation";
 
     // Set meta description
     let metaDescription = document.querySelector('meta[name="description"]');
     if (!metaDescription) {
-      metaDescription = document.createElement('meta');
-      metaDescription.name = 'description';
+      metaDescription = document.createElement("meta");
+      metaDescription.name = "description";
       document.head.appendChild(metaDescription);
     }
-    metaDescription.content = 'Click the \'Speak Now\' button to begin. Ms. Avi will explain the company and guide you through your interview. No app, no login, just follow her lead';
+    metaDescription.content =
+      "Click the 'Speak Now' button to begin. Ms. Avi will explain the company and guide you through your interview. No app, no login, just follow her lead";
 
     // Set Open Graph tags for link previews
     const setMetaTag = (property, content) => {
       let meta = document.querySelector(`meta[property="${property}"]`);
       if (!meta) {
-        meta = document.createElement('meta');
-        meta.setAttribute('property', property);
+        meta = document.createElement("meta");
+        meta.setAttribute("property", property);
         document.head.appendChild(meta);
       }
-      meta.setAttribute('content', content);
+      meta.setAttribute("content", content);
     };
 
     // Set Twitter Card tags
     const setTwitterTag = (name, content) => {
       let meta = document.querySelector(`meta[name="${name}"]`);
       if (!meta) {
-        meta = document.createElement('meta');
-        meta.setAttribute('name', name);
+        meta = document.createElement("meta");
+        meta.setAttribute("name", name);
         document.head.appendChild(meta);
       }
-      meta.setAttribute('content', content);
+      meta.setAttribute("content", content);
     };
 
     // Determine if this is a tenant subdomain or main domain
     const hostname = window.location.hostname;
-    const isTenantSubdomain = hostname !== 'ev.evueme.dev';
+    const isTenantSubdomain = hostname !== "app.evueme.live";
 
     // Set dynamic title based on domain
-    let ogTitle = 'Your Job Interview Invitation';
+    let ogTitle = "Your Job Interview Invitation";
     if (isTenantSubdomain) {
-      // Extract entity short name from subdomain (e.g., "company" from "company.ev.evueme.dev")
-      const entityShortName = hostname.split('.')[0];
-      const capitalizedEntityShortName = entityShortName.charAt(0).toUpperCase() + entityShortName.slice(1);
+      // Extract entity short name from subdomain (e.g., "company" from "company.app.evueme.live")
+      const entityShortName = hostname.split(".")[0];
+      const capitalizedEntityShortName =
+        entityShortName.charAt(0).toUpperCase() + entityShortName.slice(1);
       ogTitle = `Interview Invite from ${capitalizedEntityShortName}`;
       document.title = ogTitle;
     }
 
     // Set Open Graph tags
-    setMetaTag('og:title', ogTitle);
-    setMetaTag('og:description', 'Click the \'Speak Now\' button to begin. Ms. Avi will explain the company and guide you through your interview. No app, no login, just follow her lead');
-    setMetaTag('og:type', 'website');
-    setMetaTag('og:url', window.location.href);
+    setMetaTag("og:title", ogTitle);
+    setMetaTag(
+      "og:description",
+      "Click the 'Speak Now' button to begin. Ms. Avi will explain the company and guide you through your interview. No app, no login, just follow her lead"
+    );
+    setMetaTag("og:type", "website");
+    setMetaTag("og:url", window.location.href);
 
     // Set logo and favicon based on domain
     const favicon = document.querySelector('link[rel="icon"]');
     if (isTenantSubdomain) {
       // For tenant subdomains, use tenant logo (you'll need to get this dynamically)
-      setMetaTag('og:image', `${window.location.origin}/tenant-logo.png`);
+      setMetaTag("og:image", `${window.location.origin}/tenant-logo.png`);
       if (favicon) favicon.href = `${window.location.origin}/tenant-logo.png`;
     } else {
       // For main domain, use EvueMe V Logo
-      setMetaTag('og:image', `${window.location.origin}/evueme-logo.png`);
+      setMetaTag("og:image", `${window.location.origin}/evueme-logo.png`);
       if (favicon) favicon.href = `${window.location.origin}/evueme-logo.png`;
     }
 
     // Set Twitter Card tags
-    setTwitterTag('twitter:card', 'summary_large_image');
-    setTwitterTag('twitter:title', ogTitle);
-    setTwitterTag('twitter:description', 'Click the \'Speak Now\' button to begin. Ms. Avi will explain the company and guide you through your interview. No app, no login, just follow her lead');
+    setTwitterTag("twitter:card", "summary_large_image");
+    setTwitterTag("twitter:title", ogTitle);
+    setTwitterTag(
+      "twitter:description",
+      "Click the 'Speak Now' button to begin. Ms. Avi will explain the company and guide you through your interview. No app, no login, just follow her lead"
+    );
 
     if (isTenantSubdomain) {
-      setTwitterTag('twitter:image', `${window.location.origin}/tenant-logo.png`);
+      setTwitterTag(
+        "twitter:image",
+        `${window.location.origin}/tenant-logo.png`
+      );
     } else {
-      setTwitterTag('twitter:image', `${window.location.origin}/evueme-logo.png`);
+      setTwitterTag(
+        "twitter:image",
+        `${window.location.origin}/evueme-logo.png`
+      );
     }
 
     // Cleanup function to restore original title when component unmounts
     return () => {
-      document.title = 'EvueMe App';
+      document.title = "EvueMe App";
 
       // Remove dynamically added meta tags
       const ogTags = document.querySelectorAll('meta[property^="og:"]');
       const twitterTags = document.querySelectorAll('meta[name^="twitter:"]');
 
-      ogTags.forEach(tag => tag.remove());
-      twitterTags.forEach(tag => tag.remove());
+      ogTags.forEach((tag) => tag.remove());
+      twitterTags.forEach((tag) => tag.remove());
 
       // Restore original favicon
       const favicon = document.querySelector('link[rel="icon"]');
-      if (favicon) favicon.href = '/favicon.ico'; // Assuming default is favicon.ico
+      if (favicon) favicon.href = "/favicon.ico"; // Assuming default is favicon.ico
     };
   }, []);
 
   useEffect(() => {
     setTimeout(() => {
       // want title and meta
-      console.log('title and meta ::: ', document);
+      console.log("title and meta ::: ", document);
     }, 5000);
   }, []);
 
@@ -195,8 +216,9 @@ const InviteLink = () => {
   const [inviteInfo, setInviteInfo] = useState(initialInviteState);
   const [customLink, setCustomLink] = useState(customLinkInitialState);
   const [isCustomLinkGenerated, setIsCustomLinkGenerated] = useState(false);
-  const [isCreateLinkButtonClicked, setIsCreateLinkButtonClicked] = useState(false);
-  dispatch(setSelectedCandidateEmailWpInfo(''))
+  const [isCreateLinkButtonClicked, setIsCreateLinkButtonClicked] =
+    useState(false);
+  dispatch(setSelectedCandidateEmailWpInfo(""));
   useEffect(() => {
     setInviteInfo((prev) => {
       return {
@@ -216,7 +238,8 @@ const InviteLink = () => {
       return {
         ...prev,
         // customEditLink: state.customEditLink || state.shortenLink, // previous code
-        customEditLink: state?.customEditLink || state?.generatedLinkState?.shortenLink, // updated to prioritize customEditLink from response
+        customEditLink:
+          state?.customEditLink || state?.generatedLinkState?.shortenLink, // updated to prioritize customEditLink from response
         shortenedInterviewLinkTitle: state.shortenLinkTitle,
       };
     });
@@ -241,11 +264,11 @@ const InviteLink = () => {
 
   useEffect(() => {
     dispatch(setCustomLinkGenerated(false));
-    if (userType === 'manpower') {
+    if (userType === "manpower") {
       dispatch(getAllNotPublishedLateralJobs({ userId }));
       return;
     }
-    if (userType === 'campus') {
+    if (userType === "campus") {
       dispatch(getAllNotPublishedCampusJobs({ userId }));
       return;
     }
@@ -263,7 +286,9 @@ const InviteLink = () => {
     const currentISTTime = getCurrentISTTime();
     const dayAfterTomorrow = new Date();
     dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-    const dayAfterTomorrowIST = new Date(dayAfterTomorrow.getTime() + (5.5 * 60 * 60 * 1000));
+    const dayAfterTomorrowIST = new Date(
+      dayAfterTomorrow.getTime() + 5.5 * 60 * 60 * 1000
+    );
 
     setStartDate({
       day: currentISTTime.day,
@@ -289,9 +314,9 @@ const InviteLink = () => {
       inviteOnly: !inviteInfo.inviteOnly,
     });
 
-    if (!inviteInfo.inviteOnly) {
+   /*  if (!inviteInfo.inviteOnly) {
       navigate("/admin/invite-candidates");
-    }
+    } */
   };
 
   const handleLinkChange = (e) => {
@@ -299,11 +324,14 @@ const InviteLink = () => {
   };
 
   const handleGenerateLink = () => {
+    
     if (!jobId || !roundName) {
       return WarningToast("'Position Name' or 'Round Name' not selected");
     }
     const dateValidity = validateDates(startDate, endDate);
-    const selectedPositionName = allNotPublishedJobs?.find((item) => (item?.jobId == jobId))
+    const selectedPositionName = allNotPublishedJobs?.find(
+      (item) => item?.jobId == jobId
+    );
 
     if (!dateValidity.isValid || isEmpty(startDate) || isEmpty(endDate)) {
       return WarningToast(dateValidity.message);
@@ -362,6 +390,7 @@ const InviteLink = () => {
 
     const startDateTime = new Date(startDateUTC);
     const endDateTime = new Date(endDateUTC);
+    console.log("xxxxxxxxxxxxx---------->>");
 
     dispatch(
       generateLink({
@@ -373,6 +402,11 @@ const InviteLink = () => {
         timeZone: timezone || new Date().toTimeString().substring(9),
       })
     );
+
+    //redirect
+    if (inviteInfo.inviteOnly) {
+      navigate("/admin/invite-candidates");
+    }
   };
 
   useEffect(() => {
@@ -495,15 +529,6 @@ const InviteLink = () => {
   };
 
   useEffect(() => {
-    if (state.successMessage) {
-      SuccessToast(state.successMessage);
-    } else if (state.failMessage) {
-      ErrorToast(state.failMessage);
-    }
-    dispatch(setMessagesEmpty());
-  }, [state.successMessage, state.failMessage]);
-
-  useEffect(() => {
     if (jobId) {
       dispatch(getJob({ jobId: jobId }));
     }
@@ -511,8 +536,15 @@ const InviteLink = () => {
 
   // Auto-set dates when both jobId and roundName are selected
   useEffect(() => {
-    if (jobId && roundName && allNotPublishedJobs && Array.isArray(allNotPublishedJobs)) {
-      const selectedPositionName = allNotPublishedJobs?.find((item) => (item?.jobId == jobId));
+    if (
+      jobId &&
+      roundName &&
+      allNotPublishedJobs &&
+      Array.isArray(allNotPublishedJobs)
+    ) {
+      const selectedPositionName = allNotPublishedJobs?.find(
+        (item) => item?.jobId == jobId
+      );
       if (!selectedPositionName) return;
       const { vacancyStartDate, vacancyClosureDate } = selectedPositionName;
       if (!vacancyStartDate || !vacancyClosureDate) return;
@@ -528,8 +560,11 @@ const InviteLink = () => {
   const handleJobPositionChange = (event) => {
     dispatch(setCustomLinkGenerated(false));
     const { value } = event?.target;
-    if (!value || !allNotPublishedJobs || !Array.isArray(allNotPublishedJobs)) return;
-    const selectedPositionName = allNotPublishedJobs?.find((item) => (item?.jobId == value));
+    if (!value || !allNotPublishedJobs || !Array.isArray(allNotPublishedJobs))
+      return;
+    const selectedPositionName = allNotPublishedJobs?.find(
+      (item) => item?.jobId == value
+    );
     // console.log('selectedPositionName :: ', selectedPositionName)
     if (!selectedPositionName) return;
     const { vacancyStartDate, vacancyClosureDate } = selectedPositionName;
@@ -540,11 +575,10 @@ const InviteLink = () => {
 
     setStartDate(getCurrentAndFutureDate().currentDateParts);
     setEndDate(getCurrentAndFutureDate().futureDateParts);
-  }
+  };
 
   return (
     <>
-
       <div className="right-sidebar">
         <div className="container container-popup">
           <div className="row">
@@ -560,7 +594,7 @@ const InviteLink = () => {
                 )}
                 value={jobId}
                 onChange={(e) => {
-                  handleJobPositionChange(e)
+                  handleJobPositionChange(e);
                   dispatch(selectJobId(e.target.value));
                 }}
               />
@@ -583,7 +617,13 @@ const InviteLink = () => {
               <div className="body-box-body body-bg">
                 <div className="type-header">
                   <span>Type</span>
-                  <i class="material-icons dp48 tooltipped" data-position="top" data-tooltip="Interview type is public or invite only">info</i>
+                  <i
+                    class="material-icons dp48 tooltipped"
+                    data-position="top"
+                    data-tooltip="Interview type is public or invite only"
+                  >
+                    info
+                  </i>
                 </div>
 
                 <div className="row mo-header">
@@ -614,7 +654,7 @@ const InviteLink = () => {
                     </EvuemeModalTrigger>
                     <NormalButton
                       className="btn btn-clear btn-submit"
-                      buttonText={"Generate Link"}
+                      buttonText={inviteInfo.inviteOnly ? "Invite Now" : "Generate Link"}
                       onClick={handleGenerateLink}
                     />
                     {/* {generatedLink && <QRCodeGenerator value={generatedLink} />} */}
@@ -674,10 +714,13 @@ const InviteLink = () => {
                           "Click on generate link to get the invited link"
                         }
                         onChange={(e) => handleLinkChange(e)}
-                        style={{ paddingRight: '30px' }}
+                        style={{ paddingRight: "30px" }}
                       />
                       {generatedLink && (
-                        <QRCodeGenerator value={generatedLink} isCopyIcon={true} />
+                        <QRCodeGenerator
+                          value={generatedLink}
+                          isCopyIcon={true}
+                        />
                       )}
                     </div>
                   </div>

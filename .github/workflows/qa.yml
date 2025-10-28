@@ -1,36 +1,30 @@
-name: QA Deploy
+name: Staging Deploy
 
 on:
   push:
-    branches: [ qa, staging ]
+    branches: [ staging ]
+  pull_request:
+    branches: [ staging ]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Build Docker Image
-      run: docker build -t evuemev4-frontend:staging .
-    
-    - name: Run Tests
-      run: docker run --rm evuemev4-frontend:staging npm test -- --coverage --watchAll=false
-    
-    - name: Security Scan
-      run: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image evuemev4-frontend:staging
-    
-    - name: Deploy to QA
-      run: |
-        docker tag evuemev4-frontend:staging ${{ secrets.DOCKER_REGISTRY }}/evuemev4-frontend:staging
-        echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-        docker push ${{ secrets.DOCKER_REGISTRY }}/evuemev4-frontend:staging
-    
-    - name: Deploy to Kubernetes
-      run: |
-        echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
-        export KUBECONFIG=kubeconfig
-        sed -i 's|evueme/ev-web:latest|${{ secrets.DOCKER_REGISTRY }}/evuemev4-frontend:staging|g' ev-web-deployment.yml
-        sed -i 's|namespace: ev-dev|namespace: ev-qa|g' ev-web-deployment.yml
-        kubectl delete -f ev-web-deployment.yml --ignore-not-found=true
-        kubectl apply -f ev-web-deployment.yml
+      - uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t evuemev4-frontend:staging .
+
+      - name: Deploy to Development
+        run: |
+          docker tag evuemev4-frontend:staging ${{ secrets.DOCKER_REGISTRY }}/evuemev4-frontend:staging
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push ${{ secrets.DOCKER_REGISTRY }}/evuemev4-frontend:staging
+
+      - name: Deploy to Kubernetes
+        run: |
+          echo "${{ secrets.E2E_KUBE_CONFIG }}" > kubeconfig
+          export KUBECONFIG=kubeconfig
+          kubectl delete -f ev-web-deployment-staging.yml --ignore-not-found=true
+          kubectl apply -f ev-web-deployment-staging.yml

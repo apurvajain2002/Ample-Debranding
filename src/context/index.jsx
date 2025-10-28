@@ -20,7 +20,7 @@ export const GlobalContextProvider = ({ children }) => {
     const [privateUserId, setPrivateUserId] = useState("");
     const [interviewJobName, setInterviewJobName] = useState("");
     const [interviewSource, setInterviewSource] = useState("");
-    const hostname = window.location.hostname?.split(".")[0] || 'ev';
+    const hostname = window.location.hostname?.split(".")[0] || 'app';
     const dynamicColorPage = {
         logoUrl: image.brandEvuemeStrategicPartnerLogo,
         primary: '#b99750',
@@ -51,7 +51,7 @@ export const GlobalContextProvider = ({ children }) => {
             interviewSource, setInterviewSource,
             candidatesToInvite, setCandidatesToInvite,
             dynamicColorPage,
-            hostname: hostname === 'localhost' ? 'ev' : hostname,
+            hostname: hostname === 'localhost' ? 'app' : hostname,
             userEditProfilePageYN, setUserEditProfilePageYN,
             ipDetails, setIpDetails,
             browserInfo, setBrowserInfo,

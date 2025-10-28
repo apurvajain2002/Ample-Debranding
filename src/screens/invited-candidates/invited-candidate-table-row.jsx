@@ -133,14 +133,14 @@ const InvitedCandidateTableRow = ({
       state: { candidateInvitation: {...candidateInvitation, interviewRound: round_name} }
     });
   };
-
+  console.log("candidateInvitation :: ", candidateInvitation);
   const {
     candidateInviteId:id,
     whatsappStatus: initialWhatsappStatus = "",
     emailStatus: initialEmailStatus = "",
     emailAddress = "",
     linkOpeningStatus: initialLinkOpeningStatus = "",
-    candidateActionStatus: initialCandidateActionStatus = "",
+    candidateAction = "", //initialCandidateActionStatus = "",
     interviewLink = "",
     mobileNumber = "",
     username = "",
@@ -156,9 +156,9 @@ const InvitedCandidateTableRow = ({
     initialWhatsappStatus || "Sent"
   );
   const [emailStatus, setEmailStatus] = useState(initialEmailStatus || "Sent");
-  const [candidateActionStatus, setCandidateActionStatus] = useState(
+  /* const [candidateActionStatus, setCandidateActionStatus] = useState(
     initialCandidateActionStatus || "start interview"
-  );
+  ); */
   const [linkOpeningStatus, setLinkOpeningStatus] = useState(
     initialLinkOpeningStatus || "Public Link"
   );
@@ -245,8 +245,10 @@ const InvitedCandidateTableRow = ({
     status = status?.replace(/\s+/g, "").toLowerCase().trim();
     if (map === "delivery") return deliveryMap[status]?.icon;
     else if (map === "linkOpening") return linkOpeningMap[status]?.icon;
-    else if (map === "candidateAction")
+    else if (map === "candidateAction"){
+      console.log("getButtonIcons :: candidateAction :: ",candidateActionColorMap[status], status);
       return candidateActionColorMap[status]?.icon;
+    }
     return recruiterActionMap[status]?.icon;
   };
 
@@ -419,12 +421,12 @@ const InvitedCandidateTableRow = ({
           <NormalButton
             buttonTagCssClasses={getButtonClassName(
               "candidateAction",
-              candidateActionStatus
+              candidateAction || "Not Started"
             )}
-            buttonText={candidateActionStatus}
+            buttonText={candidateAction || "Not Started"}
             leftIconSrc={getButtonIcons(
               "candidateAction",
-              candidateActionStatus
+              candidateAction || "Not Started"
             )}
           />
         </td>

@@ -1,5 +1,5 @@
 // Import browser polyfills first to ensure compatibility
-import './utils/browserPolyfills';
+import "./utils/browserPolyfills";
 
 import ReactDOM from "react-dom/client";
 import App from "./app";
