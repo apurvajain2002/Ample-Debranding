@@ -1,49 +1,92 @@
 import { useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import AdminFooter from "../../components/admin/admin-footer/admin-footer";
 import AdminHeader from "../../components/admin/admin-header/admin-header";
 import AdminLeftNavigationMenu from "../../components/admin/admin-left-navigation-menu/admin-left-navigation-menu";
-import AdminFooter from "../../components/admin/admin-footer/admin-footer";
+import ConfirmDeleteModal from "../../components/admin/admin-modals/confirm-delete-modal";
 import SearchModal from "../../components/admin/admin-modals/search-modal";
 import ViewMoreInformationModal from "../../components/admin/admin-modals/view-more-information-modal";
-import ConfirmDeleteModal from "../../components/admin/admin-modals/confirm-delete-modal";
-import ManageRoles from "../role/index";
-import Industry from "../industry/index";
-import DomainSkill from "../domain-skill/index";
-import SoftSkill from "../soft-skill/index";
-import Location from "../location";
-import CreateJob from "../create-new-job";
-import NoRouteFound from "../no-route-found/no-route-found";
-import DefineInterview from "../define-interview";
 import AddQuestions from "../add-questions";
-import ShuffleQuestions from "../shuffle-questions/index";
-import CreateJobDetails from "../job-details/index";
-import InviteLink from "../invite-link";
-import ValidityModal from "../invite-link/validityModal";
-import InviteCandidates from "../invite-candidates";
-import MappingFields from "../invite-candidates/mapping-fields";
+import CandidateScoreSummary from "../candidate-score-summary";
+import CandidateVideoAnswerSummary from "../candidate-video-answer-summary";
+import CreateJob from "../create-new-job";
+import DefineInterview from "../define-interview";
+import DomainSkill from "../domain-skill/index";
 import FeatureTree from "../feature-tree/index";
-import InvitedCandidates from "../invited-candidates";
-import TermsOfUse from "../user-signup-signin/terms-of-use";
+import Industry from "../industry/index";
 import InterviewResponses from "../interview-responses";
 import InterviewResponseRecruiter from "../interview-responses-recruiter";
-import SummaryScores from "../summary-scores/index";
-import CandidateVideoAnswerSummary from "../candidate-video-answer-summary";
-import CandidateScoreSummary from "../candidate-score-summary";
-import UserManagement from "../user-management";
+import InviteCandidates from "../invite-candidates";
+import MappingFields from "../invite-candidates/mapping-fields";
+import InviteLink from "../invite-link";
+import ValidityModal from "../invite-link/validityModal";
+import InvitedCandidates from "../invited-candidates";
+import CreateJobDetails from "../job-details/index";
+import Location from "../location";
+import NoRouteFound from "../no-route-found/no-route-found";
+import ManageRoles from "../role/index";
 import SearchCandidates from "../search-candidates";
 import SearchInterviews from "../search-interviews";
+import ShuffleQuestions from "../shuffle-questions/index";
+import SoftSkill from "../soft-skill/index";
+import SummaryScores from "../summary-scores/index";
+import UserManagement from "../user-management";
+import TermsOfUse from "../user-signup-signin/terms-of-use";
 
 const Admin = () => {
   const [leftNavigationPathname, setLeftNavigationPathname] = useState("");
   const [isSidebarToggled, setSidebarToggled] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [redirecting, setRedirecting] = useState(true);
 
   const toggleSidebar = () => {
     setSidebarToggled((prev) => !prev);
   };
 
+  const { userType } = useSelector(
+    (state) => state.signinSliceReducer
+  );
+
+  // To redirect to first menu option and set same in side nav
   useEffect(() => {
-    setLeftNavigationPathname(window.location.pathname);
-  });
+    const targetPath = getRolesBasedSideMenusPath(userType);
+
+    // Only navigate if we're not already there
+    if (location.pathname !== targetPath) {
+      navigate(targetPath, { replace: true });
+    } else {
+      // Only update state when navigation is complete
+      setLeftNavigationPathname(targetPath);
+      setRedirecting(false);
+    }
+  }, [location.pathname, navigate, setLeftNavigationPathname]);
+
+  
+  const getRolesBasedSideMenusPath = (userType) => {
+    switch (userType) {
+      case 'manpower': return "/admin/dashboard"
+      case 'campus': return "/admin/search-interviews"
+      case 'organization recruiter': return "/admin/invite-link"
+      case 'l1 interviewer':
+      case 'l2 interviewer':
+        return "/admin/scores-by-interview-round"
+      case 'l3 interviewer': return "/admin/candidates-scores-summary"
+      case 'organization admin': return "/admin/user-management"
+      case 'placement agency admin':
+      case 'placement_agency_recruiter':
+        return "/admin/invited-candidates"
+      case 'evueMe support': return "/admin/invited-candidates"
+      case 'campus student coordinator':
+      case 'campus tpo':
+      case 'campus admin':
+        return "/admin/invited-candidates"
+      default: return "/admin/scores-by-interview-round"
+    }
+  }
+
+  if (redirecting) return null;
 
   return (
     <>

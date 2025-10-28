@@ -5,14 +5,16 @@ const UserNav = () => {
   return (
     <div className="leftsidebar leftside-cand">
       <ul className="left-nav left-nav-candidate">
-        <li className="job-position-icon">
+        {/* Will be un-commented afeter dashboard implemented*/}
+        {/* <li className="job-position-icon">
           <Link to="/user/dashboard">
             <i>
               <img src={image.dashboard} alt="" />
             </i>{" "}
             Dashboard
           </Link>
-        </li>
+        </li> */}
+
         <li>
           <Link to="/user/profile">
             <i>
