@@ -7,9 +7,6 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { Provider as ReduxProvider } from "react-redux";
 import store from "./redux/store/store";
 import { GlobalContextProvider } from "./context";
-import { preventBFCacheLogout } from "./utils/preventBFCacheLogout";
-
-preventBFCacheLogout();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
