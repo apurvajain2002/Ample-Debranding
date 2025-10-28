@@ -19,23 +19,28 @@ const AuthComponent = ({ children }) => {
     try {
       setLoading(true);
       dispatch(syncStateWithStorage());
-      
+
       const token =
         localStorage.getItem("e_access_token") ||
         Cookies.get("e_access_token") ||
         accessToken;
 
       if (!token) {
-        navigate("/signin", { replace: true });
+        //navigate("/signin", { replace: true });
+        window.location.replace("/signin");
         return;
       }
-      
+
       if (tncStatus === false) {
         navigate("/admin/terms-of-use");
         return;
       }
-      
-      if ((userType && userType === "candidate") && !location.pathname.startsWith("/user")) {
+
+      if (
+        userType &&
+        userType === "candidate" &&
+        !location.pathname.startsWith("/user")
+      ) {
         navigate("/user", { replace: true });
         return;
       }

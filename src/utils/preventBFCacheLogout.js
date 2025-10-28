@@ -1,27 +1,26 @@
-// src/utils/preventBFCacheLogout.js
-export const preventBFCacheLogout = () => {
-  window.addEventListener("pageshow", (event) => {
-    if (event.persisted) {
-      const hasToken =
-        localStorage.getItem("e_access_token") ||
-        sessionStorage.getItem("e_access_token") ||
-        document.cookie.includes("e_access_token");
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import Cookies from "js-cookie";
 
-      if (!hasToken) {
-        localStorage.clear();
-        sessionStorage.clear();
+export const usePreventBackAfterLogout = () => {
+  const location = useLocation();
 
-        document.cookie.split(";").forEach((c) => {
-          document.cookie = c
-            .replace(/^ +/, "")
-            .replace(
-              /=.*/,
-              "=;expires=" + new Date().toUTCString() + ";path=/"
-            );
-        });
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    const loggedOut = query.get("loggedout");
 
-        window.location.href = "/signin";
-      }
+    if (loggedOut) {
+      Cookies.remove("e_access_token");
+      localStorage.clear();
+      sessionStorage.clear();
+
+      window.history.pushState(null, "", window.location.href);
+      const handlePopState = () => {
+        window.history.pushState(null, "", window.location.href);
+      };
+
+      window.addEventListener("popstate", handlePopState);
+      return () => window.removeEventListener("popstate", handlePopState);
     }
-  });
+  }, [location]);
 };

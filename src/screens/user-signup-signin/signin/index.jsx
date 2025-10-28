@@ -7,10 +7,11 @@ import { OAUTH } from "../../../config/config";
 import { useGlobalContext } from "../../../context";
 import { useDispatch } from "react-redux";
 import { setLogout } from "../../../redux/slices/signin-slice";
-import { APP_AUTH_URL, baseUrl } from "../../../config/config";
 import { getHostConfig } from "../../../utils/getHostConfig";
+import { usePreventBackAfterLogout } from "../../../utils/preventBFCacheLogout";
 
 const SigninPage = () => {
+  usePreventBackAfterLogout();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { accessToken, isLogout } = useSelector(
