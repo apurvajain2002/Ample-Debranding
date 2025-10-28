@@ -238,9 +238,10 @@ const EntitySignupStep3 = ({
 
           img.onload = () => {
             const { width, height } = img;
-
-            if (width / height !== 3) {
-              WarningToast("Please upload the logo in a 3:1 aspect ratio");
+            console.log("width and height------>",width,height);
+            
+            if (width != 144 || height != 48) {
+              WarningToast("Please upload logo in size Width: 144px and Height: 48px");
               e.target.value = "";
               return;
             }
