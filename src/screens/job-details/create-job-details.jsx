@@ -536,12 +536,16 @@ const CreatejobPosition = ({ currentJobDetails }) => {
       setJobPosition({ ...jobPosition, [name]: newValue });
     }
   };
-  const handleRemoveSelectedInterviewRound = (value, name) => {
-    if (name === "interviewRounds") {
+  const handleRemoveSelectedInterviewRound = (key,value) => {
+    // console.log("------>",value,key);
+    
+    if (key === "interviewRounds") {
       // interviewers are stored both in string by name and Number by id
       const ivId = interviewerRounds.find(
         (obj) => `${obj.optionKey}` === value
       );
+      // console.log("ivId------>",ivId);
+      
 
       if (!ivId) return;
 
@@ -1148,7 +1152,7 @@ console.log("positionRes----------->",positionRes);
                   value={jobPosition.interviewRoundsSelect}
                   onChange={handleOnChangeInterviewRound}
                   selectedValues={jobPosition.interviewRoundsSelect}
-                  handleRemoveSelectedValue={handleRemoveSelectedInterviewRound}
+                  handleRemoveMultiValue={handleRemoveSelectedInterviewRound}
                   multiple={true}
                   required={true}
                   missing={error.interviewRoundsSelect}
