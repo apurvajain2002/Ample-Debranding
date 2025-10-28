@@ -2,9 +2,9 @@ name: Development Deploy
 
 on:
   push:
-    branches: [ Development]
+    branches: [ Development, vltz_role_based_menu_options]
   pull_request:
-    branches: [ Development]
+    branches: [ Development, vltz_role_based_menu_options]
 
 jobs:
   build-and-deploy:
