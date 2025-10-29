@@ -48,6 +48,7 @@ const Admin = () => {
   const { userType } = useSelector(
     (state) => state.signinSliceReducer
   );
+  console.log(userType)
 
   // To redirect to first menu option and set same in side nav
   useEffect(() => {
@@ -73,7 +74,7 @@ const Admin = () => {
       case 'l3 interviewer': return "/admin/candidates-scores-summary"
       case 'organization admin': return "/admin/user-management"
       case 'placement agency admin':
-      case 'placement_agency_recruiter':
+      case 'placement agency recruiter':
         return "/admin/invited-candidates"
       case 'evueMe support': return "/admin/invited-candidates"
       case 'campus student coordinator':

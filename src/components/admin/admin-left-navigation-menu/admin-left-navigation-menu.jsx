@@ -25,7 +25,7 @@ const AdminLeftNavigationMenu = ({
       case 'l3 interviewer': return L3InterViewerMenu
       case 'organization admin': return OrganizationAdminMenu
       case 'placement agency admin': return PlacementAgencyAdminMenu
-      case 'placement_agency_recruiter': return PlacementAgencyRecruiterMenu
+      case 'placement agency recruiter': return PlacementAgencyRecruiterMenu
       case 'evueMe support': return EvuemeSupportMenu
       case 'campus student coordinator':
       case 'campus tpo':
