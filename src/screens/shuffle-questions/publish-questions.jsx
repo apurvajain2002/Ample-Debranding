@@ -175,8 +175,9 @@ const PublishQuestions = () => {
             isRoundPublished: data.defineInterviewRounds?.roundPublished??false
           }));
           SuccessToast("Interview published successfully");
+        }else{
+          ErrorToast(data.message);
         }
-        ErrorToast(data.message);
       }, 5000);
 
     } catch (error) {

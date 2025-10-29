@@ -4,7 +4,7 @@ export const questionTypes = [
   // { optionKey: "Filler (F)", optionValue: "filler" },
   { optionKey: "Filtration (FQ)", optionValue: "filtration" },
   { optionKey: "Skill Based (SB)", optionValue: "skillBased" },
-  { optionKey: "Closing Script (CS)", optionValue: "closingScript" },
+  // { optionKey: "Closing Script (CS)", optionValue: "closingScript" },
 ];
 
 export const openingClosingScriptResponseTypes = [
