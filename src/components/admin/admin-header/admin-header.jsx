@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import getUniqueId from "../../../utils/getUniqueId";
 import { capitalize } from "lodash";
 import { useGlobalContext } from "../../../context";
+import { capitalizeEachWord } from "../../../utils/functions";
 import { useLogout } from "../../../customHooks/use-logout";
 
 const headerDropdownList = [
@@ -100,7 +101,7 @@ const AdminHeader = ({ onToggleSidebar }) => {
                       {currentUser}
                       <p>
                         <span>Role:</span>
-                        {capitalize(userType)}
+                        {capitalizeEachWord(userType)}
                       </p>
                     </h6>{" "}
                     {/*  <EvuemeImageTag

@@ -23,8 +23,11 @@ const User = () => {
         <div className="right-sidebar" style={{ paddingLeft: !userEditProfilePageYN ? "75px" : "0px" }}>
           <div className="right-sidebar-main">
             <Routes>
-              <Route path="/*" element={<UserDashboard />} />
-              <Route path="/profile" element={<UserProfile />} />
+
+              {/* Will be un-commented afeter dashboard implemented*/}
+              {/* <Route path="/*" element={<UserDashboard />} /> */}
+              
+              <Route path="/*" element={<UserProfile />} />
               <Route path="/notification" element={<UserNotification />} />
               <Route path="/l1round" element={<L1Round />} />
               <Route path="/interviews" element={<UserInterview />} />
