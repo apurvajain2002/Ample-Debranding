@@ -8,6 +8,7 @@ export const optionMapper = (
   let requiredArray = arr?.map((val) => {
     return { optionKey: val[key], optionValue: val[value] };
   });
+  console.log('requiredArray', requiredArray)
   requiredArray = [
     {
       optionKey: disabledText,

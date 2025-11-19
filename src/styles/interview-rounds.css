@@ -1321,14 +1321,14 @@ textarea.materialize-textarea.valid:focus,
     box-shadow: none;
     border-radius: 5px;
     height: 40px;
-    background: var(--secondary-color);
+    background: #2651A0;
     color: #fff;
     font-weight: 500;
     font-size: 13px;
     text-transform: capitalize;
 }
 .btn-porpel:hover {
-    background: var(--primary-color);
+    background: #377ef9;
     box-shadow: none;
 }
 .template-header label {
@@ -1864,10 +1864,10 @@ textarea.materialize-textarea.valid:focus,
     border-radius: 0;
 }
 .navyblue-btn {
-    background: var(--secondary-color);
+    background: #2651A0;
 }
 .navyblue-btn:hover {
-    background: var(--primary-color);
+    background:#377ef9;
 }
 .inline-pwr p {
     display: inline-block;
@@ -2354,7 +2354,7 @@ table.box-table tr:first-child {
     width: 25px;
     height: 25px;
     margin-right: 10px;
-    background: var(--primary-color);
+    background:  #377ef9;
     text-align: center;
     line-height: 26px;
 }
@@ -2383,7 +2383,7 @@ table.box-table tr:first-child {
     color: #fff;
 }
 .video-speed li a.active {
-    background: var(--primary-color);
+    background:  #377ef9;
     color: #fff;
 }
 .questionnumbercheck {

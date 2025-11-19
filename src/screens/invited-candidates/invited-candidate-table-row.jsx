@@ -127,8 +127,8 @@ const InvitedCandidateTableRow = ({
     dispatch(setIsGetJobsApiCalled(false));
     dispatch(setIsNotPublishedJobsApiCalled(false));
     console.log('candidateInvitation :: ', candidateInvitation);
-    const round_name = candidateInvitation.interviewRound == "Recruiter Round" ? "L1 Hiring Manager Round" : candidateInvitation.interviewRound ;
-
+    // debuggerA
+    const round_name = candidateInvitation.interviewRound == "Recruiter Round" ? candidateInvitation.interviewRound  : "L1 Hiring Manager Round" 
     navigate("/admin/invite-candidates?type=invited-candidates", {
       state: { candidateInvitation: {...candidateInvitation, interviewRound: round_name} }
     });
@@ -468,3 +468,4 @@ const InvitedCandidateTableRow = ({
 };
 
 export default InvitedCandidateTableRow;
+

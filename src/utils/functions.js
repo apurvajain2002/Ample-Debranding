@@ -85,14 +85,47 @@ export const capitalizeEachWord = (str) => {
         .join(' ');
 };
 
-export function generateTemplateOptions(templates) {
+
+// export function generateTemplateOptions(templates) {
+//     const unique = new Map();
+
+//     templates.forEach(({ name }) => {
+//         if (!unique.has(name)) {
+//             unique.set(name, {
+//                 optionKey: capitalizeEachWord(name),
+//                 optionValue: name,
+//             });
+//         }
+//     });
+
+//     return [
+//         { optionKey: "Select Template", optionValue: "" },
+//         ...Array.from(unique.values()),
+//     ];
+// }
+
+
+// working 12:59
+export function generateTemplateOptions(templates = []) {
     const unique = new Map();
 
     templates.forEach(({ name }) => {
-        if (!unique.has(name)) {
-            unique.set(name, {
-                optionKey: capitalizeEachWord(name),
-                optionValue: name,
+        if (!name) return;
+
+        // Remove tabs, newlines, multiple spaces
+        let clean = name
+            .replace(/\s+/g, " ")
+            .replace(/[\u200B-\u200D\uFEFF]/g, "") // invisible chars
+            .trim();
+
+        const normalized = clean.toLowerCase();
+
+        if (!unique.has(normalized)) {
+            const label = capitalizeEachWord(normalized);
+
+            unique.set(normalized, {
+                optionKey: label,
+                optionValue: label,
             });
         }
     });
@@ -102,6 +135,31 @@ export function generateTemplateOptions(templates) {
         ...Array.from(unique.values()),
     ];
 }
+
+// export function generateTemplateOptions(templates) {
+//     const unique = new Map();
+
+//     templates.forEach(({ name }) => {
+//         if (!name) return;
+
+//         // Normalize for uniqueness
+//         const normalized = name.trim().toLowerCase();
+//         if (!unique.has(normalized)) {
+//             console.log('ffffffffffffffffffffffffffff', name, 'fffffffffffffff', capitalizeEachWord(name), 'sssssssssss', normalized)
+//             unique.set(normalized, {
+//                 optionKey: capitalizeEachWord(name),
+//                 optionValue: name,
+//             });
+//         }
+//     });;
+//     console.log('unique', unique);
+//     console.log('...Array.from(unique.values())', ...Array.from(unique.values()))
+//     return [
+//         { optionKey: "Select Template", optionValue: "" },
+//         ...Array.from(unique.values()),
+//     ];
+// }
+
 
 export function getCurrentAndFutureDate() {
     const now = new Date();

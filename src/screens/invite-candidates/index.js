@@ -109,12 +109,10 @@ const InviteCandidates = () => {
     allCombinedTemplates, setAllCombinedTemplates,
     candidatesToInvite, setCandidatesToInvite, hostname
   } = useGlobalContext();
-  
+
   // State to store all templates in merged format (previous behavior)
   const [allTemplatesMerged, setAllTemplatesMerged] = useState([]);
-  
-  console.log("allCombinedTemplates", allCombinedTemplates);
-  console.log("allTemplatesMerged", allTemplatesMerged);
+
 
   const { selectedCandidateEmailWpInfo } = useSelector(
     (state) => state.interviewResponsesRecruiterDashboardSliceReducer
@@ -401,13 +399,15 @@ const InviteCandidates = () => {
     }
   }, [successMessage, failMessage]);
 
+   const [scroePageNavigation,setScroePageNavigation] =useState(false)
+
   useEffect(() => {
     if (location?.state) {
       const { candidateInvitation, candidateInvitations } = location.state;
-      console.log("candidateInvitation------------>,  ::: ", candidateInvitation,);
+      console.log("candidateInvitationss------------>,  ::: ", candidateInvitation,);
       console.log("candidateInvitations------------>,  ::: ", candidateInvitations,);
 
-      // Handle multiple candidates
+      // Handle multiple caandidates
       if (candidateInvitations && Array.isArray(candidateInvitations)) {
         const candidateDetails = candidateInvitations.map(candidate => {
           const { emailAddress, username, mobileNumber, whatsappNumber } = candidate || {};
@@ -417,6 +417,12 @@ const InviteCandidates = () => {
         }).join('\n'); // Join multiple candidates with newlines
 
         setCandidatesToInvite(candidateDetails);
+      //  debugger
+
+            if (candidateInvitations[0]?.pageName) {
+        const isScorePage = candidateInvitations[0]?.pageName === "scroePage";
+        setScroePageNavigation(isScorePage)
+        }
 
         // Handle other properties from the first candidate (if needed)
         if (candidateInvitations[0]?.interviewRound) {
@@ -437,6 +443,11 @@ const InviteCandidates = () => {
         const candidateDetails = emailId.concat(phoneNumber);
         setCandidatesToInvite(candidateDetails);
 
+          if (candidateInvitation?.pageName) {
+        const isScorePage = candidateInvitation?.pageName === "scroePage";
+        setScroePageNavigation(isScorePage)
+        }
+          
         if (candidateInvitation?.interviewRound) {
           dispatch(setRoundName(candidateInvitation?.interviewRound));
         }
@@ -511,39 +522,64 @@ const InviteCandidates = () => {
       dispatch(setInviteCandidateButtonDisable(false));
     }
   }, []);
-
   useEffect(() => {
     document.title = "Invite Candidates";
-    dispatch(getEntity());
-    dispatch(getAllEntities({ url: hostname }));
 
-    if (roundName && currentJobDetails?.hiringType) {
-      const inviteType = currentJobDetails?.hiringType == "Lateral Hiring" ? "invite round 1" : "process invite";
+    const fetchData = async () => {
+      try {
+        await dispatch(getEntity());
+        await dispatch(getAllEntities({ url: hostname }));
 
-      dispatch(
-        fetchTemplateNames({
-          type: "email",
-          hiringType: currentJobDetails.hiringType,
-          interviewRounds: roundName,
-          inviteType
-        })
-      );
-      dispatch(
-        fetchWATemplateNames({
-          type: "whatsapp",
-          hiringType: currentJobDetails.hiringType,
-          interviewRounds: roundName,
-          inviteType
-        })
-      );
-    }
+        const {candidateInvitations:{isShortListFlag}} = location.state
+
+        if (roundName && currentJobDetails?.hiringType) {
+         
+        //  debugger
+          // pageName
+          const inviteType =
+            roundName === "Recruiter Round"
+              ? "invite_round_1"
+              : roundName === "L1 Hiring Manager Round"
+                ? scroePageNavigation
+                  ? "invite_round_2"
+                  : "invite_l1only_round_1"
+                : "process_invite";
+
+          // 
+
+          await dispatch(
+            fetchWATemplateNames({
+              type: "whatsapp",
+              hiringType: currentJobDetails.hiringType,
+              interviewRounds: roundName,
+              inviteType,
+            })
+          );
+
+          await dispatch(
+            fetchTemplateNames({
+              type: "email",
+              hiringType: currentJobDetails.hiringType,
+              interviewRounds: roundName,
+              inviteType,
+            })
+          );
+
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
 
     // Cleanup function to clear template flags when component unmounts
     return () => {
       dispatch(clearIsTemplate());
       dispatch(clearIsTemplateWA());
     };
-  }, [currentJobDetails,roundName, section]);
+  }, [currentJobDetails, roundName, section, dispatch, hostname]);
+
 
   // Call template APIs when currentJobDetails becomes available
   // useEffect(() => {
@@ -620,29 +656,21 @@ const InviteCandidates = () => {
 
   useEffect(() => {
     if (interviewRoundTemplate && templateNames?.length > 0) {
+      console.log("templateWANames", templateWANames)
+      // debuggerA
       const results = formatFileNamesForTemplates(templateNames);
+      const whatsaapResults = formatFileNamesForTemplates(templateWANames);
+
+
       // Store only new templates (replacement behavior)
-      setAllCombinedTemplates(results);
+      setAllCombinedTemplates([...whatsaapResults, ...results]);
       // Store all templates in merged format (previous behavior)
-      setAllTemplatesMerged((prev) =>
-        mergeAndRemoveDuplicates(prev, results)
-      );
+      setAllTemplatesMerged([...whatsaapResults, ...results]);
+
       dispatch(clearIsInterviewRoundTemplate());
     }
-  }, [interviewRoundTemplate, templateNames, dispatch]);
+  }, [interviewRoundTemplate, templateNames, dispatch, templateWANames]);
 
-  useEffect(() => {
-    if (interviewRoundTemplateWA && templateWANames?.length > 0) {
-      const results = formatFileNamesForTemplates(templateWANames);
-      // Store only new templates (replacement behavior)
-      setAllCombinedTemplates(results);
-      // Store all templates in merged format (previous behavior)
-      setAllTemplatesMerged((prev) =>
-        mergeAndRemoveDuplicates(prev, results)
-      );
-      dispatch(clearIsInterviewRoundTemplateWA());
-    }
-  }, [interviewRoundTemplateWA, templateWANames, dispatch]);
 
   // Debug logging for template states
   /* console.log('Template Debug:', {
@@ -776,8 +804,6 @@ const InviteCandidates = () => {
 
     // Find matching templates by name
     const matchingTemplates = allTemplatesMerged?.filter(template => template.name === value);
-    console.log('allCombined Templates', allTemplatesMerged,value);
-    console.log('Matching templates:', matchingTemplates,);
 
     if (matchingTemplates?.length > 0) {
       // Clear existing templates first
@@ -795,8 +821,6 @@ const InviteCandidates = () => {
       // Fetch templates with a small delay to ensure proper state updates
       setTimeout(() => {
         matchingTemplates.forEach(template => {
-          console.log("xxx------------->",template);
-          
           if (template.value.includes("whatsapp")) {
             console.log('Fetching WhatsApp template:', template.value);
             dispatch(fetchWATemplate(template.value));
@@ -905,8 +929,8 @@ const InviteCandidates = () => {
   }
 
   const generateTemplateOption = () => {
+    console.log('ssssssssssssss')
     let res = generateTemplateOptions(allCombinedTemplates)
-    console.log("Original templates:-------------->", res);
 
     // if (pathAfterAdminSubstring == "/invite-candidates") {
     //   console.log("Current hiring type:", currentJobDetails?.hiringType);
@@ -931,6 +955,8 @@ const InviteCandidates = () => {
     //       res = res.filter(item => item.optionValue === "l1 round interview call");
     //     }
     //   }
+    console.log('allCombinedTemplates',res)
+
     return res
   }
 

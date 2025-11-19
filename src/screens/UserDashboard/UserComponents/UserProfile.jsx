@@ -71,7 +71,7 @@ const UserProfile = () => {
           <div className="container">
             <div className="footer-right right">
               <span>Strategic Partner</span>
-              <a href="#" className="logo-main"><img src={rootColor.logoUrl} alt="" /></a>
+              <a href="#" className="logo-main">Hi...<img src={rootColor.logoUrl} alt="" width="80px" /></a>
             </div>
           </div>
         </footer>

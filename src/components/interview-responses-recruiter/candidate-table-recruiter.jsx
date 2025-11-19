@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import EvuemeModalTrigger from "../modals/evueme-modal-trigger";
 import TableComponent from "../table-components/table-component";
-import {  icon, image } from "../assets/assets";
+import { icon, image } from "../assets/assets";
 import AudioPopupModal from "./audio-popup-modal";
 import EvuemeSelectTag from "../evueme-html-tags/evueme-select-tag";
 import InterviewerTextNote from "./interviewerTextNote";
@@ -102,7 +102,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
   const [customSortArray, setCustomSortArray] = useState([]);
   const [filterArray, setFilterArray] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-  
+
 
   const [showModal, setShowModal] = useState(false);
   const audioScoreModalButtonRef = useRef(null);
@@ -113,7 +113,11 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
   const [selectedCandidateId, setSelectedCandidateId] = useState(null);
   const [updatedStatusMap, setUpdatedStatusMap] = useState({});
   const [checkedCandidates, setCheckedCandidates] = useState({});
-  
+
+  // TODO 3
+  // Flag to check if invite or shortlist button is cliked
+  const IS_SHORTLIST_FLAG = useRef(false)
+
   // Debug effect to monitor pageRef
   useEffect(() => {
     console.log("pageRef changed:", pageRef.current);
@@ -215,19 +219,19 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
   const compareValues = useCallback((a, b, sortOrder) => {
     // Convert string sortOrder to boolean for comparison
     const isAscending = sortOrder === "true";
-    
+
     // Handle numeric values
     const numA = parseFloat(a);
     const numB = parseFloat(b);
-    
+
     if (!isNaN(numA) && !isNaN(numB)) {
       return isAscending ? numA - numB : numB - numA;
     }
-    
+
     // Handle string values
     const strA = String(a || "").toLowerCase();
     const strB = String(b || "").toLowerCase();
-    
+
     if (isAscending) {
       return strA.localeCompare(strB);
     } else {
@@ -250,10 +254,10 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
           if (!sortConfig.columnName || !sortConfig.sortByAsc) {
             continue;
           }
-          
+
           const valueA = getColumnValue(a, sortConfig.columnName);
           const valueB = getColumnValue(b, sortConfig.columnName);
-          
+
           const comparison = compareValues(valueA, valueB, sortConfig.sortByAsc);
           if (comparison !== 0) {
             return comparison;
@@ -502,11 +506,11 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
   const paginatedResponses = useMemo(() => {
     // Apply custom sorting to filteredResponses
     const sortedData = applyCustomSorting(filteredResponses || []);
-    
+
     const startIndex = (currentPage - 1) * showRows;
     const endIndex = startIndex + showRows;
     const paginatedData = sortedData.slice(startIndex, endIndex) || [];
-    
+
     return paginatedData;
   }, [filteredResponses, currentPage, showRows, customSortArray]);
 
@@ -538,7 +542,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
         const optIndex = option.charCodeAt(0) - "a".charCodeAt(0);
         return (
           selectedQuestionsMap["filtration"]?.[questionIndex]?.["answers"]?.[
-            optIndex
+          optIndex
           ]?.["optionValue"] ?? "-"
         );
       });
@@ -659,7 +663,11 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
     } else WarningToast("Please check atleast one Candidate");
   };
 
-  const handleInviteNextRound = () => {
+
+// TODO 2
+  const handleInviteNextRound = (isShortlist) => {
+    // Setting btn clicked flag
+    IS_SHORTLIST_FLAG.current = isShortlist
     const arr = [];
     const hasUpdates = Object.values(checkedCandidates).some((bool) => bool);
     if (hasUpdates) {
@@ -741,22 +749,22 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
     console.log("Starting PDF generation...");
     console.log("Current needData state:", needData);
     console.log("Current selectedCandidateId:", selectedCandidateId);
-    
+
     setNeedData(true);
     setIsGeneratingPDF(true);
-    
+
     // Wait for component to render and data to load
     await sleep(3000);
-    
+
     console.log("After initial sleep, checking pageRef...");
     console.log("pageRef:", pageRef);
     console.log("pageRef.current:", pageRef.current);
     console.log("needData after setting:", needData);
-    
+
     let input = pageRef.current;
     let retryCount = 0;
     const maxRetries = 5;
-    
+
     // Retry logic with exponential backoff
     while (!input && retryCount < maxRetries) {
       console.log(`Retry attempt ${retryCount + 1}/${maxRetries}`);
@@ -764,14 +772,14 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
       input = pageRef.current;
       retryCount++;
     }
-    
+
     if (!input) {
       console.error("pageRef.current is still null after all retries. Component may not be rendered.");
       setIsGeneratingPDF(false);
       setNeedData(false);
       return;
     }
-    
+
     console.log("pageRef.current found, proceeding with PDF generation");
     input.style.display = "block";
     input.style.position = "absolute";
@@ -823,7 +831,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
     setIsGeneratingPDFMail(true);
     await sleep(10000);
     const input = pageRef.current;
-    
+
     // Check if pageRef.current exists before accessing its properties
     if (!input) {
       console.error('pageRef.current is null or undefined');
@@ -831,7 +839,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
       setNeedData(false);
       return;
     }
-    
+
     input.style.display = "block";
     input.style.position = "absolute";
     input.style.left = "-9999px";
@@ -954,38 +962,45 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
   // Handle moveToNextRound response
   useEffect(() => {
     console.log('useEffect triggered - Status:', moveToNextRoundStatus, 'Response:', moveToNextRoundResponse);
-    
+
     if (moveToNextRoundStatus === 'succeeded' && moveToNextRoundResponse) {
       console.log('Move to next round successful:', moveToNextRoundResponse);
-      
+
       // Navigate to invite candidates page with the users data
       if (moveToNextRoundResponse.users && moveToNextRoundResponse.users.length > 0) {
         console.log('candidateInvitations :: ', moveToNextRoundResponse.users);
-        
+        // debugger
+        // debuggerA
+        // const inviteType = currentJobDetails?.hiringType == "Lateral Hiring" ? "invite round 1" : "process invite";
+        const inviteType = selectedRoundId == "Recruiter Round" ? "L1 Hiring Manager Round" : selectedRoundId
+
         // Transform the users data to match the expected format
         const candidateInvitations = moveToNextRoundResponse.users.map(user => ({
           emailAddress: user.primaryEmailId,
           username: user.userName,
           mobileNumber: user.mobileNumber1,
           whatsappNumber: user.whatsappNumber,
-          interviewRound: selectedRoundId, // Use the current round ID
+          interviewRound: inviteType, // Use the current round ID
           vacancyLocations: "Multiple locations", // You might want to get this from somewhere
           agencyName: "Multiple agencies", // You might want to get this from somewhere
+          pageName: 'scroePage',
+          isShortListFlag: IS_SHORTLIST_FLAG.current
           // Add any other required fields
         }));
-        
+
         // Set the jobId and roundName in Redux state
         dispatch(selectJobId(selectedJobId));
         dispatch(setRoundName(selectedRoundId));
-        
+
         // Set the flags to trigger the API call
         dispatch(setIsGetJobsApiCalled(false));
         dispatch(setIsNotPublishedJobsApiCalled(false));
-        
+      
+        // TODO 1
         navigate("/admin/invite-candidates?type=invited-candidates", {
           state: { candidateInvitations: candidateInvitations }
         });
-        
+
         // Clear the response state to prevent re-navigation
         dispatch(clearMoveToNextRoundResponse());
       }
@@ -1006,9 +1021,9 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
     <>
       {/* Debug: Move to Next Round Response Status */}
       {moveToNextRoundStatus !== 'idle' && (
-        <div style={{ 
-          padding: '10px', 
-          margin: '10px', 
+        <div style={{
+          padding: '10px',
+          margin: '10px',
           backgroundColor: moveToNextRoundStatus === 'succeeded' ? '#d4edda' : '#f8d7da',
           border: `1px solid ${moveToNextRoundStatus === 'succeeded' ? '#c3e6cb' : '#f5c6cb'}`,
           borderRadius: '4px',
@@ -1017,7 +1032,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
           <strong>Move to Next Round Status:</strong> {moveToNextRoundStatus}
           {moveToNextRoundResponse && (
             <div style={{ marginTop: '5px' }}>
-              <strong>Response:</strong> 
+              <strong>Response:</strong>
               <div style={{ marginTop: '5px', fontSize: '12px', maxHeight: '200px', overflow: 'auto' }}>
                 <pre>{JSON.stringify(moveToNextRoundResponse, null, 2)}</pre>
               </div>
@@ -1035,7 +1050,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
           )}
         </div>
       )}
-      
+
       {filteredResponses?.length !== 0 ? (
         <>
           <div className="right-sidebar candidate-rightwrapper-recruiter">
@@ -1092,12 +1107,12 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                       </button>
                       <button
                         id="rec-table-footer-btn"
-                        onClick={handleInviteNextRound}
+                        onClick={()=>handleInviteNextRound(false)}
                       >
                         Next Round Invite
                       </button>
                       <button id="rec-table-footer-btn"
-                      onClick={handleInviteNextRound}
+                        onClick={()=>handleInviteNextRound(true)}
                       >
                         Inform Next Round Shortlist
                       </button>
@@ -1107,8 +1122,8 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                   {paginatedResponses && paginatedResponses?.length > 0 ? (
                     (paginatedResponses ?? []).map((userData, index) =>
                       selectedQueTypes.length === 3 ||
-                      (selectedQueTypes.includes("audio") &&
-                        selectedQueTypes.includes("video")) ? (
+                        (selectedQueTypes.includes("audio") &&
+                          selectedQueTypes.includes("video")) ? (
                         <tr
                           key={index}
                           onMouseEnter={() =>
@@ -1125,7 +1140,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                 class="filled-in"
                                 checked={
                                   checkedCandidates[
-                                    userData?.["applicant"]?.["id"]
+                                  userData?.["applicant"]?.["id"]
                                   ]
                                 }
                                 onChange={(e) =>
@@ -1167,37 +1182,19 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                   />{" "}
                                   {audioPopupFlag ===
                                     index + "-" + colIndex && (
-                                    <div className="popup audio-top">
-                                      <AudioPopupModal
-                                        audioFile={audioResponse?.["response"]}
-                                        audioPopupClose={(e) =>
-                                          handlePlayPauseClick(
-                                            e,
-                                            audioPopupFlag,
-                                            setAudioPopupFlag,
-                                            index,
-                                            colIndex
-                                          )
-                                        }
-                                        audioTranscriptPopupToggle={(e) =>
-                                          handlePlayPauseClick(
-                                            e,
-                                            audioTranscriptPopupFlag,
-                                            setAudioTranscriptPopupFlag,
-                                            index,
-                                            colIndex
-                                          )
-                                        }
-                                      />
-                                    </div>
-                                  )}
-                                  {audioTranscriptPopupFlag ===
-                                    index + "-" + colIndex && (
-                                    <div className="popup transcript-bottom-wrapper">
-                                      <div className="transcript-bottom-header">
-                                        Transcription{" "}
-                                        <span
-                                          onClick={(e) =>
+                                      <div className="popup audio-top">
+                                        <AudioPopupModal
+                                          audioFile={audioResponse?.["response"]}
+                                          audioPopupClose={(e) =>
+                                            handlePlayPauseClick(
+                                              e,
+                                              audioPopupFlag,
+                                              setAudioPopupFlag,
+                                              index,
+                                              colIndex
+                                            )
+                                          }
+                                          audioTranscriptPopupToggle={(e) =>
                                             handlePlayPauseClick(
                                               e,
                                               audioTranscriptPopupFlag,
@@ -1206,17 +1203,35 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                               colIndex
                                             )
                                           }
-                                        >
-                                          x
-                                        </span>
+                                        />
                                       </div>
-                                      <div className="transcript-bottom-text">
-                                        {audioResponse?.["transcription"]}
-                                      </div>
+                                    )}
+                                  {audioTranscriptPopupFlag ===
+                                    index + "-" + colIndex && (
+                                      <div className="popup transcript-bottom-wrapper">
+                                        <div className="transcript-bottom-header">
+                                          Transcription{" "}
+                                          <span
+                                            onClick={(e) =>
+                                              handlePlayPauseClick(
+                                                e,
+                                                audioTranscriptPopupFlag,
+                                                setAudioTranscriptPopupFlag,
+                                                index,
+                                                colIndex
+                                              )
+                                            }
+                                          >
+                                            x
+                                          </span>
+                                        </div>
+                                        <div className="transcript-bottom-text">
+                                          {audioResponse?.["transcription"]}
+                                        </div>
 
-                                      {}
-                                    </div>
-                                  )}
+                                        { }
+                                      </div>
+                                    )}
                                 </td>
                               )
                             )}
@@ -1239,39 +1254,21 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                   />
                                   {videoPopupFlag ===
                                     index + "-" + colIndex && (
-                                    <div className="popup video-top">
-                                      <VideoPopupModal
-                                        videoUrl={
-                                          videoResponse?.["response"] ?? ""
-                                        }
-                                        videoPopupClose={(e) =>
-                                          handlePlayPauseClick(
-                                            e,
-                                            videoPopupFlag,
-                                            setVideoPopupFlag,
-                                            index,
-                                            colIndex
-                                          )
-                                        }
-                                        videoTranscriptPopupToggle={(e) =>
-                                          handlePlayPauseClick(
-                                            e,
-                                            videoTranscriptPopupFlag,
-                                            setVideoTranscriptPopupFlag,
-                                            index,
-                                            colIndex
-                                          )
-                                        }
-                                      />
-                                    </div>
-                                  )}
-                                  {videoTranscriptPopupFlag ===
-                                    index + "-" + colIndex && (
-                                    <div className="popup transcript-bottom-wrapper">
-                                      <div className="transcript-bottom-header">
-                                        Transcription{" "}
-                                        <span
-                                          onClick={(e) =>
+                                      <div className="popup video-top">
+                                        <VideoPopupModal
+                                          videoUrl={
+                                            videoResponse?.["response"] ?? ""
+                                          }
+                                          videoPopupClose={(e) =>
+                                            handlePlayPauseClick(
+                                              e,
+                                              videoPopupFlag,
+                                              setVideoPopupFlag,
+                                              index,
+                                              colIndex
+                                            )
+                                          }
+                                          videoTranscriptPopupToggle={(e) =>
                                             handlePlayPauseClick(
                                               e,
                                               videoTranscriptPopupFlag,
@@ -1280,15 +1277,33 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                               colIndex
                                             )
                                           }
-                                        >
-                                          x
-                                        </span>
+                                        />
                                       </div>
-                                      <div className="transcript-bottom-text">
-                                        {videoResponse?.["transcription"]}
+                                    )}
+                                  {videoTranscriptPopupFlag ===
+                                    index + "-" + colIndex && (
+                                      <div className="popup transcript-bottom-wrapper">
+                                        <div className="transcript-bottom-header">
+                                          Transcription{" "}
+                                          <span
+                                            onClick={(e) =>
+                                              handlePlayPauseClick(
+                                                e,
+                                                videoTranscriptPopupFlag,
+                                                setVideoTranscriptPopupFlag,
+                                                index,
+                                                colIndex
+                                              )
+                                            }
+                                          >
+                                            x
+                                          </span>
+                                        </div>
+                                        <div className="transcript-bottom-text">
+                                          {videoResponse?.["transcription"]}
+                                        </div>
                                       </div>
-                                    </div>
-                                  )}
+                                    )}
                                 </td>
                               )
                             )}
@@ -1389,7 +1404,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                               <EvuemeSelectTag
                                 value={
                                   updatedStatusMap[
-                                    userData["applicant"]?.["id"]
+                                  userData["applicant"]?.["id"]
                                   ]?.["status"] ??
                                   userData["status"] ??
                                   0
@@ -1398,8 +1413,8 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                   (disableUpdatedStatusCandidates[
                                     userData["applicant"]?.["id"]
                                   ] ??
-                                  userData["published"] ??
-                                  false) || savingRating
+                                    userData["published"] ??
+                                    false) || savingRating
                                 }
                                 // firstOptionDisabled={true}
                                 options={candidateStatusOptions}
@@ -1412,7 +1427,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                   marginTop: '2px',
                                   fontStyle: 'italic'
                                 }}>
-                                
+
                                 </div>
                               )}
                             </div>
@@ -1543,7 +1558,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                       onClick={
                                         handleSendEmailWhatsappCandidates
                                       }
-                                      // onClick={openWpModal}
+                                    // onClick={openWpModal}
                                     >
                                       <i>
                                         <img src={icon.whatsappIconShare} />
@@ -1557,7 +1572,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                       onClick={
                                         handleSendEmailWhatsappCandidates
                                       }
-                                      // onClick={openCandidateEmailModal}
+                                    // onClick={openCandidateEmailModal}
                                     >
                                       <i>
                                         <img src={icon.emailAddressIconShare} />
@@ -1571,7 +1586,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                       className="hover-mobile-no"
                                       contact={
                                         userData["applicant"]?.[
-                                          "mobileNumber1"
+                                        "mobileNumber1"
                                         ] ?? "-"
                                       }
                                     >
@@ -1589,11 +1604,11 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                       ) : (
                         <tr
                           key={index}
-                                                      onMouseEnter={() =>
-                              setSelectedCandidateId(
-                                paginatedResponses[index]?.applicant?.id
-                              )
-                            }
+                          onMouseEnter={() =>
+                            setSelectedCandidateId(
+                              paginatedResponses[index]?.applicant?.id
+                            )
+                          }
                           className="candidate-table-row-rec"
                         >
                           <td className="candidate-checkbox-td">
@@ -1603,7 +1618,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                 class="filled-in"
                                 checked={
                                   checkedCandidates[
-                                    userData?.["applicant"]?.["id"]
+                                  userData?.["applicant"]?.["id"]
                                   ]
                                 }
                                 onChange={(e) =>
@@ -1662,37 +1677,19 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                   />{" "}
                                   {audioPopupFlag ===
                                     index + "-" + colIndex && (
-                                    <div className="popup audio-top">
-                                      <AudioPopupModal
-                                        audioFile={audioResponse?.["response"]}
-                                        audioPopupClose={(e) =>
-                                          handlePlayPauseClick(
-                                            e,
-                                            audioPopupFlag,
-                                            setAudioPopupFlag,
-                                            index,
-                                            colIndex
-                                          )
-                                        }
-                                        audioTranscriptPopupToggle={(e) =>
-                                          handlePlayPauseClick(
-                                            e,
-                                            audioTranscriptPopupFlag,
-                                            setAudioTranscriptPopupFlag,
-                                            index,
-                                            colIndex
-                                          )
-                                        }
-                                      />
-                                    </div>
-                                  )}
-                                  {audioTranscriptPopupFlag ===
-                                    index + "-" + colIndex && (
-                                    <div className="popup transcript-bottom-wrapper">
-                                      <div className="transcript-bottom-header">
-                                        Transcription{" "}
-                                        <span
-                                          onClick={(e) =>
+                                      <div className="popup audio-top">
+                                        <AudioPopupModal
+                                          audioFile={audioResponse?.["response"]}
+                                          audioPopupClose={(e) =>
+                                            handlePlayPauseClick(
+                                              e,
+                                              audioPopupFlag,
+                                              setAudioPopupFlag,
+                                              index,
+                                              colIndex
+                                            )
+                                          }
+                                          audioTranscriptPopupToggle={(e) =>
                                             handlePlayPauseClick(
                                               e,
                                               audioTranscriptPopupFlag,
@@ -1701,17 +1698,35 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                               colIndex
                                             )
                                           }
-                                        >
-                                          x
-                                        </span>
+                                        />
                                       </div>
-                                      <div className="transcript-bottom-text">
-                                        {audioResponse?.["transcription"]}
-                                      </div>
+                                    )}
+                                  {audioTranscriptPopupFlag ===
+                                    index + "-" + colIndex && (
+                                      <div className="popup transcript-bottom-wrapper">
+                                        <div className="transcript-bottom-header">
+                                          Transcription{" "}
+                                          <span
+                                            onClick={(e) =>
+                                              handlePlayPauseClick(
+                                                e,
+                                                audioTranscriptPopupFlag,
+                                                setAudioTranscriptPopupFlag,
+                                                index,
+                                                colIndex
+                                              )
+                                            }
+                                          >
+                                            x
+                                          </span>
+                                        </div>
+                                        <div className="transcript-bottom-text">
+                                          {audioResponse?.["transcription"]}
+                                        </div>
 
-                                      {}
-                                    </div>
-                                  )}
+                                        { }
+                                      </div>
+                                    )}
                                 </td>
                               )
                             )}
@@ -1759,39 +1774,21 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                   />
                                   {videoPopupFlag ===
                                     index + "-" + colIndex && (
-                                    <div className="popup video-top">
-                                      <VideoPopupModal
-                                        videoUrl={
-                                          videoResponse?.["response"] ?? ""
-                                        }
-                                        videoPopupClose={(e) =>
-                                          handlePlayPauseClick(
-                                            e,
-                                            videoPopupFlag,
-                                            setVideoPopupFlag,
-                                            index,
-                                            colIndex
-                                          )
-                                        }
-                                        videoTranscriptPopupToggle={(e) =>
-                                          handlePlayPauseClick(
-                                            e,
-                                            videoTranscriptPopupFlag,
-                                            setVideoTranscriptPopupFlag,
-                                            index,
-                                            colIndex
-                                          )
-                                        }
-                                      />
-                                    </div>
-                                  )}
-                                  {videoTranscriptPopupFlag ===
-                                    index + "-" + colIndex && (
-                                    <div className="popup transcript-bottom-wrapper">
-                                      <div className="transcript-bottom-header">
-                                        Transcription{" "}
-                                        <span
-                                          onClick={(e) =>
+                                      <div className="popup video-top">
+                                        <VideoPopupModal
+                                          videoUrl={
+                                            videoResponse?.["response"] ?? ""
+                                          }
+                                          videoPopupClose={(e) =>
+                                            handlePlayPauseClick(
+                                              e,
+                                              videoPopupFlag,
+                                              setVideoPopupFlag,
+                                              index,
+                                              colIndex
+                                            )
+                                          }
+                                          videoTranscriptPopupToggle={(e) =>
                                             handlePlayPauseClick(
                                               e,
                                               videoTranscriptPopupFlag,
@@ -1800,15 +1797,33 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                               colIndex
                                             )
                                           }
-                                        >
-                                          x
-                                        </span>
+                                        />
                                       </div>
-                                      <div className="transcript-bottom-text">
-                                        {videoResponse?.["transcription"]}
+                                    )}
+                                  {videoTranscriptPopupFlag ===
+                                    index + "-" + colIndex && (
+                                      <div className="popup transcript-bottom-wrapper">
+                                        <div className="transcript-bottom-header">
+                                          Transcription{" "}
+                                          <span
+                                            onClick={(e) =>
+                                              handlePlayPauseClick(
+                                                e,
+                                                videoTranscriptPopupFlag,
+                                                setVideoTranscriptPopupFlag,
+                                                index,
+                                                colIndex
+                                              )
+                                            }
+                                          >
+                                            x
+                                          </span>
+                                        </div>
+                                        <div className="transcript-bottom-text">
+                                          {videoResponse?.["transcription"]}
+                                        </div>
                                       </div>
-                                    </div>
-                                  )}
+                                    )}
                                 </td>
                               )
                             )}
@@ -1829,7 +1844,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                               <EvuemeSelectTag
                                 value={
                                   updatedStatusMap[
-                                    userData["applicant"]?.["id"]
+                                  userData["applicant"]?.["id"]
                                   ]?.["status"] ??
                                   userData["status"] ??
                                   0
@@ -1838,8 +1853,8 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                   (disableUpdatedStatusCandidates[
                                     userData["applicant"]?.["id"]
                                   ] ??
-                                  userData["published"] ??
-                                  false) || savingRating
+                                    userData["published"] ??
+                                    false) || savingRating
                                 }
                                 // firstOptionDisabled={true}
                                 options={candidateStatusOptions}
@@ -1852,7 +1867,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                   marginTop: '2px',
                                   fontStyle: 'italic'
                                 }}>
-                                
+
                                 </div>
                               )}
                             </div>
@@ -1919,7 +1934,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                       {/* <i>
                                         <img src={icon.emailAddressIconShare} />
                                       </i>{" "} */}
-                                       {isGeneratingPDFMail ? (
+                                      {isGeneratingPDFMail ? (
                                         <ClockLoader
                                           size={15}
                                           color={rootColor.primary}
@@ -2008,7 +2023,7 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
                                       className="hover-mobile-no"
                                       contact={
                                         userData["applicant"]?.[
-                                          "mobileNumber1"
+                                        "mobileNumber1"
                                         ] ?? "-"
                                       }
                                     >
@@ -2093,3 +2108,4 @@ const CandidateTableRecruiter = ({ selectedInterviewersInJob }) => {
 };
 
 export default CandidateTableRecruiter;
+

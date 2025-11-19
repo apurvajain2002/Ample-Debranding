@@ -16,10 +16,11 @@
 }
 
 :root {
-  --primary-color: #b99750;
+  --primary-color: #377ef9;
   --secondary-color: #3b0532;
 }
 
+/* --secondary-color: #377ef9; */
 /*
 
 ----------------------------------------------------- Feature tree start -----------------------------------------------------
@@ -914,6 +915,7 @@ h6 {
   padding: 30px 50px 15px;
 }
 
+
 .login-left-header img {
   width: 150px;
 }
@@ -1661,7 +1663,7 @@ textarea.materialize-textarea.validate + label {
 }
 
 .left-nav li.active a {
-  background: var(--primary-color);
+  background: #2651A0;
 }
 
 .left-nav li.active a svg path {
@@ -1675,7 +1677,7 @@ textarea.materialize-textarea.validate + label {
 }
 
 .left-nav li a:hover {
-  background: var(--primary-color);
+  background: #2651A0;
 }
 .left-nav-candidate li a:hover {
   background: none;
@@ -1824,7 +1826,7 @@ i.left {
 }
 
 .btn-clear {
-  background: #aeaeae;
+  background: #e2e2e0 ;
   color: #fff;
   font-weight: 600;
   border-radius: 40px;
@@ -1844,11 +1846,11 @@ i.left {
 
 .btn-clear:hover {
   box-shadow: none;
-  background: var(--primary-color);
+  background: #2651A0 ;
 }
 
 .btn-submit {
-  background: var(--secondary-color);
+  background: #377ef9;
 }
 
 .bginput .select-wrapper input.select-dropdown {
@@ -2065,14 +2067,14 @@ i.left {
 }
 
 .tabs .indicator {
-  background-color: var(--primary-color);
+  background-color: #377ef9;
 }
 
 .btn-porpel {
   box-shadow: none;
   border-radius: 5px;
   height: 40px;
-  background: var(--secondary-color);
+  background: #2651A0;
   color: #fff;
   font-weight: 500;
   font-size: 13px;
@@ -2080,7 +2082,7 @@ i.left {
 }
 
 .btn-porpel:hover {
-  background: var(--primary-color);
+  background: #377ef9;
   box-shadow: none;
 }
 
@@ -2516,7 +2518,7 @@ table tr td {
 }
 
 .top-tab-button .active a {
-  background: var(--secondary-color);
+  background: #377ef9;
   color: #fff;
 }
 
@@ -2733,11 +2735,11 @@ table tr td {
 }
 
 .btnsmall-tr {
-  background: var(--primary-color);
+  background: #377ef9;
 }
 
 .btnsmall-tr:hover {
-  background: var(--secondary-color);
+  background: #2651A0;
 }
 
 .mcq-qs-boxwrap {
@@ -2896,7 +2898,7 @@ table tr td {
 }
 
 .enhance-sectionul li.active a {
-  background: var(--primary-color);
+  background: #377ef9;
   border: 1px solid var(--primary-color);
 }
 
@@ -3407,7 +3409,7 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .btn-save {
-  background-color: var(--secondary-color);
+  background-color: #377ef9;
 }
 
 .candidate-question-i-rec {
@@ -5189,7 +5191,7 @@ textarea.materialize-textarea.valid:focus,
 }
 
 .btn-filter {
-  background: var(--primary-color);
+  background: #377ef9;
   border: 1px solid var(--primary-color);
   font-size: 12px;
   font-weight: 600;
@@ -5204,8 +5206,8 @@ textarea.materialize-textarea.valid:focus,
 }
 
 .btn-filter:hover {
-  background: var(--secondary-color);
-  border: 1px solid #34032c;
+  background: #2651A0;
+  border: 1px solid #2651A0;
   box-shadow: none;
 }
 
@@ -5561,11 +5563,11 @@ nav ul a:hover {
 }
 
 .navyblue-btn {
-  background: var(--secondary-color);
+  background: #2651A0;
 }
 
 .navyblue-btn:hover {
-  background: var(--primary-color);
+  background: #377ef9;
 }
 
 .inline-pwr p {
@@ -6422,7 +6424,7 @@ td {
 .add-city-vacancy-btn {
   cursor: pointer;
   padding: 0.85rem 1rem;
-  background-color: var(--secondary-color);
+  background-color: #377ef9;
   color: rgb(255, 255, 255);
   border-radius: 0px 5px 5px 0px;
   border: none;
@@ -6434,7 +6436,7 @@ td {
   margin-left: 14px;
 }
 .add-city-vacancy-btn:hover {
-  background-color: var(--primary-color);
+  background-color: #2651A0;
   color: #fff;
 }
 
@@ -7203,7 +7205,7 @@ table .moreoutder-wrap {
 .leftside-det .socialbox-ul li a {
   width: 43px;
   height: 43px;
-  background: #f5f5f5;
+  background: #377ef9;
   float: left;
   line-height: 49px;
   text-align: center;
@@ -7941,24 +7943,24 @@ table.box-table tr:first-child {
 }
 
 .linked-in {
-  background: var(--primary-color) url(../resources/images/linkedin-icon.svg) no-repeat
+  background: #377ef9 url(../resources/images/linkedin-icon.svg) no-repeat
     center;
   margin-right: 5px;
 }
 
 .github {
-  background: var(--primary-color) url(../resources/images/github-icon.svg) no-repeat center;
+  background: #377ef9 url(../resources/images/github-icon.svg) no-repeat center;
   margin-right: 5px;
 }
 
 .stackoverflow {
-  background: var(--primary-color) url(../resources/images/logo-stackoverflow.svg) no-repeat
+  background: #377ef9 url(../resources/images/logo-stackoverflow.svg) no-repeat
     center;
   margin-right: 5px;
 }
 
 .resume-ico {
-  background: var(--primary-color) url(../resources/images/user-clipboard-icon.svg) no-repeat
+  background: #377ef9 url(../resources/images/user-clipboard-icon.svg) no-repeat
     center;
 }
 
@@ -8173,7 +8175,7 @@ table.box-table tr:first-child {
 }
 
 .video-speed li a.active {
-  background: var(--primary-color);
+  background: #377ef9;
   color: #fff;
 }
 
@@ -8187,7 +8189,7 @@ table.box-table tr:first-child {
   width: 25px;
   height: 25px;
   margin-right: 10px;
-  background: var(--primary-color);
+  background: #377ef9;
   text-align: center;
   line-height: 26px;
 }
@@ -10896,7 +10898,7 @@ h3 {
     padding-right: 5px;
   }
   .scorebox .avg-goldent {
-    color: #B99750;
+    color: #377ef9;
     margin-bottom: 5px;
   }
   .avgtricolor span {
@@ -11009,7 +11011,7 @@ h3 {
     font-weight: 500;
     margin: 0;
     margin-bottom: 15px;
-    color: #B99750;
+    color: #377ef9;
     padding-left: 0;
   }
   .min-325 {
@@ -11062,7 +11064,7 @@ h3 {
     width: 100%;
     font-size: 13px;
     font-weight: 600;
-    color: #B99750;
+    color: #377ef9;
     margin: 0;
     margin-bottom: 5px;
   }
@@ -11077,7 +11079,7 @@ h3 {
   .play-videoa {
     float: left;
     font-size: 13px;
-    color: #B99750;
+    color: #377ef9;
     font-weight: 600;
     padding: 4px 32px;
     /* background: url(../images-3/play-round.svg) no-repeat 0px 0px; */
@@ -11122,7 +11124,7 @@ h3 {
     float: left;
     width: 100%;
     padding: 10px 0px;
-    border-bottom: 1px solid #B99750;
+    border-bottom: 1px solid #377ef9;
     margin-bottom: 10px;
   }
   .prb-solverwr h3 {
@@ -11149,7 +11151,7 @@ h3 {
     color: #191919;
   }
   .skill-prb-wr h3 span {
-    color: #B99750;
+    color: #377ef9;
   }
   .skill-prb-wr h5 {
     margin: 0;
@@ -11669,7 +11671,7 @@ h3 {
 
 .hm-submit-btn {
   color: white;
-  background-color: var(--primary-color);
+  background-color: #377ef9;
   width: 90%;
   padding: 8px 0px;
   cursor: pointer;
@@ -12412,7 +12414,7 @@ input[type="range"] {
 .workex-header a {
   float: right;
   font-size: 14px;
-  color: #B99750;
+  color: #377ef9;
   font-weight: 600;
 }
 
@@ -12454,7 +12456,7 @@ input[type="range"] {
   margin-bottom: 5px;
 }
 .exbox-wr-right .golden-h3 {
-  color: #B99750;
+  color: #377ef9;
   margin-top: 15px;
 }
 .exbox-wr-right ul {
